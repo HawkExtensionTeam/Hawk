@@ -6,6 +6,6 @@
     "permissions": ["activeTab"],
     "action": {
       "default_popup": "hello.html",
-      "default_icon": "hello_extensions.png"
+      "default_icon": "images/logo128x128.png"
     }
 }
