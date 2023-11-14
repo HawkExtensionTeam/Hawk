@@ -3,7 +3,7 @@
     "name": "To-Do Make",
     "description": "Base Level Extension",
     "version": "1.0",
-    "permissions": ["activeTab"],
+    "permissions": ["activeTab", "storage"],
     "action": {
       "default_popup": "hello.html",
       "default_icon": "images/logo128x128.png"
