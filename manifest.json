@@ -1,11 +1,26 @@
 {
-    "manifest_version": 3,
-    "name": "To-Do Make",
-    "description": "Base Level Extension",
-    "version": "1.0",
-    "permissions": ["activeTab", "storage"],
-    "action": {
-      "default_popup": "hello.html",
-      "default_icon": "images/logo128x128.png"
+  "manifest_version": 3,
+  "name": "To-Do Make",
+  "description": "Base Level Extension",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "hello.html",
+    "default_icon": "images/logo128x128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "popup.js",
+        "popup_jquery.js",
+        "todo_make.js"
+      ]
     }
+  ]
 }
