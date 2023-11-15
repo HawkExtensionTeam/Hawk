@@ -1,9 +1,23 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/Roboto-Regular-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Roboto Medium';
+    src: url('fonts/Roboto-Medium-webfont.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+}
+
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     background-color: white;
     margin: 0;
     min-height: 550x;
-    width: 500px;
+    width: 400px;
     padding: 0;
 }
 
@@ -23,6 +37,34 @@ body {
     padding: 10px;
     border-radius: 18px;
     position: relative;
+}
+
+.button-div {
+	margin-top: 0.8em !important;
+}
+
+.round-override {
+	border-radius: 12px !important; 
+}
+
+.size-1 {
+	margin-top: 0.2em !important;
+	margin-bottom: 0.2em !important;
+	font-size: calc(1.2rem + .9vw);
+}
+
+.light-text {
+	color: #4F4F4F;
+}
+
+.card-header {
+	background-color: #DDDDDD;
+	border-bottom: 0;
+}
+
+.card-title {
+	font-family: Roboto Medium, Arial, sans-serif;
+	font-size: calc(1.25rem + .9vw);
 }
 
 #add-todo-btn {
@@ -64,8 +106,27 @@ body {
 
 #checklist {
     background-color: #DDDDDD;
-    margin-top: 10px;
     padding: 5px;
+}
+
+.card {
+	border: None;
+	background-color: #DDDDDD;
+}
+
+.todo-container {
+	background-color: #DDDDDD;
+	border: None;
+}
+
+.form-check {
+	background-color: #DDDDDD;
+}
+
+.list-group-item {
+	background-color: #DDDDDD;
+	padding: 2px var(--bs-list-group-item-padding-x); 
+	border: None;
 }
 
 #checklist input {
@@ -173,6 +234,10 @@ label {
     margin-left: 8px;
 }
 
+input[type="checkbox"] {
+	background-color: #FFFFFF;
+}
+
 input[type="checkbox"]:checked {
     background-color: #C45500;
     border: 2px solid #C45500;
@@ -182,3 +247,22 @@ input[type="checkbox"]:checked {
 input[type="checkbox"]:checked + label {
     text-decoration: line-through;
 }
+
+#new-tab-button {
+    background-color: #DDDDDD;
+    border: 3px solid #C45500;
+    width: 6vw;
+    height: 6vw;
+    color: #C45500;
+	font-size: 3vw;
+    border-radius: 1.5vw;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
