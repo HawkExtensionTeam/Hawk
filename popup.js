@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
 
             const taskTitle = document.getElementById("taskInput").value;
-            const taskDescription = document.getElementById("taskDescription").value;
-            // const taskDate = document.getElementById("taskDate").value;
-            const taskTime = document.getElementById("taskTime").value;
+            const taskDescription = document.getElementById("descriptionInput").value;
+            const taskDate = document.getElementById("dateInput").value;
+            const taskTime = document.getElementById("timeInput").value;
 
             // require
             if (taskTitle.length > 0 && taskDescription > 0 && taskDate > 0 && taskTime > 0) {
