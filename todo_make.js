@@ -1,11 +1,6 @@
 $(document).ready(function() {
     setTime();
 
-    $("#note").on("click", function() {
-        // Redirect to another HTML page
-        window.location.href = "note.html";
-    });
-
     $("#todoForm").submit(function(event) {
         // prevents default page reload
         event.preventDefault();
