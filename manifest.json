@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "To-Do Make",
   "description": "Base Level Extension",
-  "version": "1.0",
+  "version": "0.2",
   "permissions": [
     "activeTab",
     "storage"
@@ -18,7 +18,8 @@
       ],
       "js": [
         "popup.js",
-        "todo_make.js"
+        "todo_make.js",
+        "note.js"
       ]
     }
   ]
