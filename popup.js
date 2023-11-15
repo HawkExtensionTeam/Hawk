@@ -1,16 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     const currentURL = document.location.href;
-    if (currentURL.includes("new_tab.html")) {
-        setTime();
-    }
 
     document.getElementById("new-tab-button").addEventListener("click", function () {
         chrome.tabs.create({url: "new_tab.html"});
     });
 
     // prevent errors where popup.js is used on a page other than new_tab
-    if (document.getElementById("todoForm")) {
+    if (currentURL.includes("new_tab.html")) {
+        const todoForm = document.getElementById("todoForm");
+        setTime();
         todoForm.addEventListener("submit", function (event) {
             // prevents default page reload
             event.preventDefault();
@@ -21,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const taskTime = document.getElementById("timeInput").value;
 
             // require
-            if (taskTitle.length > 0 && taskDescription > 0 && taskDate > 0 && taskTime > 0) {
+            if (taskTitle !== '' && taskDescription !== '' && taskDate !== '' && taskTime !== '') {
                 chrome.storage.local.get({'tasks': []}, function (result) {
                     // avoid pushing to undefined if there are no previous tasks
                     const existingTasks = result.tasks || [];
