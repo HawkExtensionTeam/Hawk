@@ -248,12 +248,13 @@ input[type="checkbox"]:checked + label {
     text-decoration: line-through;
 }
 
-#newTabButton {
+#new-tab-button {
     background-color: #DDDDDD;
     border: 3px solid #C45500;
     width: 6vw;
     height: 6vw;
     color: #C45500;
+	font-size: 3vw;
     border-radius: 1.5vw;
     font-weight: bold;
     cursor: pointer;
