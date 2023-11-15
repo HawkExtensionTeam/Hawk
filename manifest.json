@@ -18,7 +18,6 @@
       ],
       "js": [
         "popup.js",
-        "popup_jquery.js",
         "todo_make.js"
       ]
     }
