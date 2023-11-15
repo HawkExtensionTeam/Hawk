@@ -17,7 +17,7 @@ body {
     background-color: white;
     margin: 0;
     min-height: 550x;
-    width: 500px;
+    width: 400px;
     padding: 0;
 }
 
@@ -39,8 +39,32 @@ body {
     position: relative;
 }
 
+.button-div {
+	margin-top: 0.8em !important;
+}
+
+.round-override {
+	border-radius: 12px !important; 
+}
+
+.size-1 {
+	margin-top: 0.2em !important;
+	margin-bottom: 0.2em !important;
+	font-size: calc(1.2rem + .9vw);
+}
+
+.light-text {
+	color: #4F4F4F;
+}
+
+.card-header {
+	background-color: #DDDDDD;
+	border-bottom: 0;
+}
+
 .card-title {
 	font-family: Roboto Medium, Arial, sans-serif;
+	font-size: calc(1.25rem + .9vw);
 }
 
 #add-todo-btn {
@@ -82,8 +106,27 @@ body {
 
 #checklist {
     background-color: #DDDDDD;
-    margin-top: 10px;
     padding: 5px;
+}
+
+.card {
+	border: None;
+	background-color: #DDDDDD;
+}
+
+.todo-container {
+	background-color: #DDDDDD;
+	border: None;
+}
+
+.form-check {
+	background-color: #DDDDDD;
+}
+
+.list-group-item {
+	background-color: #DDDDDD;
+	padding: 2px var(--bs-list-group-item-padding-x); 
+	border: None;
 }
 
 #checklist input {
@@ -189,6 +232,10 @@ label {
     font-size: 16px;
     color: #333;
     margin-left: 8px;
+}
+
+input[type="checkbox"] {
+	background-color: #FFFFFF;
 }
 
 input[type="checkbox"]:checked {
