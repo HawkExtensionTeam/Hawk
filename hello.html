@@ -16,28 +16,11 @@
         <div class="card round-override todo-container">
             <div class="card-header round-override d-flex justify-content-between align-items-center">
                 <h2 class="card-title">To-Do List</h2>
-                <p id="newTabButton"></p>
-                <button class="btn btn-primary add-task" id="add-todo-btn">+</button>
+                <p id="new-tab-button">
+				>
+				</p>
             </div>
             <ul class="list-group round-override list-group-flush" id="checklist">
-                <li class="list-group-item">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="item1">
-                        <label class="form-check-label" for="item1">Item 1</label>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="item2">
-                        <label class="form-check-label" for="item2">Item 2</label>
-                    </div>
-                </li>
-                <li class="list-group-item">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="item3">
-                        <label class="form-check-label" for="item3">Item 3</label>
-                    </div>
-                </li>
             </ul>
         </div>
 
@@ -46,7 +29,7 @@
                 &times;
             </div>
             <div class="task-form task-form-modal">
-                <label for="task-input-updated"></label><textarea class="form-control" id="task-input-updated" rows="4" placeholder="Updated Task"></textarea>
+                <textarea class="form-control" id="task-input-updated" rows="4" placeholder="Updated Task"></textarea>
                 <input type="hidden" id="hidden-index-updated">
                 <button class="btn btn-primary add-task" id="update-task-btn">Update</button>
             </div>
@@ -61,7 +44,7 @@
         <div class="card round-override">
             <div class="card-header round-override">
                 <h2 class="text-center size-1 my-auto">Open Notebook</h2>
-                <button class="btn btn-outline-primary primary-outline-btn"></button>
+                <button class="btn btn-outline-primary" id="primary-outline-btn">></button>
             </div>
         </div>
     </div>
@@ -69,20 +52,21 @@
         <div class="card round-override">
             <div class="card-header round-override">
                 <h2 class="text-center size-1 my-auto">View Indexing</h2>
-                <button class="btn btn-outline-primary primary-outline-btn"></button>
+                <button class="btn btn-outline-primary" id="primary-outline-btn">></button>
             </div>
         </div>
-    </div>/home/niox
+    </div>
     <div class="container mt-3">
         <div class="card-body">
             <hr> 
-            <h2 class="text-center light-text mb-3">Manage Settings</h2>
+            <h4 class="text-center light-text mb-3">Manage Settings</h2>
         </div>
     </div>
 
     <script src="handleTabKey.js"></script>
+    <script src="jquery-3.7.1.min.js"></script>
     <script src="popup.js"></script>
-    
+    <script src="popup_jquery.js"></script>
     <script src="assets/bootstrap.min.js"></script>
 
 </body>
