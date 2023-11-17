@@ -5,7 +5,8 @@
   "version": "1.0",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ],
   "action": {
     "default_popup": "hello.html",
