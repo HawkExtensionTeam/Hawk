@@ -15,9 +15,8 @@ $(document).ready(function() {
                 console.log(existingTasks[i]);
                 $("#checklist").append('<li class="list-group-item"> <div class="form-check">' +
                     '<input type="checkbox" class="form-check-input" id="item1">' +
-                    '<label class="form-check-label" for="item1">' + existingTasks[i] + '</label>' +
-                    '</div>' +
-                    '</li>');
+                    ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item1">' + existingTasks[i] + '</label>' +
+                    '<label class="form-check-label" for="item1">' + 'DATE, TIME' + '</label>' + '</div> </div>' + '</div>' + '</li>');
             }
         }
     })
