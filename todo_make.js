@@ -34,10 +34,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             (dateObject.getMonth() + 1) + "/" +
             dateObject.getFullYear();
 
-        const time =
-            dateObject.getHours() + ":" +
-            dateObject.getMinutes() + ":" +
-            dateObject.getSeconds();
+    const time =
+        dateObject.getHours() + ":" +
+        dateObject.getMinutes() + ":" +
+        dateObject.getSeconds();
 
         // Set the default value using jQuery
         $("#timeInput").val(time);
