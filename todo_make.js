@@ -28,7 +28,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                     } else {
                         taskId = '1';
                     }
-                    // don't sync with other machines - extension is local
+                    // don't sync with other machines - extension is local    
                     chrome.storage.local.set({'tasks': existingTasks}, function () {
                         console.log('existingTasks', existingTasks);
                         console.log('newTask', taskTitle);
