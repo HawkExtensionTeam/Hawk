@@ -11,12 +11,23 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const taskDate = $("#dateInput").val();
             const taskTime = $("#timeInput").val();
 
-            // require
+            for (taskData in [taskTitle, taskDescription, taskDate, taskTime]) {
+                if (taskData === '') return;
+            }
+
+            const date = new Date(taskDate);
+            if (date.toString === 'Invalid Date') return;
+
             if (taskTitle !== '' && taskDescription !== '' && taskDate !== '' && taskTime !== '') {
                 chrome.storage.local.get({'tasks': []}, function (result) {
-                    // avoid pushing to undefined if there are no previous tasks
                     const existingTasks = result.tasks || [];
-                    existingTasks.push(taskTitle);
+                    let taskId;
+                    if (existingTasks.length > 0) {
+                        pastTaskIds = Object.keys(existingTasks);
+                        taskId = (Number(pastTaskIds[pastTaskIds.length-1]) + 1).toString();
+                    } else {
+                        taskId = '1';
+                    }
                     // don't sync with other machines - extension is local
                     chrome.storage.local.set({'tasks': existingTasks}, function () {
                         console.log('existingTasks', existingTasks);
@@ -30,14 +41,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     function setTime() {
         const dateObject = new Date();
         const date =
-            dateObject.getDate() + "/" +
+        dateObject.getFullYear() + "/" +
             (dateObject.getMonth() + 1) + "/" +
-            dateObject.getFullYear();
+            dateObject.getDate();
 
     const time =
         dateObject.getHours() + ":" +
-        dateObject.getMinutes() + ":" +
-        dateObject.getSeconds();
+        dateObject.getMinutes();
 
         // Set the default value using jQuery
         $("#timeInput").val(time);
