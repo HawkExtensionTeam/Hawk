@@ -28,6 +28,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                     } else {
                         taskId = '1';
                     }
+                    // store as array for now
+                    existingTasks.push({taskId: [taskTitle, taskDescription, taskDate, taskTime]})
                     // don't sync with other machines - extension is local    
                     chrome.storage.local.set({'tasks': existingTasks}, function () {
                         console.log('existingTasks', existingTasks);
