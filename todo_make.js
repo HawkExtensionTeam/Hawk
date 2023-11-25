@@ -1,6 +1,10 @@
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $(document).ready(function () {
         setTime();
+        get_tasks();
+        $("#new-task-button").click(function () {
+            $("#todoForm").toggle();
+        });
 
         $("#todoForm").submit(function (event) {
             // prevents default page reload
@@ -75,5 +79,33 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         // Set the default value using jQuery
         $("#timeInput").val(time);
         $("#dateInput").val(date);
+    }
+
+    function get_tasks() {
+        chrome.storage.local.get({ 'tasks': [] }, function(result) {
+            const existingTasks = result.tasks || [];
+
+            if (existingTasks.length === 0) {
+                $("#checklist").append('<h1>There are no tasks!</h1>');
+            } else {
+                updateChecklist(existingTasks);
+            }
+        });
+    }
+
+    function updateChecklist(tasks) {
+        $("#checklist").empty(); // Clear existing items
+
+        tasks.forEach(function(task) {
+            const dueDate = new Date(task.due);
+            const formattedDueDate = dueDate.toLocaleString();
+
+            $("#checklist").append(
+                '<li class="list-group-item"> <div class="form-check">' +
+                '<input type="checkbox" class="form-check-input" id="item' + task.id + '">' +
+                ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + task.id + '">' + task.title + '</label>' +
+                '<label class="form-check-label" for="item' + task.id + '">' + formattedDueDate + '</label>' + '</div> </div>' + '</div>' + '</li>'
+            );
+        });
     }
 }

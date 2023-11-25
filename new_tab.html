@@ -1,45 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <link rel="stylesheet" href="assets/bootstrap.min.css">
     <link rel="stylesheet" href="assets/style.css"> 
     <title>New Tab To-Do</title>
-    <h2 class="card-title">To-Do List</h2>
-  </head>
-  <body>
+</head>
+<body class="d-flex justify-content-center align-items-center"> <!-- Center content -->
 
-    <form id="new-tab-form">
-      <div class="form-group">
-          <label>
-              <input type="checkbox"> Task:
-              <input type="text" id="newTaskInput" name="newTaskInput" class="new-task-input" required>
-          </label>
-      </div>
-      <div class="form-group">
-          <label>
-              <input type="checkbox"> Description:
-              <input type="text" id="newDescriptionInput" name="newDescriptionInput" class="new-description-input" required>
-          </label>
-      </div>
-      <div class="form-group">
-          <label>
-              <input type="checkbox"> Date:
-              <input type="text" id="newDateInput" name="newDateInput" required>
-          </label>
-      </div>
-      <div class="form-group">
-          <label>
-              <input type="checkbox"> Time:
-              <input type="text" id="newTimeInput" name="newTimeInput" required>
-          </label>
-      </div>
-      <button type="submit">Save</button>
-      <button type="button"> Open to do</button>
-  </form>
-</div>
-</div>
+    <div class="container mt-5" id = "to-do-list-main">
+        <div class="row">
+            <div class="col-6">
+                <h2 class="card-title">To-Do List</h2>
+            </div>
+            <div class="col-6">
+                <img src="images/add_icon_circle.png" alt="New Tab" id="new-task-button">
+            </div>
+        </div>
+        <ul class="list-group round-override list-group-flush" id="checklist">
+        </ul>
+        <div class="task-list" id="task-list">
+        </div>
+        <form id="todoForm" style="display: none;">
+            <div class="form-group">
+                <label for="taskInput">Task Title</label>
+                <input type="text" class="form-control" id="taskInput" placeholder="Enter task title" required>
+            </div>
+            <div class="form-group">
+                <label for="descriptionInput">Task Description</label>
+                <textarea class="form-control" id="descriptionInput" rows="3" placeholder="Enter task description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="dateInput">Due Date</label>
+                <input type="text" class="form-control" id="dateInput" placeholder="YYYY/MM/DD" required>
+            </div>
+            <div class="form-group">
+                <label for="timeInput">Due Time</label>
+                <input type="text" class="form-control" id="timeInput" placeholder="HH:MM" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+    </div>
+
     <script src="jquery-3.7.1.min.js"></script>
     <script src="todo_make.js"></script>
     <script src="assets/bootstrap.min.js"></script>
+
 </body>
 </html>

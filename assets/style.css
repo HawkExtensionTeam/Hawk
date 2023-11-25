@@ -269,14 +269,19 @@ input[type="checkbox"]:checked + label {
     align-items: center;
 
 }
-#new-tab-form {
+#todoForm {
     background-color: #DDDDDD; 
-    padding: 15px;
     border-radius: 10px;
     
 }
 
 .form-group {
     margin-bottom: 15px;
+}
+
+#new-task-button {
+    width: 35px;
+    height:35px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
