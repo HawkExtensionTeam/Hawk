@@ -269,4 +269,14 @@ input[type="checkbox"]:checked + label {
     align-items: center;
 
 }
+#new-tab-form {
+    background-color: #DDDDDD; 
+    padding: 15px;
+    border-radius: 10px;
+    
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
 

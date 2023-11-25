@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<link rel="stylesheet" href="assets/bootstrap.min.css">
-    <title>To-Do Make</title>
+    <link rel="stylesheet" href="assets/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/style.css"> 
+    <title>New Tab To-Do</title>
+    <h2 class="card-title">To-Do List</h2>
   </head>
   <body>
-    <form id="todoForm">
-      <label for="taskInput">Task:</label>
-      <input type="text" id="taskInput" name="taskInput" required>
-      <label for="descriptionInput">Description:</label>
-      <input type="text" id="descriptionInput" name="descriptionInput" required>
-      <label for="dateInput">Date:</label>
-      <input type="text" id="dateInput" name="dateInput" required>
-      <label for="timeInput">Time:</label>
-      <input type="text" id="timeInput" name="timeInput" required>
+
+    <form id="new-tab-form">
+      <div class="form-group">
+          <label>
+              <input type="checkbox"> Task:
+              <input type="text" id="newTaskInput" name="newTaskInput" class="new-task-input" required>
+          </label>
+      </div>
+      <div class="form-group">
+          <label>
+              <input type="checkbox"> Description:
+              <input type="text" id="newDescriptionInput" name="newDescriptionInput" class="new-description-input" required>
+          </label>
+      </div>
+      <div class="form-group">
+          <label>
+              <input type="checkbox"> Date:
+              <input type="text" id="newDateInput" name="newDateInput" required>
+          </label>
+      </div>
+      <div class="form-group">
+          <label>
+              <input type="checkbox"> Time:
+              <input type="text" id="newTimeInput" name="newTimeInput" required>
+          </label>
+      </div>
       <button type="submit">Save</button>
-    </form>
-    <h1>To-Do Make</h1>
-    <input type="button" id="new-tab-button" value="Open to-do">
+      <button type="button"> Open to do</button>
+  </form>
+</div>
+</div>
     <script src="jquery-3.7.1.min.js"></script>
     <script src="todo_make.js"></script>
-	<script src="assets/bootstrap.min.js"></script>
-  </body>
+    <script src="assets/bootstrap.min.js"></script>
+</body>
 </html>
