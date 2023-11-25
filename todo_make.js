@@ -6,37 +6,58 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             // prevents default page reload
             event.preventDefault();
 
-            const taskTitle = $("#taskInput").val();
-            const taskDescription = $("#descriptionInput").val();
-            const taskDate = $("#dateInput").val();
-            const taskTime = $("#timeInput").val();
+            const taskTitle = $("#taskInput").val().trim();
+            const taskDescription = $("#descriptionInput").val().trim();
+            const taskDate = $("#dateInput").val().trim();
+            const taskTime = $("#timeInput").val().trim();
 
-            for (taskData in [taskTitle, taskDescription, taskDate, taskTime]) {
+            for (const taskData of [taskTitle, taskDescription, taskDate, taskTime]) {
                 if (taskData === '') return;
             }
 
-            const date = new Date(taskDate);
-            if (date.toString === 'Invalid Date') return;
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!timeRegex.test(taskTime)) return;
 
-            if (taskTitle !== '' && taskDescription !== '' && taskDate !== '' && taskTime !== '') {
-                chrome.storage.local.get({'tasks': []}, function (result) {
-                    const existingTasks = result.tasks || [];
-                    let taskId;
-                    if (existingTasks.length > 0) {
-                        pastTaskIds = Object.keys(existingTasks);
-                        taskId = (Number(pastTaskIds[pastTaskIds.length-1]) + 1).toString();
-                    } else {
-                        taskId = '1';
-                    }
-                    // store as array for now
-                    existingTasks.push({taskId: [taskTitle, taskDescription, taskDate, taskTime]})
-                    // don't sync with other machines - extension is local    
-                    chrome.storage.local.set({'tasks': existingTasks}, function () {
-                        console.log('existingTasks', existingTasks);
-                        console.log('newTask', taskTitle);
-                    });
+            const [hoursStr, minutesStr] = taskTime.split(':');
+            const hours = parseInt(hoursStr);
+            const minutes = parseInt(minutesStr);
+
+            const dateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+            if (!dateRegex.test(taskDate)) return;
+
+            const [yearsStr, monthsStr, daysStr] = taskDate.split('/');
+            const years = parseInt(yearsStr);
+            const months = parseInt(monthsStr);
+            const days = parseInt(daysStr);
+
+            // months start from 0
+            const dueDate = new Date(years, months-1, days, hours, minutes, 0);
+            if (dueDate.toString === 'Invalid Date') return;
+
+            chrome.storage.local.get({'tasks': {}}, function (result) {
+                const existingTasks = result.tasks || {};
+
+                let taskId;
+                if (Object.keys(existingTasks).length > 0) {
+                    pastTaskIds = Object.keys(existingTasks);
+                    taskId = (Number(pastTaskIds[pastTaskIds.length-1]) + 1).toString();
+                } else {
+                    taskId = '1';
+                }
+
+                existingTasks[taskId] = {
+                    'title': taskTitle,
+                    'description': taskDescription,
+                    // ISO strings are consistent between JS engines
+                    'due': dueDate.toISOString(),
+                };
+
+                // don't sync with other machines - extension is local    
+                chrome.storage.local.set({'tasks': existingTasks}, function () {
+                    console.log('existingTasks', existingTasks);
+                    console.log('newTask', taskTitle);
                 });
-            }
+            });
         });
     });
 
