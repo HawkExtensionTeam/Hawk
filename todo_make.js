@@ -114,4 +114,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             );
         };
     }
+
+    function deleteTask(allTasks, taskId) {
+        delete allTasks[taskId];
+        chrome.storage.local.set({'tasks': allTasks}, function () {
+            console.log('allTasks', allTasks);
+            updateChecklist(existingTasks);
+        });
+    }
 }
