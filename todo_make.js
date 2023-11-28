@@ -98,31 +98,30 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     function get_tasks() {
         chrome.storage.local.get({ 'tasks': [] }, function(result) {
             const existingTasks = result.tasks || [];
-
-            if (Object.keys(existingTasks).length === 0) {
-                $("#checklist").append('<h1>There are no tasks!</h1>');
-            } else {
-                updateChecklist(existingTasks);
-            }
+            updateChecklist(existingTasks);
         });
     }
 
     function updateChecklist(tasks) {
         $("#checklist").empty(); // Clear existing items
+		if (Object.keys(tasks).length === 0) {
+			$("#checklist").append('<h1>There are no tasks!</h1>');
+		}
+		else {
+			for (const taskId in tasks) {
+				const task = tasks[taskId];
+				const dueDate = new Date(task.due);
+				const formattedDueDate = dueDate.toLocaleString();
 
-        for (const taskId in tasks) {
-            const task = tasks[taskId];
-            const dueDate = new Date(task.due);
-            const formattedDueDate = dueDate.toLocaleString();
-
-            $("#checklist").append(
-                '<li class="list-group-item"> <div class="form-check">' +
-                '<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
-                ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
-                '<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' +
-				'</div> </div>' + '</div>' + '</li>'
-            );
-        };
+				$("#checklist").append(
+					'<li class="list-group-item"> <div class="form-check">' +
+					'<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
+					' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
+					'<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' +
+					'</div> </div>' + '</div>' + '</li>'
+				);
+			};
+		}
     }
 
     function deleteTask(allTasks, taskId) {
