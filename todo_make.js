@@ -60,6 +60,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 chrome.storage.local.set({'tasks': existingTasks}, function () {
                     console.log('existingTasks', existingTasks);
                     console.log('newTask', taskTitle);
+                    updateChecklist(existingTasks);
                 });
             });
         });
