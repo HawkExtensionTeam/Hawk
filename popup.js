@@ -6,7 +6,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         chrome.storage.local.get({ 'tasks': [] }, function(result) {
             // avoid pushing to undefined if there are no previous tasks
             const existingTasks = result.tasks || [];
-            if (existingTasks.length === 0) {
+            if (Object.keys(existingTasks).length === 0) {
                 $("#checklist").append('<h1>There are no tasks!</h1>');
             }
             else {

@@ -5,6 +5,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         $("#new-task-button").click(function () {
             $("#todoForm").toggle();
         });
+		
+		$(document).on('click', '.btn.btn-danger.delete-btn', function(event) {
+			console.log("WOW");
+			var $delBtn = $(event.currentTarget);
+			chrome.storage.local.get({'tasks': {}}, function (result) {
+				const existingTasks = result.tasks || {};
+				deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
+			});
+		});
 
         $("#todoForm").submit(function (event) {
             // prevents default page reload
@@ -90,7 +99,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         chrome.storage.local.get({ 'tasks': [] }, function(result) {
             const existingTasks = result.tasks || [];
 
-            if (existingTasks.length === 0) {
+            if (Object.keys(existingTasks).length === 0) {
                 $("#checklist").append('<h1>There are no tasks!</h1>');
             } else {
                 updateChecklist(existingTasks);
@@ -108,9 +117,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
             $("#checklist").append(
                 '<li class="list-group-item"> <div class="form-check">' +
-                '<input type="checkbox" class="form-check-input" id="item' + task.id + '">' +
-                ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + task.id + '">' + task.title + '</label>' +
-                '<label class="form-check-label" for="item' + task.id + '">' + formattedDueDate + '</label>' + '</div> </div>' + '</div>' + '</li>'
+                '<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
+                ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
+                '<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' +
+				'</div> </div>' + '</div>' + '</li>'
             );
         };
     }
@@ -119,7 +129,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         delete allTasks[taskId];
         chrome.storage.local.set({'tasks': allTasks}, function () {
             console.log('allTasks', allTasks);
-            updateChecklist(existingTasks);
+            updateChecklist(allTasks);
         });
     }
 }
