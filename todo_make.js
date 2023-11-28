@@ -100,7 +100,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     function updateChecklist(tasks) {
         $("#checklist").empty(); // Clear existing items
 
-        tasks.forEach(function(task) {
+        for (const taskId in tasks) {
+            const task = tasks[taskId];
             const dueDate = new Date(task.due);
             const formattedDueDate = dueDate.toLocaleString();
 
@@ -110,6 +111,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + task.id + '">' + task.title + '</label>' +
                 '<label class="form-check-label" for="item' + task.id + '">' + formattedDueDate + '</label>' + '</div> </div>' + '</div>' + '</li>'
             );
-        });
+        };
     }
 }
