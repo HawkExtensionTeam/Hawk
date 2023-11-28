@@ -7,7 +7,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
 		
 		$(document).on('click', '.btn.btn-danger.delete-btn', function(event) {
-			console.log("WOW");
 			var $delBtn = $(event.currentTarget);
 			chrome.storage.local.get({'tasks': {}}, function (result) {
 				const existingTasks = result.tasks || {};
@@ -117,6 +116,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 					'<li class="list-group-item"> <div class="form-check">' +
 					'<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
 					' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
+                    '<label class="form-check-label" for="item' + taskId + '">' + task.description + '</label>' +
 					'<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' +
 					'</div> </div>' + '</div>' + '</li>'
 				);
