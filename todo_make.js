@@ -65,6 +65,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
     });
 
+    function formatTime(time) {
+        return time < 10 ? '0' + time : time;
+    }
+
     function setTime() {
         const dateObject = new Date();
         const date =
@@ -73,8 +77,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             dateObject.getDate();
 
     const time =
-        dateObject.getHours() + ":" +
-        dateObject.getMinutes();
+        formatTime(dateObject.getHours()) + ":" +
+        formatTime(dateObject.getMinutes());
 
         // Set the default value using jQuery
         $("#timeInput").val(time);
