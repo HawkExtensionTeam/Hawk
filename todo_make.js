@@ -5,6 +5,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         $("#new-task-button").click(function () {
             $("#todoForm").toggle();
         });
+
+        $(document).on('click', '.btn.btn-warning.edit-btn', function(event) {
+            const $editBtn = $(event.currentTarget);
+            const taskId = $editBtn.attr('edit-task-id');
+        
+            openEditForm(taskId);
+        });
 		
 		$(document).on('click', '.btn.btn-danger.delete-btn', function(event) {
 			var $delBtn = $(event.currentTarget);
@@ -13,6 +20,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 				deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
 			});
 		});
+
+        
 
         $("#todoForm").submit(function (event) {
             // prevents default page reload
@@ -72,6 +81,76 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 });
             });
         });
+
+        $("#editForm").submit(function (event) {
+            // prevents default page reload
+            event.preventDefault();
+            const editedTaskTitle = $("#editTaskInput").val().trim();
+            const editedTaskDescription = $("#editDescriptionInput").val().trim();
+            const editedTaskDate = $("#editDateInput").val().trim();
+            const editedTaskTime = $("#editTimeInput").val().trim();
+        
+            // Perform validation on edited task data here if needed
+        
+            const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!editedTimeRegex.test(editedTaskTime)) {
+                console.log('Invalid Time Format');
+                console.log(editedTaskTime)
+                return;
+            }
+        
+            const [editedHoursStr, editedMinutesStr] = editedTaskTime.split(':');
+            const editedHours = parseInt(editedHoursStr);
+            const editedMinutes = parseInt(editedMinutesStr);
+        
+            const editedDateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+            if (!editedDateRegex.test(editedTaskDate)) {
+                console.log('Invalid Date Format');
+                return;
+            }
+        
+            const [editedYearsStr, editedMonthsStr, editedDaysStr] = editedTaskDate.split('/');
+            const editedYears = parseInt(editedYearsStr);
+            const editedMonths = parseInt(editedMonthsStr);
+            const editedDays = parseInt(editedDaysStr);
+        
+            // months start from 0
+            const editedDueDate = new Date(editedYears, editedMonths - 1, editedDays, editedHours, editedMinutes, 0);
+            if (editedDueDate.toString() === 'Invalid Date') {
+                console.log('Invalid Date');
+                return;
+            }
+        
+            console.log("Validation Passed");
+        
+            chrome.storage.local.get({ 'tasks': {} }, function (result) {
+                const existingTasks = result.tasks || {};
+                const taskIdToEdit = $("#editForm").attr('edit-task-id');
+                console.log(taskIdToEdit);
+        
+                if (existingTasks[taskIdToEdit]) {
+                    existingTasks[taskIdToEdit] = {
+                        'title': editedTaskTitle,
+                        'description': editedTaskDescription,
+                        'due': editedDueDate.toISOString(),
+                    };
+        
+                    chrome.storage.local.set({ 'tasks': existingTasks }, function () {
+                        console.log('existingTasks', existingTasks);
+                        console.log('editedTask', editedTaskTitle);
+                        updateChecklist(existingTasks);
+        
+                        // You can add any other logic or UI updates after editing the task
+                        $("#editForm").hide(); // Hide the edit form after submission
+                        // Add any additional UI feedback or reset form logic here
+                    });
+                }
+            });
+        });
+        
+
+
+        
     });
 
     function formatTime(time) {
@@ -117,8 +196,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 					'<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
 					' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
                     '<label class="form-check-label" for="item' + taskId + '">' + task.description + '</label>' +
-					'<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' +
-					'</div> </div>' + '</div>' + '</li>'
+					'<label class="form-check-label" for="item' + taskId + '">' + formattedDueDate + '</label>' + 
+                    '<div class="row">'+
+                    '<div class="col-sm">'+
+                    '<button type="button" class="btn btn-danger delete-btn" delete-task-id="' + taskId + '">Delete</button>' + '</div>' +
+                    '<div class="col-sm">'+
+                    '<button type="button" class="btn btn-warning edit-btn" edit-task-id="' + taskId + '">Edit</button>' + '</div>' +
+					'</div> </div> </div>' + '</div>' + '</li>'
 				);
 			};
 		}
@@ -131,4 +215,23 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             updateChecklist(allTasks);
         });
     }
+
+    function openEditForm(taskId) {
+        chrome.storage.local.get({'tasks': {}}, function (result) {
+            const allTasks = result.tasks || {};
+            const taskToEdit = allTasks[taskId];
+    
+            // Pre-fill the form with existing task details
+            $("#editTaskInput").val(taskToEdit.title);
+            $("#editDescriptionInput").val(taskToEdit.description);
+            const dueDate = new Date(taskToEdit.due);
+            $("#editDateInput").val(`${dueDate.getFullYear()}/${dueDate.getMonth() + 1}/${dueDate.getDate()}`);
+            $("#editTimeInput").val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
+            $("#editForm").attr('edit-task-id', taskId);
+    
+            // Show the form
+            $("#editForm").toggle();
+        });
+    }
+    
 }

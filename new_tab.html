@@ -39,6 +39,25 @@
             </div>
             <button type="submit" class="btn btn-primary">Add Task</button>
         </form>
+        <form id="editForm" style="display: none;">
+            <div class="form-group">
+                <label for="editTaskInput">Task Title</label>
+                <input type="text" class="form-control" id="editTaskInput" placeholder="Enter task title" required>
+            </div>
+            <div class="form-group">
+                <label for="editDescriptionInput">Task Description</label>
+                <textarea class="form-control" id="editDescriptionInput" rows="3" placeholder="Enter task description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editDateInput">Due Date</label>
+                <input type="text" class="form-control" id="editDateInput" placeholder="YYYY/MM/DD" required>
+            </div>
+            <div class="form-group">
+                <label for="editTimeInput">Due Time</label>
+                <input type="text" class="form-control" id="editTimeInput" placeholder="HH:MM" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Edit Task</button>
+        </form>
     </div>
 
     <script src="jquery-3.7.1.min.js"></script>
