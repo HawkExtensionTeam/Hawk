@@ -3,14 +3,21 @@
   "name": "To-Do Make",
   "description": "Base Level Extension",
   "version": "1.0",
+  "omnibox": { "keyword": "@i\t" },
   "permissions": [
     "activeTab",
+    "tabs",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "webNavigation"
   ],
   "action": {
     "default_popup": "hello.html",
     "default_icon": "images/logo128x128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -20,6 +27,15 @@
       "js": [
         "popup.js",
         "todo_make.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.amazon.com/*",
+        "https://atoz.amazon.work/*"
+      ],
+      "js": [
+        "send_content.js"
       ]
     }
   ]

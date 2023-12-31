@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "minisearch": "^6.3.0"
   }
 }
