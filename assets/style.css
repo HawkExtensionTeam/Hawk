@@ -116,8 +116,6 @@ body {
 .todo-container {
 	background-color: #DDDDDD;
 	border: None;
-    height: 300px;
-    overflow-y: auto;
 
 }
 
@@ -129,6 +127,11 @@ body {
 	background-color: #DDDDDD;
 	padding: 2px var(--bs-list-group-item-padding-x); 
 	border: None;
+}
+
+#checklist {
+    height: 200px;
+    overflow-y: auto;
 }
 
 #checklist input {
