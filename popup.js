@@ -29,12 +29,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                         ' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + task.id + '">' + task.title + '</label>' +
                         '<label class="form-check-label" for="item' + task.id + '">' + formattedDueDate + '</label>' + '</div> </div>' + '</div>' + '</li>'
                     );
-                
-                    taskCounter++;
-                
-                    if (taskCounter === 3) {
-                        break;
-                    }
+            
                 };
                 
                 chrome.storage.local.set({ 'tasks': existingTasks });
