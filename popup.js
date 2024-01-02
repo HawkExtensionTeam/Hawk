@@ -16,6 +16,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                     const task = existingTasks[taskId];
                     const dueDate = new Date(task.due);
                     const formattedDueDate = dueDate.toLocaleString();
+                    const now = new Date();
+                    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    if (dueDate < twentyFourHoursAgo) {
+                        delete existingTasks[taskId];
+                        continue;
+                    }
                 
                     $("#checklist").append(
                         '<li class="list-group-item"> <div class="form-check">' +
@@ -30,6 +36,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                         break;
                     }
                 };
+                
+                chrome.storage.local.set({ 'tasks': existingTasks });
             }
         });
     });
