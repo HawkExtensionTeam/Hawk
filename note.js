@@ -50,17 +50,21 @@ function loadExistingNotes(editor) {
 
 function updateNotesList(notes, editor) {
     const notesListElement = $("#notes-list");
-    notesListElement.empty(); 
+    notesListElement.empty();
 
-    notes.forEach(function (note) {
-        const noteItem = $("<div>").addClass("note-item").text(note.title);
+    if (notes.length === 0) {
+        notesListElement.append("<p>No notes yet</p>");
+    } else {
+        notes.forEach(function (note) {
+            const noteItem = $("<div>").addClass("note-item").text(note.title);
 
-        noteItem.click(function () {
-            loadNoteInEditor(note, editor);
+            noteItem.click(function () {
+                loadNoteInEditor(note, editor);
+            });
+
+            notesListElement.append(noteItem);
         });
-
-        notesListElement.append(noteItem);
-    });
+    }
 }
 
 function loadNoteInEditor(note, editor) {
