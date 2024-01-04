@@ -2,7 +2,12 @@
 $(document).ready(function () {
     const editorElement = $("#editor");
     const titleElement = $("#title");
-    $('#edit').hide();
+    $("#show-note").hide();
+
+    $('#add-note').click(function (){
+        $("#note-form").show();
+        $("#show-note").hide();
+    });
 
     if (editorElement.length > 0) {
         const simplemde = new SimpleMDE({
@@ -66,7 +71,7 @@ function updateNotesList(notes, editor) {
             // loadNoteInEditor(note, editor);
             $("#note-form").hide();
             viewNote(note);
-            $('#edit').show();
+            $('#show-note').show();
         });
 
             notesListElement.append(noteItem);
