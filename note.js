@@ -27,25 +27,28 @@ $(document).ready(function () {
                     content: content,
                 };
 
-                const existingNotes = JSON.parse(localStorage.getItem("notes")) || [];
+                chrome.storage.sync.get({ notes: [] }, function (data) {
+                    const existingNotes = data.notes;
 
-                existingNotes.push(note);
+                    existingNotes.push(note);
 
-                localStorage.setItem("notes", JSON.stringify(existingNotes));
+                    chrome.storage.sync.set({ notes: existingNotes }, function () {
+                        titleElement.val("");
+                        simplemde.value("");
 
-                titleElement.val("");
-                simplemde.value("");
-
-                updateNotesList(existingNotes, simplemde);
+                        updateNotesList(existingNotes, simplemde);
+                    });
+                });
             }
         });
     }
 });
 
 function loadExistingNotes(editor) {
-    const existingNotes = JSON.parse(localStorage.getItem("notes")) || [];
-
-    updateNotesList(existingNotes, editor);
+    chrome.storage.sync.get({ notes: [] }, function (data) {
+        const existingNotes = data.notes;
+        updateNotesList(existingNotes, editor);
+    });
 }
 
 function updateNotesList(notes, editor) {
@@ -71,6 +74,5 @@ function loadNoteInEditor(note, editor) {
     const titleElement = $("#title");
 
     titleElement.val(note.title);
-    console.log(note.content);
     editor.value(note.content);
 }
