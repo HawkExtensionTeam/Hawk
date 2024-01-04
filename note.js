@@ -61,9 +61,12 @@ function updateNotesList(notes, editor) {
         notes.forEach(function (note) {
             const noteItem = $("<div>").addClass("note-item").text(note.title);
 
-            noteItem.click(function () {
-                loadNoteInEditor(note, editor);
-            });
+        noteItem.click(function () {
+            // loadNoteInEditor(note, editor);
+            $("#note-form").hide();
+            viewNote(note);
+            $('#edit').show();
+        });
 
             notesListElement.append(noteItem);
         });
@@ -75,4 +78,12 @@ function loadNoteInEditor(note, editor) {
 
     titleElement.val(note.title);
     editor.value(note.content);
+}
+
+function viewNote(note){
+    const noteTitle = document.getElementById("titleDisplay");
+    const noteContent = document.getElementById("contentDisplay");
+
+    noteTitle.innerHTML = '<h1>'+ note.title + '</h1>';
+    noteContent.innerHTML = marked.parse(note.content);
 }
