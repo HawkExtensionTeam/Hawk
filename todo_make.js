@@ -31,7 +31,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const taskDescription = $("#descriptionInput").val().trim();
             const taskDate = $("#dateInput").val().trim();
             const taskTime = $("#timeInput").val().trim();
-
+            console.log(taskTitle);
+            console.log(taskDescription);
+            console.log(taskDate);
+            console.log(taskTime);
             for (const taskData of [taskTitle, taskDescription, taskDate, taskTime]) {
                 if (taskData === '') return;
             }
@@ -43,7 +46,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const hours = parseInt(hoursStr);
             const minutes = parseInt(minutesStr);
 
-            const dateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+            const dateRegex = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
             if (!dateRegex.test(taskDate)) return;
 
             const [yearsStr, monthsStr, daysStr] = taskDate.split('/');
@@ -57,7 +60,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
             chrome.storage.local.get({'tasks': {}}, function (result) {
                 const existingTasks = result.tasks || {};
-
+                console.log("67");
                 let taskId;
                 if (Object.keys(existingTasks).length > 0) {
                     pastTaskIds = Object.keys(existingTasks);
