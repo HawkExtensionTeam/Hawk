@@ -2,6 +2,7 @@
 $(document).ready(function () {
     const editorElement = $("#editor");
     const titleElement = $("#title");
+    $('#edit').hide();
 
     if (editorElement.length > 0) {
         const simplemde = new SimpleMDE({
