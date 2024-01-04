@@ -7,4 +7,4 @@ eslint:
   stage: lint
   script:
     - npm install
-    - npx eslint --fix --ignore-pattern 'assets/bootstrap-min.js' --ignore-pattern 'assets/minisearch-min.js' .
+    - npx eslint --fix .
