@@ -31,10 +31,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const taskDescription = $("#descriptionInput").val().trim();
             const taskDate = $("#dateInput").val().trim();
             const taskTime = $("#timeInput").val().trim();
-            console.log(taskTitle);
-            console.log(taskDescription);
-            console.log(taskDate);
-            console.log(taskTime);
+
             for (const taskData of [taskTitle, taskDescription, taskDate, taskTime]) {
                 if (taskData === '') return;
             }
