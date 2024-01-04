@@ -3,6 +3,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         $("#new-tab-button").click(function () {
             chrome.tabs.create({url: "new_tab.html"});
         });
+        $("#notebook").click(function () {
+            chrome.tabs.create({url: "add_note.html"});
+        });
         chrome.storage.local.get({ 'tasks': [] }, function(result) {
             // avoid pushing to undefined if there are no previous tasks
             const existingTasks = result.tasks || [];
