@@ -83,6 +83,8 @@ $(document).ready(function () {
                     content: content,
                 };
 
+                currentNote = note;
+
                 chrome.storage.sync.get({ notes: [] }, function (data) {
                     const existingNotes = data.notes;
 
@@ -93,6 +95,7 @@ $(document).ready(function () {
                         simplemde.value("");
 
                         updateNotesList(existingNotes, simplemde);
+                        viewNote(note)
                     });
                 });
             }
@@ -119,7 +122,7 @@ $(document).ready(function () {
             }
         });
 
-        deleteButton.click(function () {
+        $("#confirmDelete").click(function () {
             if (currentNote) {
                 chrome.storage.sync.get({ notes: [] }, function (data) {
                     const existingNotes = data.notes;
