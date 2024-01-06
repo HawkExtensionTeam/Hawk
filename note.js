@@ -1,8 +1,42 @@
 // Check if the document is ready
 $(document).ready(function () {
+    let currentNote = null;
     const editorElement = $("#editor");
     const titleElement = $("#title");
     $("#show-note").hide();
+
+
+    function loadExistingNotes(editor) {
+        chrome.storage.sync.get({ notes: [] }, function (data) {
+            const existingNotes = data.notes;
+            updateNotesList(existingNotes, editor);
+        });
+    }
+
+    function updateNotesList(notes, editor) {
+        const notesListElement = $("#notes-list");
+        notesListElement.empty();
+
+        if (notes.length === 0) {
+            notesListElement.append("<p>No notes yet</p>");
+        } else {
+            notes.forEach(function (note) {
+                const noteItem = $("<div>").addClass("note-item").text(note.title);
+
+                noteItem.click(function () {
+                    currentNote = note;
+                    // loadNoteInEditor(note, editor);
+                    $("#save").hide();
+                    $("#note-form").hide();
+                    viewNote(note);
+                    $('#show-note').show();
+                });
+
+                notesListElement.append(noteItem);
+            });
+        }
+    }
+
 
     $('#add-note').click(function (){
         $("#note-form").show();
@@ -47,37 +81,20 @@ $(document).ready(function () {
                 });
             }
         });
+
+        $("#edit").click(function (){
+            $("#note-form").show();
+            $('#show-note').hide();
+            $("#save").show();
+            if (currentNote){
+                titleElement.val(currentNote.title);
+                simplemde.value(currentNote.content);
+            }
+        })
+
     }
 });
 
-function loadExistingNotes(editor) {
-    chrome.storage.sync.get({ notes: [] }, function (data) {
-        const existingNotes = data.notes;
-        updateNotesList(existingNotes, editor);
-    });
-}
-
-function updateNotesList(notes, editor) {
-    const notesListElement = $("#notes-list");
-    notesListElement.empty();
-
-    if (notes.length === 0) {
-        notesListElement.append("<p>No notes yet</p>");
-    } else {
-        notes.forEach(function (note) {
-            const noteItem = $("<div>").addClass("note-item").text(note.title);
-
-        noteItem.click(function () {
-            // loadNoteInEditor(note, editor);
-            $("#note-form").hide();
-            viewNote(note);
-            $('#show-note').show();
-        });
-
-            notesListElement.append(noteItem);
-        });
-    }
-}
 
 function loadNoteInEditor(note, editor) {
     const titleElement = $("#title");
