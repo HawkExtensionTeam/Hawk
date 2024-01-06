@@ -53,12 +53,7 @@ $(document).ready(function () {
         showNote.show();
     }
 
-    $('#add-note').click(function (){
-        noteForm.show();
-        showNote.hide();
-        save.hide();
-        addNoteButton.show();
-    });
+
 
     if (editorElement.length > 0) {
         const simplemde = new SimpleMDE({
@@ -97,6 +92,15 @@ $(document).ready(function () {
                     });
                 });
             }
+        });
+
+        $('#add-note').click(function (){
+            noteForm.show();
+            showNote.hide();
+            save.hide();
+            addNoteButton.show();
+            simplemde.value("");
+            titleElement.val("");
         });
 
         $("#edit").click(function (){
