@@ -136,6 +136,7 @@ $(document).ready(function () {
                             viewNote(nextNote);
                         } else {
                             currentNote = null;
+                            addNote.click();
                         }
                         loadExistingNotes(simplemde);
                     });
