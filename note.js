@@ -74,7 +74,9 @@ $(document).ready(function () {
             const title = titleElement.val();
             const content = simplemde.value();
 
-            if (title && content) {
+            if (title.trim() === '' || content.trim() === '') {
+                alert('Both title and content must be filled out.');
+            } else {
                 const noteId = Date.now().toString();
 
                 const note = {
@@ -95,12 +97,11 @@ $(document).ready(function () {
                         simplemde.value("");
 
                         updateNotesList(existingNotes, simplemde);
-                        viewNote(note)
+                        viewNote(note);
                     });
                 });
             }
         });
-
         addNote.click(function (){
             noteForm.show();
             showNote.hide();
