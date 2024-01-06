@@ -4,6 +4,7 @@ $(document).ready(function () {
     const editorElement = $("#editor");
     const titleElement = $("#title");
     $("#show-note").hide();
+    $("#save").hide();
 
 
     function loadExistingNotes(editor) {
@@ -26,7 +27,6 @@ $(document).ready(function () {
                 noteItem.click(function () {
                     currentNote = note;
                     // loadNoteInEditor(note, editor);
-                    $("#save").hide();
                     $("#note-form").hide();
                     viewNote(note);
                     $('#show-note').show();
@@ -41,6 +41,7 @@ $(document).ready(function () {
     $('#add-note').click(function (){
         $("#note-form").show();
         $("#show-note").hide();
+        $("#save").hide();
     });
 
     if (editorElement.length > 0) {
