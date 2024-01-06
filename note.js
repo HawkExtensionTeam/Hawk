@@ -18,7 +18,7 @@ $(function () {
     //     editor.value(note.content);
     // }
 
-    function loadExistingNotes(editor) {
+    function loadExistingNotes() {
         chrome.storage.sync.get({ notes: [] }, function (data) {
             const existingNotes = data.notes;
             updateNotesList(existingNotes);
@@ -68,10 +68,10 @@ $(function () {
             },
         });
 
-        loadExistingNotes(simplemde);
+        loadExistingNotes();
 
         addNoteButton.on("click",function () {
-            const title = titleElement.val();
+            const title = titleElement.value;
             const content = simplemde.value();
 
             if (title.trim() === '' || content.trim() === '') {
@@ -143,7 +143,7 @@ $(function () {
                             currentNote = null;
                             addNote.trigger("click");
                         }
-                        loadExistingNotes(simplemde);
+                        loadExistingNotes();
                     });
                 });
             }
@@ -161,7 +161,7 @@ $(function () {
                         existingNotes[index] = currentNote;
                         chrome.storage.sync.set({ notes: existingNotes }, function () {
                             viewNote(currentNote);
-                            loadExistingNotes(simplemde);
+                            loadExistingNotes();
                         });
                     }
                 });
