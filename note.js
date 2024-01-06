@@ -7,8 +7,11 @@ $(document).ready(function () {
     const save = $("#save");
     const noteForm = $("#note-form");
     const addNoteButton = $("#add-note-button");
+    const deleteButton = $("#delete");
+    const addNote = $("#add-note");
     showNote.hide();
     save.hide();
+    deleteButton.hide();
 
     // function loadNoteInEditor(note, editor) {
     //     titleElement.val(note.title);
@@ -51,6 +54,7 @@ $(document).ready(function () {
         noteContent.innerHTML = marked.parse(note.content);
         noteForm.hide();
         showNote.show();
+        deleteButton.show();
     }
 
 
@@ -94,13 +98,14 @@ $(document).ready(function () {
             }
         });
 
-        $('#add-note').click(function (){
+        addNote.click(function (){
             noteForm.show();
             showNote.hide();
             save.hide();
             addNoteButton.show();
             simplemde.value("");
             titleElement.val("");
+            deleteButton.hide();
         });
 
         $("#edit").click(function (){
@@ -112,7 +117,32 @@ $(document).ready(function () {
                 titleElement.val(currentNote.title);
                 simplemde.value(currentNote.content);
             }
-        })
+        });
+
+        deleteButton.click(function () {
+            if (currentNote) {
+                chrome.storage.sync.get({ notes: [] }, function (data) {
+                    const existingNotes = data.notes;
+                    const updatedNotes = existingNotes.filter(note => note.id !== currentNote.id);
+
+                    chrome.storage.sync.set({ notes: updatedNotes, currentNote: null }, function () {
+                        const currentIndex = existingNotes.findIndex(note => note.id === currentNote.id);
+
+                        if (currentIndex !== -1 && updatedNotes.length > 0) {
+                            const nextIndex = currentIndex < updatedNotes.length ? currentIndex : 0;
+                            const nextNote = updatedNotes[nextIndex];
+
+                            currentNote = nextNote;
+                            viewNote(nextNote);
+                        } else {
+                            currentNote = null;
+                        }
+                        loadExistingNotes(simplemde);
+                    });
+                });
+            }
+        });
+
 
         save.click(function (){
             if (currentNote){
