@@ -5,16 +5,16 @@ let miniSearch = new MiniSearch({
     storeFields: ['url']
 });
 
-$.when(chrome.storage.local.get(['indexed'])).done((result) => {
+chrome.storage.local.get(['indexed']).then((result) => {
     miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
 });
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-    $.when(chrome.storage.local.get(['indexed'])).done((result) => {
+    chrome.storage.local.get(['indexed']).then((result) => {
         if (result && result.indexed) {
             let corpus = result.indexed.corpus;
             let searchResults = miniSearch.search(text, {
-                boost: {title: 2},
+                boost: { title: 2 },
                 prefix: term => term.length > 3,
                 fuzzy: term => term.length > 3 ? 0.2 : null
             });
@@ -39,21 +39,21 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
 });
 
 chrome.omnibox.onInputEntered.addListener((text, disposition) => {
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs && tabs[0]) {
             const tabId = tabs[0].id;
-            chrome.tabs.update(tabId, {url: text});
+            chrome.tabs.update(tabId, { url: text });
         } else {
-            chrome.tabs.create({url: text});
+            chrome.tabs.create({ url: text });
         }
     });
 });
 
 chrome.runtime.onMessage.addListener(function (request) {
     if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
-        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length) {
-                $.when(chrome.storage.local.get(['indexed'])).done((result) => {
+                chrome.storage.local.get(['indexed']).then((result) => {
                     let indexed = result.indexed || {};
                     if (Object.keys(indexed).length === 0) {
                         indexed.corpus = [];
@@ -79,7 +79,7 @@ chrome.runtime.onMessage.addListener(function (request) {
                         // must convert to an array to avoid values being lost when
                         // the set is converted to an Object during serialisation
                         indexed.links = Array.from(indexed.links);
-                        chrome.storage.local.set({'indexed': indexed});
+                        chrome.storage.local.set({ 'indexed': indexed });
                         console.log('added', page.url);
                     }
                 }).catch((error) => {
