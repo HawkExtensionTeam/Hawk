@@ -5,12 +5,12 @@ let miniSearch = new MiniSearch({
     storeFields: ['url']
 });
 
-chrome.storage.local.get(['indexed']).then((result) => {
+$.when(chrome.storage.local.get(['indexed'])).done((result) => {
     miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
 });
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-    chrome.storage.local.get(['indexed']).then((result) => {
+    $.when(chrome.storage.local.get(['indexed'])).done((result) => {
         if (result && result.indexed) {
             let corpus = result.indexed.corpus;
             let searchResults = miniSearch.search(text, { 
@@ -53,7 +53,7 @@ chrome.runtime.onMessage.addListener(function (request) {
     if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs && tabs.length) {
-                chrome.storage.local.get(['indexed']).then((result) => {
+                $.when(chrome.storage.local.get(['indexed'])).done((result) => {
                     let indexed = result.indexed || {};
                     if (Object.keys(indexed).length === 0) {
                         indexed.corpus = [];
