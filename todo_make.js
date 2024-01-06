@@ -1,5 +1,5 @@
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
-    $(document).ready(function () {
+    $(function () {
         setTime();
         get_tasks();
         $("#new-task-button").click(function () {
@@ -14,8 +14,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
 		
 		$(document).on('click', '.btn.btn-danger.delete-btn', function(event) {
-			var $delBtn = $(event.currentTarget);
-			chrome.storage.local.get({'tasks': {}}, function (result) {
+            const $delBtn = $(event.currentTarget);
+            chrome.storage.local.get({'tasks': {}}, function (result) {
 				const existingTasks = result.tasks || {};
 				deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
 			});
@@ -23,7 +23,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
         
 
-        $("#todoForm").submit(function (event) {
+        $("#todoForm").on("submit", function (event) {
             // prevents default page reload
             event.preventDefault();
 
@@ -53,17 +53,18 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
             // months start from 0
             const dueDate = new Date(years, months-1, days, hours, minutes, 0);
-            if (dueDate.toString === 'Invalid Date') return;
+            if (dueDate.toString() === 'Invalid Date') return;
 
-            chrome.storage.local.get({'tasks': {}}, function (result) {
+            $.when(chrome.storage.local.get({'tasks': {}})).done(function (result) {
                 const existingTasks = result.tasks || {};
                 console.log("67");
                 let taskId;
-                if (Object.keys(existingTasks).length > 0) {
-                    pastTaskIds = Object.keys(existingTasks);
-                    taskId = (Number(pastTaskIds[pastTaskIds.length-1]) + 1).toString();
-                } else {
+                let pastTaskIds;
+                if ($.isEmptyObject(existingTasks)) {
                     taskId = '1';
+                } else {
+                    pastTaskIds = Object.keys(existingTasks);
+                    taskId = (Number(pastTaskIds[pastTaskIds.length - 1]) + 1).toString();
                 }
 
                 existingTasks[taskId] = {
@@ -74,7 +75,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 };
 
                 // don't sync with other machines - extension is local    
-                chrome.storage.local.set({'tasks': existingTasks}, function () {
+                $.when(chrome.storage.local.set({'tasks': existingTasks})).done(function () {
                     console.log('existingTasks', existingTasks);
                     console.log('newTask', taskTitle);
                     updateChecklist(existingTasks);
@@ -82,7 +83,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             });
         });
 
-        $("#editForm").submit(function (event) {
+        $("#editForm").on('submit',function (event) {
             // prevents default page reload
             event.preventDefault();
             const editedTaskTitle = $("#editTaskInput").val().trim();
@@ -122,8 +123,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             }
         
             console.log("Validation Passed");
-        
-            chrome.storage.local.get({ 'tasks': {} }, function (result) {
+
+            $.when(chrome.storage.local.get({ 'tasks': {} })).done(function (result) {
                 const existingTasks = result.tasks || {};
                 const taskIdToEdit = $("#editForm").attr('edit-task-id');
                 console.log(taskIdToEdit);
@@ -134,8 +135,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                         'description': editedTaskDescription,
                         'due': editedDueDate.toISOString(),
                     };
-        
-                    chrome.storage.local.set({ 'tasks': existingTasks }, function () {
+
+                    $.when(chrome.storage.local.set({ 'tasks': existingTasks })).done(function () {
                         console.log('existingTasks', existingTasks);
                         console.log('editedTask', editedTaskTitle);
                         updateChecklist(existingTasks);
@@ -174,16 +175,17 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     }
 
     function get_tasks() {
-        chrome.storage.local.get({ 'tasks': [] }, function(result) {
+        $.when(chrome.storage.local.get({ 'tasks': [] })).done(function(result) {
             const existingTasks = result.tasks || [];
             updateChecklist(existingTasks);
         });
     }
 
     function updateChecklist(tasks) {
-        $("#checklist").empty(); // Clear existing items
+        const checklist = $("#checklist");
+        checklist.empty(); // Clear existing items
 		if (Object.keys(tasks).length === 0) {
-			$("#checklist").append('<h1>There are no tasks!</h1>');
+			checklist.append('<h1>There are no tasks!</h1>');
 		}
 		else {
 			for (const taskId in tasks) {
@@ -191,7 +193,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 				const dueDate = new Date(task.due);
 				const formattedDueDate = dueDate.toLocaleString();
 
-				$("#checklist").append(
+				checklist.append(
 					'<li class="list-group-item"> <div class="form-check">' +
 					'<input type="checkbox" class="form-check-input" id="item' + taskId + '">' +
 					' <div class="container">' + '<div class="row"> <label class="form-check-label" for="item' + taskId + '">' + task.title + '</label>' +
@@ -204,7 +206,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                     '<button type="button" class="btn btn-warning edit-btn" edit-task-id="' + taskId + '">Edit</button>' + '</div>' +
 					'</div> </div> </div>' + '</div>' + '</li>'
 				);
-			};
+			}
 		}
     }
 
@@ -217,6 +219,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     }
 
     function openEditForm(taskId) {
+        const editForm = $("#editForm");
         chrome.storage.local.get({'tasks': {}}, function (result) {
             const allTasks = result.tasks || {};
             const taskToEdit = allTasks[taskId];
@@ -227,10 +230,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const dueDate = new Date(taskToEdit.due);
             $("#editDateInput").val(`${dueDate.getFullYear()}/${dueDate.getMonth() + 1}/${dueDate.getDate()}`);
             $("#editTimeInput").val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
-            $("#editForm").attr('edit-task-id', taskId);
+            editForm.attr('edit-task-id', taskId);
     
             // Show the form
-            $("#editForm").toggle();
+            editForm.toggle();
         });
     }
     
