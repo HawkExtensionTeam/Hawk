@@ -54,7 +54,7 @@ $(document).ready(function () {
 
         loadExistingNotes(simplemde);
 
-        $("button").click(function () {
+        $("#add-note-button").click(function () {
             const title = titleElement.val();
             const content = simplemde.value();
 
