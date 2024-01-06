@@ -1,5 +1,5 @@
 // Check if the document is ready
-$(document).ready(function () {
+$(function () {
     let currentNote = null;
     const editorElement = $("#editor");
     const titleElement = $("#title");
@@ -21,11 +21,11 @@ $(document).ready(function () {
     function loadExistingNotes(editor) {
         chrome.storage.sync.get({ notes: [] }, function (data) {
             const existingNotes = data.notes;
-            updateNotesList(existingNotes, editor);
+            updateNotesList(existingNotes);
         });
     }
 
-    function updateNotesList(notes, editor) {
+    function updateNotesList(notes) {
         const notesListElement = $("#notes-list");
         notesListElement.empty();
 
@@ -70,7 +70,7 @@ $(document).ready(function () {
 
         loadExistingNotes(simplemde);
 
-        addNoteButton.click(function () {
+        addNoteButton.on("click",function () {
             const title = titleElement.val();
             const content = simplemde.value();
 
@@ -94,14 +94,14 @@ $(document).ready(function () {
                         titleElement.val("");
                         simplemde.value("");
 
-                        updateNotesList(existingNotes, simplemde);
+                        updateNotesList(existingNotes);
                         viewNote(note)
                     });
                 });
             }
         });
 
-        addNote.click(function (){
+        addNote.on("click",function (){
             noteForm.show();
             showNote.hide();
             save.hide();
@@ -111,7 +111,7 @@ $(document).ready(function () {
             deleteButton.hide();
         });
 
-        $("#edit").click(function (){
+        $("#edit").on("click",function (){
             noteForm.show();
             showNote.hide();
             save.show();
@@ -122,7 +122,7 @@ $(document).ready(function () {
             }
         });
 
-        $("#confirmDelete").click(function () {
+        $("#confirmDelete").on("click",function () {
             if (currentNote) {
                 chrome.storage.sync.get({ notes: [] }, function (data) {
                     const existingNotes = data.notes;
@@ -139,7 +139,7 @@ $(document).ready(function () {
                             viewNote(nextNote);
                         } else {
                             currentNote = null;
-                            addNote.click();
+                            addNote.trigger("click");
                         }
                         loadExistingNotes(simplemde);
                     });
@@ -148,7 +148,7 @@ $(document).ready(function () {
         });
 
 
-        save.click(function (){
+        save.on("click",function (){
             if (currentNote){
                 currentNote.title = titleElement.val();
                 currentNote.content = simplemde.value();
