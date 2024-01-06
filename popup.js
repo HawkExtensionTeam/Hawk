@@ -1,9 +1,9 @@
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
-    $(document).ready(function () {
-        $("#new-tab-button").click(function () {
+    $(function () {
+        $("#new-tab-button").on("click", function () {
             chrome.tabs.create({url: "new_tab.html"});
         });
-        $("#notebook").click(function () {
+        $("#notebook").on("click", function () {
             chrome.tabs.create({url: "add_note.html"});
         });
         chrome.storage.local.get({ 'tasks': [] }, function(result) {
@@ -13,8 +13,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 $("#checklist").append('<h1>There are no tasks!</h1>');
             }
             else {
-                let taskCounter = 0;
-
                 for (const taskId in existingTasks) {
                     const task = existingTasks[taskId];
                     const dueDate = new Date(task.due);
@@ -33,10 +31,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                         '<label class="form-check-label" for="item' + task.id + '">' + formattedDueDate + '</label>' + '</div> </div>' + '</div>' + '</li>'
                     );
             
-                };
+                }
                 
                 chrome.storage.local.set({ 'tasks': existingTasks });
             }
         });
     });
-};
+}
