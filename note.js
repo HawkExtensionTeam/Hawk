@@ -42,6 +42,7 @@ $(document).ready(function () {
         $("#note-form").show();
         $("#show-note").hide();
         $("#save").hide();
+        $("#add-note-button").show();
     });
 
     if (editorElement.length > 0) {
@@ -87,6 +88,7 @@ $(document).ready(function () {
             $("#note-form").show();
             $('#show-note').hide();
             $("#save").show();
+            $("#add-note-button").hide();
             if (currentNote){
                 titleElement.val(currentNote.title);
                 simplemde.value(currentNote.content);
