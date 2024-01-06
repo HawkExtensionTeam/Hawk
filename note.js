@@ -71,7 +71,7 @@ $(function () {
         loadExistingNotes();
 
         addNoteButton.on("click",function () {
-            const title = titleElement.value;
+            const title = titleElement.val();
             const content = simplemde.value();
 
             if (title.trim() === '' || content.trim() === '') {
