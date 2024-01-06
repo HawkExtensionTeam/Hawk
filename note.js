@@ -3,9 +3,17 @@ $(document).ready(function () {
     let currentNote = null;
     const editorElement = $("#editor");
     const titleElement = $("#title");
-    $("#show-note").hide();
-    $("#save").hide();
+    const showNote = $("#show-note");
+    const save = $("#save");
+    const noteForm = $("#note-form");
+    const addNoteButton = $("#add-note-button");
+    showNote.hide();
+    save.hide();
 
+    // function loadNoteInEditor(note, editor) {
+    //     titleElement.val(note.title);
+    //     editor.value(note.content);
+    // }
 
     function loadExistingNotes(editor) {
         chrome.storage.sync.get({ notes: [] }, function (data) {
@@ -27,9 +35,7 @@ $(document).ready(function () {
                 noteItem.click(function () {
                     currentNote = note;
                     // loadNoteInEditor(note, editor);
-                    $("#note-form").hide();
                     viewNote(note);
-                    $('#show-note').show();
                 });
 
                 notesListElement.append(noteItem);
@@ -37,12 +43,21 @@ $(document).ready(function () {
         }
     }
 
+    function viewNote(note){
+        const noteTitle = document.getElementById("titleDisplay");
+        const noteContent = document.getElementById("contentDisplay");
+
+        noteTitle.innerHTML = '<h1>'+ note.title + '</h1>';
+        noteContent.innerHTML = marked.parse(note.content);
+        noteForm.hide();
+        showNote.show();
+    }
 
     $('#add-note').click(function (){
-        $("#note-form").show();
-        $("#show-note").hide();
-        $("#save").hide();
-        $("#add-note-button").show();
+        noteForm.show();
+        showNote.hide();
+        save.hide();
+        addNoteButton.show();
     });
 
     if (editorElement.length > 0) {
@@ -56,7 +71,7 @@ $(document).ready(function () {
 
         loadExistingNotes(simplemde);
 
-        $("#add-note-button").click(function () {
+        addNoteButton.click(function () {
             const title = titleElement.val();
             const content = simplemde.value();
 
@@ -85,31 +100,37 @@ $(document).ready(function () {
         });
 
         $("#edit").click(function (){
-            $("#note-form").show();
-            $('#show-note').hide();
-            $("#save").show();
-            $("#add-note-button").hide();
+            noteForm.show();
+            showNote.hide();
+            save.show();
+            addNoteButton.hide();
             if (currentNote){
                 titleElement.val(currentNote.title);
                 simplemde.value(currentNote.content);
             }
         })
 
+        save.click(function (){
+            if (currentNote){
+                currentNote.title = titleElement.val();
+                currentNote.content = simplemde.value();
+                chrome.storage.sync.get({ notes: [] }, function (data) {
+                    const existingNotes = data.notes;
+                    const index = existingNotes.findIndex(note => note.id === currentNote.id);
+                    if (index !== -1) {
+                        existingNotes[index] = currentNote;
+                        chrome.storage.sync.set({ notes: existingNotes }, function () {
+                            viewNote(currentNote);
+                            loadExistingNotes(simplemde);
+                        });
+                    }
+                });
+            }
+        });
     }
 });
 
 
-function loadNoteInEditor(note, editor) {
-    const titleElement = $("#title");
 
-    titleElement.val(note.title);
-    editor.value(note.content);
-}
 
-function viewNote(note){
-    const noteTitle = document.getElementById("titleDisplay");
-    const noteContent = document.getElementById("contentDisplay");
 
-    noteTitle.innerHTML = '<h1>'+ note.title + '</h1>';
-    noteContent.innerHTML = marked.parse(note.content);
-}
