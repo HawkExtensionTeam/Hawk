@@ -35,6 +35,7 @@
         "https://atoz.amazon.work/*"
       ],
       "js": [
+        "assets/jquery-3.7.1.min.js",
         "send_content.js"
       ]
     }
