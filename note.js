@@ -33,13 +33,21 @@ $(function () {
             notesListElement.append("<p>No notes yet</p>");
         } else {
             notes.forEach(function (note) {
-                const noteItem = $("<div>").addClass("note-item").text(note.title);
+                const noteItem = $("<div>").addClass("note-item");
+                
+                // Create image element and append it to noteItem
+                const noteItemImage = $("<img>").attr("src", "images/arrowIconButton.png").addClass("note-item-icon");
+                noteItem.append(noteItemImage);
+    
+                // Create span element for the title and append it to noteItem
+                const noteItemTitle = $("<span>").addClass("note-item-title").text(note.title);
+                noteItem.prepend(noteItemTitle);
+    
                 noteItem.click(function () {
                     currentNote = note;
-                    // loadNoteInEditor(note, editor);
                     viewNote(note);
                 });
-
+    
                 notesListElement.append(noteItem);
             });
         }

@@ -312,24 +312,16 @@ input[type="checkbox"]:checked {
 
 #title {
 	background: white;
+    color: #C45500;
 }
 
 #notes-list {
-    border: 10px;
-    border-color: #C45500;
     overflow-y: auto;
     max-height: 450px;
-    background-color: #f8f9fa; 
-    padding: 10px; 
-    border-radius: 5px;
+    background-color: #DDDDDD; 
+    border-radius: 0;
 }
 
-.note-item {
-    cursor: pointer;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    transition: background-color 0.3s; 
-}
 
 .note-item:hover {
     background-color: #e9ecef; 
@@ -347,3 +339,34 @@ input[type="checkbox"]:checked {
 .sidebar {
 	border-right: 2px solid black;
 }
+
+.bold-text{
+    font-weight: bold;
+    border-bottom: 2px solid #000; 
+    padding-bottom: 10px;
+}
+.no-padding{
+    padding:0;
+}
+
+.note-item {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 2px solid black;
+    transition: background-color 0.3s;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.note-item-icon {
+    width: 40px; 
+    height: auto; 
+    margin-right: 10px; 
+}
+
+.note-item-title {
+    margin-right: 10px; 
+}
+
