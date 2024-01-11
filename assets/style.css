@@ -299,9 +299,21 @@ input[type="checkbox"]:checked {
 
 .custom-container {
     width: 300%;
-    padding: 10px; 
     border-radius: 10px; 
+	background-color: #DDDDDD;
 }
+
+#add-note {
+	background-color: transparent;
+	border: 2px solid black;
+	border-radius: 10px;
+	color: black;
+}
+
+#title {
+	background: white;
+}
+
 #notes-list {
     border: 10px;
     border-color: #C45500;
@@ -324,9 +336,7 @@ input[type="checkbox"]:checked {
 }
 
 #contentDisplay {
-    border: 1px solid #ccc;
-    border-radius: 8px; /* Adjust the value for the desired level of rounding */
-    background-color: #f8f9fa; 
+    background-color: transparent; 
     overflow-x: auto;
     padding: 10px;
     margin-top: 10px;
@@ -334,3 +344,6 @@ input[type="checkbox"]:checked {
     width:100%;
 }
 
+.sidebar {
+	border-right: 2px solid black;
+}

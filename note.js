@@ -34,7 +34,6 @@ $(function () {
         } else {
             notes.forEach(function (note) {
                 const noteItem = $("<div>").addClass("note-item").text(note.title);
-
                 noteItem.click(function () {
                     currentNote = note;
                     // loadNoteInEditor(note, editor);
