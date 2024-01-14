@@ -49,40 +49,54 @@ chrome.omnibox.onInputEntered.addListener((text) => {
   });
 });
 
-chrome.runtime.onMessage.addListener((request) => {
+function setURL(request) {
+  return new Promise((resolve) => {
+    if (request.clickedURL) {
+      setTimeout(() => {
+        resolve(request.clickedURL);
+      }, 500);
+    } else {
+      resolve(request.currentURL);
+    }
+  });
+}
+
+chrome.runtime.onMessage.addListener(async (request) => {
   if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs && tabs.length) {
-        chrome.storage.local.get(['indexed']).then((result) => {
-          const indexed = result.indexed || {};
-          if (Object.keys(indexed).length === 0) {
-            indexed.corpus = [];
-            indexed.links = new Set();
-          }
-
-          const { url } = tabs[0];
-          // chrome storage serialising and deserialising loses set type
-          indexed.links = new Set(indexed.links);
-          if (!indexed.links.has(url)) {
-            const page = {
-              id: indexed.corpus.length + 1,
-              url,
-              title: tabs[0].title,
-              body: request.visibleTextContent,
-            };
-
-            indexed.corpus.push(page);
-            indexed.links.add(url);
-
-            miniSearch.add(page);
-
-            // must convert to an array to avoid values being lost when
-            // the set is converted to an Object during serialisation
-            indexed.links = Array.from(indexed.links);
-            chrome.storage.local.set({ indexed });
-          }
-        });
-      }
+    const url = await setURL(request);
+    const tabs = await new Promise((resolve) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
+        resolve(allTabs);
+      });
     });
+    if (tabs && tabs.length) {
+      chrome.storage.local.get(['indexed']).then((result) => {
+        const indexed = result.indexed || {};
+        if (Object.keys(indexed).length === 0) {
+          indexed.corpus = [];
+          indexed.links = new Set();
+        }
+        // chrome storage serialising and deserialising loses set type
+        indexed.links = new Set(indexed.links);
+        if (!indexed.links.has(url)) {
+          const page = {
+            id: indexed.corpus.length + 1,
+            url,
+            title: tabs[0].title,
+            body: request.visibleTextContent,
+          };
+
+          indexed.corpus.push(page);
+          indexed.links.add(url);
+
+          miniSearch.add(page);
+
+          // must convert to an array to avoid values being lost when
+          // the set is converted to an Object during serialisation
+          indexed.links = Array.from(indexed.links);
+          chrome.storage.local.set({ indexed });
+        }
+      });
+    }
   }
 });
