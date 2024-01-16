@@ -8,3 +8,4 @@ eslint:
   script:
     - npm install
     - npx eslint --fix .
+    - jest --config jest.config.js
