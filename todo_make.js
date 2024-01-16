@@ -16,12 +16,25 @@ function setTime() {
   $('#dateInput').val(date);
 }
 
+function sortTasks(tasks) {
+  const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
+  tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
+  const sortedIds = tasksArray.map((task) => task.id);
+  const sortedTasks = {};
+  sortedIds.forEach((id) => {
+    taskId = Object.keys(sortedTasks).length + 1;
+    sortedTasks[taskId] = tasks[id];
+  });
+  chrome.storage.local.set({ tasks: sortedTasks }, () => {});
+}
+
 function updateChecklist(tasks) {
   const checklist = $('#checklist');
   checklist.empty(); // Clear existing items
   if (Object.keys(tasks).length === 0) {
     checklist.append('<h1>There are no tasks!</h1>');
   } else {
+    sortTasks(tasks);
     Object.keys(tasks).forEach((taskId) => {
       const task = tasks[taskId];
       const dueDate = new Date(task.due);

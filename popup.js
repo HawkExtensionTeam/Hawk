@@ -12,7 +12,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       if (Object.keys(existingTasks).length === 0) {
         $('#checklist').append('<h1>There are no tasks!</h1>');
       } else {
-        Object.values(existingTasks).forEach((task) => {
+        Object.keys(existingTasks).forEach((taskId) => {
+          const task = existingTasks[taskId];
           const dueDate = new Date(task.due);
           const formattedDueDate = dueDate.toLocaleString();
           const now = new Date();
