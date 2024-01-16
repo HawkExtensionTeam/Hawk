@@ -2,6 +2,7 @@ image: node:latest
 
 stages:
   - lint
+  - test
 
 before_script:
   - apt-get update
@@ -20,3 +21,13 @@ eslint:
     - npx eslint --fix .
     - npm install -g jest
     - jest --config jest.config.js
+
+test:
+  stage: test
+  script:
+    - npm install
+    - npm install -g jest
+    - npm install puppeteer
+    - jest --config jest.config.js
+  before_script:
+    - apt-get install -yq libgbm-dev
