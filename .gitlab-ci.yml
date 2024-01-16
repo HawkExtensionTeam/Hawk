@@ -27,5 +27,3 @@ test:
     - npm install -g jest
     - npm install puppeteer
     - jest --config jest.config.js
-  before_script:
-    - apt-get install -yq libgbm-dev
