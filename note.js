@@ -58,7 +58,7 @@ $(() => {
   }
 
   function loadExistingNotes() {
-    chrome.storage.sync.get({ notes: [] }, (data) => {
+    chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
       updateNotesList(existingNotes);
     });
@@ -92,12 +92,12 @@ $(() => {
 
         currentNote = note;
 
-        chrome.storage.sync.get({ notes: [] }, (data) => {
+        chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
 
           existingNotes.push(note);
 
-          chrome.storage.sync.set({ notes: existingNotes }, () => {
+          chrome.storage.local.set({ notes: existingNotes }, () => {
             titleElement.val('');
             simplemde.value('');
 
@@ -131,11 +131,11 @@ $(() => {
 
     $('#confirmDelete').on('click', () => {
       if (currentNote) {
-        chrome.storage.sync.get({ notes: [] }, (data) => {
+        chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
           const updatedNotes = existingNotes.filter((note) => note.id !== currentNote.id);
 
-          chrome.storage.sync.set({ notes: updatedNotes, currentNote: null }, () => {
+          chrome.storage.local.set({ notes: updatedNotes, currentNote: null }, () => {
             const currentIndex = existingNotes.findIndex((note) => note.id === currentNote.id);
 
             if (currentIndex !== -1 && updatedNotes.length > 0) {
@@ -158,12 +158,12 @@ $(() => {
       if (currentNote) {
         currentNote.title = titleElement.val();
         currentNote.content = simplemde.value();
-        chrome.storage.sync.get({ notes: [] }, (data) => {
+        chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
           const index = existingNotes.findIndex((note) => note.id === currentNote.id);
           if (index !== -1) {
             existingNotes[index] = currentNote;
-            chrome.storage.sync.set({ notes: existingNotes }, () => {
+            chrome.storage.local.set({ notes: existingNotes }, () => {
               viewNote(currentNote);
               loadExistingNotes();
             });
