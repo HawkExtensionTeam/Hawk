@@ -16,7 +16,7 @@
     "default_icon": "images/logo128x128.png"
   },
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "dist/bundle.js",
     "type": "module"
   },
   "content_scripts": [

@@ -1,4 +1,8 @@
 import MiniSearch from './assets/minisearch.min.js';
+import bm25f from './assets/wink-bm25-text-search.min.js';
+
+const BM25F = bm25f();
+BM25F.getDocs();
 
 const miniSearch = new MiniSearch({
   fields: ['title', 'body'],
