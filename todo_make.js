@@ -234,9 +234,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
             updateChecklist(existingTasks);
 
-            // You can add any other logic or UI updates after editing the task
             $('#editForm').hide(); // Hide the edit form after submission
-            // Add any additional UI feedback or reset form logic here
           });
         }
       });
