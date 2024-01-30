@@ -11,7 +11,12 @@ function exportAll() {
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
-			exportAll();
+				const $backupBtn = $(event.currentTarget);
+				exportAll();
+				$backupBtn.text("Downloaded data backup");
+				setTimeout(function() {
+					$backupBtn.text("Export extension data to backup (JSON)");
+				}, 1000);
     });
   });
 }
