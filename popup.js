@@ -3,6 +3,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#new-tab-button').on('click', () => {
       chrome.tabs.create({ url: 'new_tab.html' });
     });
+
+    $('#manage-settings-container').on('click', () => {
+      chrome.tabs.create({url: 'settings.html'})  ; 
+    });
+
     $('#notebook').on('click', () => {
       chrome.tabs.create({ url: 'add_note.html' });
     });
