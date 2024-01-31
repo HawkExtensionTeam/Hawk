@@ -222,7 +222,7 @@ var bm25fIMS = function () {
     for ( var field in cfg.fldWeights ) {
       // The `null` check is required as `isNaN( null )` returns `false`!!
       // This first ensures non-`null/undefined/0` values before testing for NaN.
-      if ( isNaN( cfg.fldWeights[ field ] ) ) {
+      if ( !cfg.fldWeights[ field ] || isNaN( cfg.fldWeights[ field ] ) ) {
         throw Error( 'winkBM25S: Field weight should be number >0, instead found: ' + JSON.stringify( cfg.fldWeights[ field ] ) );
       }
       // Update config parameters from `cfg`.
@@ -301,7 +301,7 @@ var bm25fIMS = function () {
       if ( doc[ field ] === undefined ) {
         throw Error( 'winkBM25S: Missing field in the document: ' + JSON.stringify( field ) );
       }
-      length = updateFreq( id, String(doc[ field ]), fldWeights[ field ], documents[ id ].freq, field );
+      length = updateFreq( id, doc[ field ], fldWeights[ field ], documents[ id ].freq, field );
       documents[ id ].length += length;
       totalCorpusLength += length;
     }
@@ -421,61 +421,6 @@ var bm25fIMS = function () {
   // retained field name/value pairs along with the `params` (which is passed as
   // the second argument). It is useful in limiting the search space or making the
   // search more focussed.
-  // var search = function ( text, limit, filter, params ) {
-  //   // Predict/Search only if learnings have been consolidated!
-  //   if ( !consolidated ) {
-  //     throw Error( 'winkBM25S: search is not possible unless learnings are consolidated!' );
-  //   }
-  //   if ( typeof text !== 'string' ) {
-  //     throw Error( 'winkBM25S: search text should be a string, instead found: ' + ( typeof text ) );
-  //   }
-  //   // Setup filter function
-  //   var f = ( typeof filter === 'function' ) ?
-  //             filter :
-  //             function () {
-  //               return true;
-  //             };
-  //   // Tokenized `text`. Use search specific weights.
-  //   var tkns = prepareInput( text, 'search' )
-  //               // Filter out tokens that do not exists in the vocabulary.
-  //               .filter( function ( t ) {
-  //                  return ( token2Index[ t ] !== undefined );
-  //                } )
-  //               // Now map them to their respective indexes using `token2Index`.
-  //               .map( function ( t ) {
-  //                  return token2Index[ t ];
-  //                } );
-  //   // Search results go here as doc id/score pairs.
-  //   var results = Object.create( null );
-  //   // Helper variables.
-  //   var id, ids, t;
-  //   var i, imax, j, jmax;
-  //   // Iterate for every token in the preapred text.
-  //   for ( j = 0, jmax = tkns.length; j < jmax; j += 1 ) {
-  //     t = tkns[ j ];
-  //     // Use Inverted Idx to look up - accelerates search!<br/>
-  //     // Note, `ids` can never be `undefined` as **unknown** tokens have already
-  //     // been filtered.
-  //     ids = invertedIdx[ t ];
-  //     // Means the token exists in the vocabulary!
-  //     // Compute scores for every document.
-  //     for ( i = 0, imax = ids.length; i < imax; i += 1 ) {
-  //       id = ids[ i ];
-  //       if ( f( documents[ id ].fieldValues, params ) ) {
-  //         results[ id ] = documents[ id ].freq[ t ] + ( results[ id ] || 0 );
-  //       }
-  //       // To be uncommented to probe values!
-  //       /* console.log( '%s, %d, %d, %d', t, documents[ id ].freq[ t ], idf[ t ], results[ id ] ); */
-  //     }
-  //   }
-  //   // Convert to a table in `[ id, score ]` format; sort and slice required number
-  //   // of resultant documents.
-  //   return ( ( helpers.object.table( results ) )
-  //               .sort( helpers.array.descendingOnValue )
-  //               .slice( 0, Math.max( ( limit || 10 ), 1 ) )
-  //          );
-  // }; // search()
-
   var search = function ( text, limit, filter, params ) {
     // Predict/Search only if learnings have been consolidated!
     if ( !consolidated ) {
@@ -517,24 +462,18 @@ var bm25fIMS = function () {
       for ( i = 0, imax = ids.length; i < imax; i += 1 ) {
         id = ids[ i ];
         if ( f( documents[ id ].fieldValues, params ) ) {
-          results[ id ] = {
-            id: id,
-            title: documents[id].fieldValues.title,
-            body: documents[id].fieldValues.body,
-            url: documents[id].fieldValues.url,
-            score: documents[ id ].freq[ t ] + ( results[ id ] ? results[ id ].score : 0 ),
-          };
+          results[ id ] = documents[ id ].freq[ t ] + ( results[ id ] || 0 );
         }
         // To be uncommented to probe values!
-        // console.log( '%s, %d, %d, %d', t, documents[ id ].freq[ t ], idf[ t ], results[ id ] );
+        /* console.log( '%s, %d, %d, %d', t, documents[ id ].freq[ t ], idf[ t ], results[ id ] ); */
       }
     }
     // Convert to a table in `[ id, score ]` format; sort and slice required number
     // of resultant documents.
-    return (Object.values(results)
-          .sort((a, b) => b.score - a.score)
-          .slice(0, Math.max(limit || 10, 1))
-    );
+    return ( ( helpers.object.table( results ) )
+                .sort( helpers.array.descendingOnValue )
+                .slice( 0, Math.max( ( limit || 10 ), 1 ) )
+           );
   }; // search()
 
   // #### Reset

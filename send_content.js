@@ -8,7 +8,7 @@ $(document).on('click', 'a', (event) => {
 
   // Check if the clicked link is not an anchor link within the same page
   if (clickedURL.origin === new URL(currentURL).origin && clickedURLPath === currentURLPath) {
-    const visibleTextContent = $('body').text();
+    const visibleTextContent = document.body.innerText;
 
     // Send a message indicating that the page has navigated
     try {
@@ -24,7 +24,7 @@ $(document).on('click', 'a', (event) => {
 });
 
 $(document).ready(() => {
-  const visibleTextContent = $('body').text();
+  const visibleTextContent = document.body.innerText;
   chrome.runtime.sendMessage({
     action: 'sendVisibleTextContent',
     visibleTextContent,

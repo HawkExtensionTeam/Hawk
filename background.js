@@ -39,7 +39,7 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
       const prepTask = prep;
       engine.defineConfig({
         fldWeights: {
-          title: 3, body: 2, id: 1, url: 1,
+          title: 3, body: 2,
         },
       });
       engine.definePrepTasks([prepTask]);
@@ -52,6 +52,12 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
       console.log('%d entries found.', results.length);
       // eslint-disable-next-line no-console
       console.log('results', results);
+      if (results.length) {
+        for (let j = 0; j < results.length; j += 1) {
+          // eslint-disable-next-line no-console
+          console.log(corpus[results[j][0]].title);
+        }
+      }
 
       const searchResults = miniSearch.search(text, {
         boost: { title: 2 },
@@ -110,6 +116,8 @@ chrome.runtime.onMessage.addListener(async (request) => {
       });
     });
     if (tabs && tabs.length) {
+      // eslint-disable-next-line no-console
+      console.log('content', request.visibleTextContent);
       chrome.storage.local.get(['indexed']).then((result) => {
         const indexed = result.indexed || {};
         if (Object.keys(indexed).length === 0) {

@@ -19,7 +19,7 @@ function overwriteIndex(indexArray) {
   chrome.storage.local.get(['indexed'], () => {
     const newIndexed = {
       corpus: indexArray[0],
-      links: indexArray[1]
+      links: indexArray[1],
     };
     chrome.storage.local.set({ indexed: newIndexed });
   });
@@ -53,10 +53,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
-		
-		$(document).on('change', '#jsonIndexInput', (event) => {
+
+    $(document).on('change', '#jsonIndexInput', (event) => {
       const selectedFile = event.target.files[0];
-			
+
       if (selectedFile) {
         const reader = new FileReader();
         reader.onload = (e) => {
