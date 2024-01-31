@@ -16,8 +16,7 @@ function overwriteTasks(tasks) {
 }
 
 function overwriteIndex(indexArray) {
-	console.log(indexArray);
-  chrome.storage.local.get(['indexed'], (result) => {
+  chrome.storage.local.get(['indexed'], () => {
     const newIndexed = {
       corpus: indexArray[0],
       links: indexArray[1]
