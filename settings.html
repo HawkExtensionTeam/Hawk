@@ -6,14 +6,31 @@
     <title>To-Do Make - Settings</title>
 </head>
 
-<body class="d-flex justify-content-center align-items-center">
-    <div class="container mt-5" id="backup-pane">
-        <button class="btn btn-primary backup-btn">Export extension data to backup (JSON)</button>
+<body class="d-flex flex-column align-items-center">
+    <div class="row w-100" id="page-title">
+        <h1>Settings</h1>
     </div>
-    <div class="container mt-5" id="restore-pane">
-        <label for="jsonInput" class="btn btn-primary tasks-restore-btn">Upload data to restore tasks</label>
-        <input type="file" id="jsonInput" name="jsonInput" accept=".json" style="display: none;"/>
+
+    <div class="container mt-5" id="backup-pane">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary backup-btn">Export extension data to backup (JSON)</button>
+            </div>
         </div>
+    </div>
+
+    <div class="container mt-5" id="restore-pane">
+        <div class="row">
+            <div class="col-md-6">
+                <label for="jsonIndexInput" class="btn btn-primary index-restore-btn">Upload data to restore search index</label>
+                <input type="file" id="jsonIndexInput" name="jsonIndexInput" accept=".json" style="display: none;" />
+            </div>
+            <div class="col-md-6">
+                <label for="jsonInput" class="btn btn-primary tasks-restore-btn">Upload data to restore tasks</label>
+                <input type="file" id="jsonInput" name="jsonInput" accept=".json" style="display: none;" />
+            </div>
+        </div>
+    </div>
 
     <script src="assets/jquery-3.7.1.min.js"></script>
     <script src="todo_make_settings.js"></script>
