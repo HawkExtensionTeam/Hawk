@@ -1,6 +1,10 @@
 import MiniSearch from './assets/minisearch.min.js';
 import bm25f from './assets/wink-bm25-text-search.min.js';
 
+const winkNLP = require('wink-nlp');
+const model = require('wink-eng-lite-web-model');
+const bm25 = require('./assets/wink-bm25-text-search.js');
+
 const BM25F = bm25f();
 BM25F.getDocs();
 
@@ -17,6 +21,38 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
     if (result && result.indexed) {
       const { corpus } = result.indexed;
+
+      const engine = bm25();
+      const nlp = winkNLP(model);
+      const { its } = nlp;
+
+      // eslint-disable-next-line no-inner-declarations
+      function prep(data) {
+        const tokens = [];
+        nlp.readDoc(data)
+          .tokens()
+          .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
+          .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
+        return tokens;
+      }
+
+      const prepTask = prep;
+      engine.defineConfig({
+        fldWeights: {
+          title: 3, body: 2, id: 1, url: 1,
+        },
+      });
+      engine.definePrepTasks([prepTask]);
+      corpus.forEach((doc, i) => {
+        engine.addDoc(doc, i);
+      });
+      engine.consolidate();
+      const results = engine.search(text);
+      // eslint-disable-next-line no-console
+      console.log('%d entries found.', results.length);
+      // eslint-disable-next-line no-console
+      console.log('results', results);
+
       const searchResults = miniSearch.search(text, {
         boost: { title: 2 },
         prefix: (term) => term.length > 3,

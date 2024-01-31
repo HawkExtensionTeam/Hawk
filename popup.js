@@ -5,7 +5,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
 
     $('#manage-settings-container').on('click', () => {
-      chrome.tabs.create({url: 'settings.html'})  ; 
+      chrome.tabs.create({ url: 'settings.html' });
     });
 
     $('#notebook').on('click', () => {
