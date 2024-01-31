@@ -239,6 +239,11 @@ label {
     margin-left: 8px;
 }
 
+.btn.btn-primary.index-restore-btn,
+.btn.btn-primary.tasks-restore-btn {
+	margin-left: 0px;
+}
+
 input[type="checkbox"] {
 	background-color: #FFFFFF;
 }
