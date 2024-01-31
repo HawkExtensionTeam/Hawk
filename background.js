@@ -21,41 +21,42 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
     if (result && result.indexed) {
       const { corpus } = result.indexed;
+      if (corpus.length >= 3) {
+        const engine = bm25();
+        const nlp = winkNLP(model);
+        const { its } = nlp;
 
-      const engine = bm25();
-      const nlp = winkNLP(model);
-      const { its } = nlp;
+        // eslint-disable-next-line no-inner-declarations
+        function prep(data) {
+          const tokens = [];
+          nlp.readDoc(data)
+            .tokens()
+            .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
+            .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
+          return tokens;
+        }
 
-      // eslint-disable-next-line no-inner-declarations
-      function prep(data) {
-        const tokens = [];
-        nlp.readDoc(data)
-          .tokens()
-          .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
-          .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
-        return tokens;
-      }
-
-      const prepTask = prep;
-      engine.defineConfig({
-        fldWeights: {
-          title: 3, body: 2,
-        },
-      });
-      engine.definePrepTasks([prepTask]);
-      corpus.forEach((doc, i) => {
-        engine.addDoc(doc, i);
-      });
-      engine.consolidate();
-      const results = engine.search(text);
-      // eslint-disable-next-line no-console
-      console.log('%d entries found.', results.length);
-      // eslint-disable-next-line no-console
-      console.log('results', results);
-      if (results.length) {
-        for (let j = 0; j < results.length; j += 1) {
-          // eslint-disable-next-line no-console
-          console.log(corpus[results[j][0]].title);
+        const prepTask = prep;
+        engine.defineConfig({
+          fldWeights: {
+            title: 3, body: 2,
+          },
+        });
+        engine.definePrepTasks([prepTask]);
+        corpus.forEach((doc, i) => {
+          engine.addDoc(doc, i);
+        });
+        engine.consolidate();
+        const results = engine.search(text);
+        // eslint-disable-next-line no-console
+        console.log('%d entries found.', results.length);
+        // eslint-disable-next-line no-console
+        console.log('results', results);
+        if (results.length) {
+          for (let j = 0; j < results.length; j += 1) {
+            // eslint-disable-next-line no-console
+            console.log(corpus[results[j][0]].title);
+          }
         }
       }
 
