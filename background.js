@@ -1,4 +1,45 @@
+import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
+
+const engine = new BM25F();
+const winkNLP = require('wink-nlp');
+const model = require('wink-eng-lite-web-model');
+
+const nlp = winkNLP(model);
+const { its } = nlp;
+const _ = require('lodash');
+
+const { removeStopwords } = require('stopword');
+
+const prepTask = function prepTask(text) {
+  const tokens = [];
+  nlp.readDoc(text)
+    .tokens()
+    .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
+    .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
+  return tokens;
+};
+
+let docs;
+await chrome.storage.local.get(['indexed']).then((result) => {
+  if (result && result.indexed) {
+    docs = result.indexed.corpus;
+  }
+});
+
+let runningEngine;
+
+engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
+engine.definePrepTasks([prepTask]);
+if (docs && docs.length) {
+  docs.forEach((doc, i) => {
+    engine.addDoc(doc, i + 1);
+  });
+  if (docs.length >= 3) {
+    runningEngine = _.cloneDeep(engine);
+    runningEngine.consolidate();
+  }
+}
 
 const miniSearch = new MiniSearch({
   fields: ['title', 'body'],
@@ -11,30 +52,45 @@ chrome.storage.local.get(['indexed']).then((result) => {
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
-    if (result && result.indexed) {
+    if (Object.keys(result).length > 0) {
       const { corpus } = result.indexed;
+      if (corpus.length) {
+        const suggestions = [];
+        let searchResults = [];
 
-      const searchResults = miniSearch.search(text, {
-        boost: { title: 2 },
-        prefix: (term) => term.length > 3,
-        fuzzy: (term) => (term.length > 3 ? 0.2 : null),
-      });
+        if (corpus.length >= 3) {
+          searchResults = runningEngine.search(text);
+          for (let i = 0; i < 10; i += 1) {
+            if (i === searchResults.length) break;
+            const page = corpus[searchResults[i][0] - 1];
+            suggestions.push({
+              content: page.url,
+              description: page.title,
+              deletable: true,
+            });
+          }
+        }
 
-      const suggestions = [];
-      let i = 0;
-      while (i < 10) {
-        if (i === searchResults.length) break;
-        const searchResult = searchResults[i];
-        const page = corpus[searchResult.id - 1];
-        suggestions.push({
-          content: page.url,
-          description: page.title,
-          deletable: true,
-        });
-        i += 1;
+        if (!suggestions.length) {
+          searchResults = miniSearch.search(text, {
+            boost: { title: 3 },
+            prefix: (term) => term.length > 3,
+            fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+          });
+          for (let i = 0; i < 10; i += 1) {
+            if (i === searchResults.length) break;
+            const searchResult = searchResults[i];
+            const page = corpus[searchResult.id - 1];
+            suggestions.push({
+              content: page.url,
+              description: page.title,
+              deletable: true,
+            });
+          }
+        }
+
+        suggest(suggestions);
       }
-
-      suggest(suggestions);
     }
   });
 });
@@ -71,8 +127,6 @@ chrome.runtime.onMessage.addListener(async (request) => {
       });
     });
     if (tabs && tabs.length) {
-      // eslint-disable-next-line no-console
-      console.log('content', request.visibleTextContent);
       chrome.storage.local.get(['indexed']).then((result) => {
         const indexed = result.indexed || {};
         if (Object.keys(indexed).length === 0) {
@@ -89,10 +143,26 @@ chrome.runtime.onMessage.addListener(async (request) => {
             body: request.visibleTextContent,
           };
 
+          const decodedURL = decodeURIComponent(page.url);
+          if (`https://www.${page.title}` === decodedURL) {
+            return;
+          } if (`https://${page.title}` === decodedURL) {
+            return;
+          }
+
+          const oldBody = page.body.split(/\n|\s/);
+          const newBody = removeStopwords(oldBody).join(' ');
+          page.body = newBody;
           indexed.corpus.push(page);
           indexed.links.add(url);
 
           miniSearch.add(page);
+
+          engine.addDoc(page, String(page.id));
+          runningEngine = _.cloneDeep(engine);
+          if (Object.keys(runningEngine.getDocs()).length >= 3) {
+            runningEngine.consolidate();
+          }
 
           // must convert to an array to avoid values being lost when
           // the set is converted to an Object during serialisation
