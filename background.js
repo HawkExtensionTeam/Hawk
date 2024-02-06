@@ -9,6 +9,8 @@ const nlp = winkNLP(model);
 const { its } = nlp;
 const _ = require('lodash');
 
+const { removeStopwords } = require('stopword');
+
 const prepTask = function prepTask(text) {
   const tokens = [];
   nlp.readDoc(text)
@@ -141,6 +143,9 @@ chrome.runtime.onMessage.addListener(async (request) => {
             body: request.visibleTextContent,
           };
 
+          const oldBody = page.body.split(/\n|\s/);
+          const newBody = removeStopwords(oldBody).join(' ');
+          page.body = newBody;
           indexed.corpus.push(page);
           indexed.links.add(url);
 

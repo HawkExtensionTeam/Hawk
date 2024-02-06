@@ -34,6 +34,7 @@
     "lodash": "^4.17.21",
     "minisearch": "^6.3.0",
     "puppeteer": "^21.7.0",
+    "stopword": "^3.0.1",
     "wink-bm25-text-search": "^3.1.2",
     "wink-eng-lite-web-model": "^1.5.2",
     "wink-nlp": "^1.14.3"
