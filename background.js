@@ -1,12 +1,43 @@
+import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
-import bm25f from './assets/wink-bm25-text-search.min.js';
 
+const engine = new BM25F();
 const winkNLP = require('wink-nlp');
 const model = require('wink-eng-lite-web-model');
-const bm25 = require('./assets/wink-bm25-text-search.js');
 
-const BM25F = bm25f();
-BM25F.getDocs();
+const nlp = winkNLP(model);
+const { its } = nlp;
+const _ = require('lodash');
+
+const prepTask = function prepTask(text) {
+  const tokens = [];
+  nlp.readDoc(text)
+    .tokens()
+    .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
+    .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
+  return tokens;
+};
+
+let docs;
+await chrome.storage.local.get(['indexed']).then((result) => {
+  if (result && result.indexed) {
+    docs = result.indexed.corpus;
+  }
+});
+
+let runningEngine;
+
+engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
+engine.definePrepTasks([prepTask]);
+if (docs && docs.length) {
+  docs.forEach((doc, i) => {
+    engine.addDoc(doc, i + 1);
+  });
+  if (docs.length >= 3) {
+    runningEngine = _.cloneDeep(engine);
+    runningEngine.consolidate();
+  }
+}
 
 const miniSearch = new MiniSearch({
   fields: ['title', 'body'],
@@ -19,56 +50,30 @@ chrome.storage.local.get(['indexed']).then((result) => {
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
-    if (result && result.indexed) {
-      const { corpus } = result.indexed;
-      if (corpus.length >= 3) {
-        const engine = bm25();
-        const nlp = winkNLP(model);
-        const { its } = nlp;
+    const { corpus } = result.indexed;
+    const suggestions = [];
+    let searchResults = [];
 
-        // eslint-disable-next-line no-inner-declarations
-        function prep(data) {
-          const tokens = [];
-          nlp.readDoc(data)
-            .tokens()
-            .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
-            .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
-          return tokens;
-        }
-
-        const prepTask = prep;
-        engine.defineConfig({
-          fldWeights: {
-            title: 3, body: 2,
-          },
+    if (corpus.length >= 3) {
+      searchResults = runningEngine.search(text);
+      for (let i = 0; i < 10; i += 1) {
+        if (i === searchResults.length) break;
+        const page = corpus[searchResults[i][0] - 1];
+        suggestions.push({
+          content: page.url,
+          description: page.title,
+          deletable: true,
         });
-        engine.definePrepTasks([prepTask]);
-        corpus.forEach((doc, i) => {
-          engine.addDoc(doc, i);
-        });
-        engine.consolidate();
-        const results = engine.search(text);
-        // eslint-disable-next-line no-console
-        console.log('%d entries found.', results.length);
-        // eslint-disable-next-line no-console
-        console.log('results', results);
-        if (results.length) {
-          for (let j = 0; j < results.length; j += 1) {
-            // eslint-disable-next-line no-console
-            console.log(corpus[results[j][0]].title);
-          }
-        }
       }
+    }
 
-      const searchResults = miniSearch.search(text, {
-        boost: { title: 2 },
+    if (!suggestions.length) {
+      searchResults = miniSearch.search(text, {
+        boost: { title: 3 },
         prefix: (term) => term.length > 3,
         fuzzy: (term) => (term.length > 3 ? 0.2 : null),
       });
-
-      const suggestions = [];
-      let i = 0;
-      while (i < 10) {
+      for (let i = 0; i < 10; i += 1) {
         if (i === searchResults.length) break;
         const searchResult = searchResults[i];
         const page = corpus[searchResult.id - 1];
@@ -77,11 +82,10 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
           description: page.title,
           deletable: true,
         });
-        i += 1;
       }
-
-      suggest(suggestions);
     }
+
+    suggest(suggestions);
   });
 });
 
@@ -117,8 +121,6 @@ chrome.runtime.onMessage.addListener(async (request) => {
       });
     });
     if (tabs && tabs.length) {
-      // eslint-disable-next-line no-console
-      console.log('content', request.visibleTextContent);
       chrome.storage.local.get(['indexed']).then((result) => {
         const indexed = result.indexed || {};
         if (Object.keys(indexed).length === 0) {
@@ -139,6 +141,12 @@ chrome.runtime.onMessage.addListener(async (request) => {
           indexed.links.add(url);
 
           miniSearch.add(page);
+
+          engine.addDoc(page, String(page.id));
+          runningEngine = _.cloneDeep(engine);
+          if (Object.keys(runningEngine.getDocs()).length >= 3) {
+            runningEngine.consolidate();
+          }
 
           // must convert to an array to avoid values being lost when
           // the set is converted to an Object during serialisation
