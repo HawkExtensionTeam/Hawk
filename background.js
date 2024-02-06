@@ -50,42 +50,46 @@ chrome.storage.local.get(['indexed']).then((result) => {
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
-    const { corpus } = result.indexed;
-    const suggestions = [];
-    let searchResults = [];
+    if (Object.keys(result).length > 0) {
+      const { corpus } = result.indexed;
+      if (corpus.length) {
+        const suggestions = [];
+        let searchResults = [];
 
-    if (corpus.length >= 3) {
-      searchResults = runningEngine.search(text);
-      for (let i = 0; i < 10; i += 1) {
-        if (i === searchResults.length) break;
-        const page = corpus[searchResults[i][0] - 1];
-        suggestions.push({
-          content: page.url,
-          description: page.title,
-          deletable: true,
-        });
+        if (corpus.length >= 3) {
+          searchResults = runningEngine.search(text);
+          for (let i = 0; i < 10; i += 1) {
+            if (i === searchResults.length) break;
+            const page = corpus[searchResults[i][0] - 1];
+            suggestions.push({
+              content: page.url,
+              description: page.title,
+              deletable: true,
+            });
+          }
+        }
+
+        if (!suggestions.length) {
+          searchResults = miniSearch.search(text, {
+            boost: { title: 3 },
+            prefix: (term) => term.length > 3,
+            fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+          });
+          for (let i = 0; i < 10; i += 1) {
+            if (i === searchResults.length) break;
+            const searchResult = searchResults[i];
+            const page = corpus[searchResult.id - 1];
+            suggestions.push({
+              content: page.url,
+              description: page.title,
+              deletable: true,
+            });
+          }
+        }
+
+        suggest(suggestions);
       }
     }
-
-    if (!suggestions.length) {
-      searchResults = miniSearch.search(text, {
-        boost: { title: 3 },
-        prefix: (term) => term.length > 3,
-        fuzzy: (term) => (term.length > 3 ? 0.2 : null),
-      });
-      for (let i = 0; i < 10; i += 1) {
-        if (i === searchResults.length) break;
-        const searchResult = searchResults[i];
-        const page = corpus[searchResult.id - 1];
-        suggestions.push({
-          content: page.url,
-          description: page.title,
-          deletable: true,
-        });
-      }
-    }
-
-    suggest(suggestions);
   });
 });
 
