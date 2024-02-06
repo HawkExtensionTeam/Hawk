@@ -23,6 +23,7 @@ const currentURL = window.location.href;
 
 $(document).on('click', 'a', (event) => {
   let link = $(event.target).prop('href');
+  if (!link) return;
   const parts = link.split('?');
   if (parts.length > 1) {
     link = parseURLWithParams(parts);

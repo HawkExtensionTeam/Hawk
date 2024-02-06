@@ -143,6 +143,13 @@ chrome.runtime.onMessage.addListener(async (request) => {
             body: request.visibleTextContent,
           };
 
+          const decodedURL = decodeURIComponent(page.url);
+          if (`https://www.${page.title}` === decodedURL) {
+            return;
+          } if (`https://${page.title}` === decodedURL) {
+            return;
+          }
+
           const oldBody = page.body.split(/\n|\s/);
           const newBody = removeStopwords(oldBody).join(' ');
           page.body = newBody;
