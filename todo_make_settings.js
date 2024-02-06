@@ -35,13 +35,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         $backupBtn.text('Export extension data to backup (JSON)');
       }, 1000);
     });
-		
-		$(document).on('click', '.settings-entry', (event) => {
+
+    $(document).on('click', '.settings-entry', (event) => {
       const $entry = $(event.currentTarget);
-			$('.settings-entry').removeClass('selected');
-			$entry.addClass('selected');
-			$('.settings-pane').addClass('hidden');
-			$('#' + $entry.attr('id') + '-pane').removeClass('hidden');
+      $('.settings-entry').removeClass('selected');
+      $entry.addClass('selected');
+      $('.settings-pane').addClass('hidden');
+      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     });
 
     $(document).on('change', '#jsonInput', (event) => {
