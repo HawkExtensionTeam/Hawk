@@ -86,15 +86,13 @@ function openEditForm(taskId) {
     const allTasks = result.tasks || {};
     const taskToEdit = allTasks[taskId];
 
-    // Pre-fill the form with existing task details
     $('#editTaskInput').val(taskToEdit.title);
     $('#editDescriptionInput').val(taskToEdit.description);
     const dueDate = new Date(taskToEdit.due);
-    $('#editDateInput').val(`${dueDate.getFullYear()}/${dueDate.getMonth() + 1}/${dueDate.getDate()}`);
+    $('#editDateInput').val(`${dueDate.getFullYear()}/${String(dueDate.getMonth() + 1).padStart(2, '0')}/${String(dueDate.getDate()).padStart(2, '0')}`);
     $('#editTimeInput').val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
     editForm.attr('edit-task-id', taskId);
 
-    // Show the form
     editForm.toggle();
   });
 }
@@ -179,14 +177,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
 
     $('#editForm').on('submit', (event) => {
-      // prevents default page reload
       event.preventDefault();
       const editedTaskTitle = $('#editTaskInput').val().trim();
       const editedTaskDescription = $('#editDescriptionInput').val().trim();
       const editedTaskDate = $('#editDateInput').val().trim();
       const editedTaskTime = $('#editTimeInput').val().trim();
-
-      // Perform validation on edited task data here if needed
 
       const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
       if (!editedTimeRegex.test(editedTaskTime)) {
@@ -196,7 +191,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const [editedHoursStr, editedMinutesStr] = editedTaskTime.split(':');
       const editedHours = parseInt(editedHoursStr, 10);
       const editedMinutes = parseInt(editedMinutesStr, 10);
-
       const editedDateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
       if (!editedDateRegex.test(editedTaskDate)) {
         return;
@@ -207,7 +201,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const editedMonths = parseInt(editedMonthsStr, 10);
       const editedDays = parseInt(editedDaysStr, 10);
 
-      // months start from 0
       const editedDueDate = new Date(
         editedYears,
         editedMonths - 1,
@@ -234,7 +227,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
             updateChecklist(existingTasks);
 
-            $('#editForm').hide(); // Hide the edit form after submission
+            $('#editForm').hide();
           });
         }
       });
