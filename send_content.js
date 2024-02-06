@@ -1,8 +1,33 @@
+// sometimes params contain invalid characters like underscores
+// encode them to avoid the URL constructor throwing an error
+const parseURLWithParams = function parseURLWithParams(parts) {
+  const baseURL = parts[0];
+  const queryParams = parts[1];
+  const params = queryParams.split('&');
+  let newURL = `${baseURL}?`;
+  params.forEach((param, index) => {
+    if (index > 0) {
+      newURL += '&';
+    }
+
+    const [key, value] = param.split('=');
+    const encodedKey = encodeURIComponent(key);
+    const encodedValue = encodeURIComponent(value);
+    newURL += `${encodedKey}=${encodedValue}`;
+  });
+
+  return newURL;
+};
+
 const currentURL = window.location.href;
 
 $(document).on('click', 'a', (event) => {
-  const link = $(event.target);
-  const clickedURL = new URL(link.prop('href'));
+  let link = $(event.target).prop('href');
+  const parts = link.split('?');
+  if (parts.length > 1) {
+    link = parseURLWithParams(parts);
+  }
+  const clickedURL = new URL(link);
   const clickedURLPath = clickedURL.pathname.replace(/\/[^\/]+$/, '');
   const currentURLPath = new URL(currentURL).pathname.replace(/\/[^\/]+$/, '');
 
