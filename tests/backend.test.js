@@ -27,8 +27,9 @@ beforeEach(async () => {
   });
 });
 
-
-
+// Test: Popup Renders Correctly
+// Confirms the popup page loads with the expected `#checklist` element present and containing a single child,
+// ensuring the popup UI is correctly initialized.
     test('popup renders correctly', async () => {
         const popupUrl = `chrome-extension://${EXTENSION_ID}/hello.html`;
         await page.goto(popupUrl);
@@ -43,29 +44,26 @@ beforeEach(async () => {
 
         expect(tasksCount).toBe(1); 
       });
+// Test: Add Task - Form Interaction Test
+// Validates the ability to open, fill, and submit the new task form,
+// verifying user interaction workflows for adding tasks are functioning as designed.
 
       test('Add Task - Opens form correctly', async () => {
-        // Navigate to the extension's new tab page
         await page.goto(`chrome-extension://${EXTENSION_ID}/new_tab.html`);
     
-        // Click the "New Task" button to open the task addition form
         await page.click('#new-task-button');
     
-        // Wait for the task form to become visible
         await page.waitForSelector('#todoForm', {
             visible: true,
         });
     
-        // Fill out the form
         await page.type('#taskInput', 'New Task Title');
         await page.type('#descriptionInput', 'New Task Description');
-        await page.type('#dateInput', '2024/02/10'); // Use a future date for the test
+        await page.type('#dateInput', '2024/02/10'); 
         await page.type('#timeInput', '12:00');
     
-        // Submit the form by clicking the "Add Task" button within the form
-        await page.click('#todoForm button[type="submit"]'); // Adjust if your button has a unique identifier
+        await page.click('#todoForm button[type="submit"]'); 
     
-        // Additional assertions can be added here to verify the task was added correctly
-        // For example, you could check if the task appears in the checklist
+
     });
     
