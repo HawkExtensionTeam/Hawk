@@ -22,8 +22,12 @@ function showTasks(tasks) {
 	selectiveList.empty();
 	$.each(tasks, function(key, value) {
 		const taskDiv = $("<div>").addClass('task-row');
+		const title = "Title: " + value.title;
+		const desc = "Description: " + value.description;
+		const due = "Due: " + value.due;
 		taskDiv.append(
-				$("<label>").html("Title: " + value.title + "<br />" + "Description: " + value.description + "<br />" + "Due: " + value.due).prepend(
+				$("<label>").html(title + "<br />" + desc + "<br />" + due)
+				.prepend(
 						$("<input>").attr('type', 'checkbox').val(key)
 								.prop('checked', false)
 								.addClass('selective-checkbox')
@@ -39,7 +43,7 @@ function restoreSelectedTasks() {
 	if (curTasks) {
 		const toRestore = []
 		const selectiveList = $(".selective-list.task-list");
-		selectiveList.find('.selective-checkbox').each(function() {
+		selectiveList.find('.selective-checkbox').each(function _() {
 			const elt = $(this);
 			if (elt.is(':checked')) {
 				const taskId = elt.val();
