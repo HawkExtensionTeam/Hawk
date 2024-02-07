@@ -1,4 +1,9 @@
 let curTasks = null;
+const taskList = $('#selective-task-list');
+
+function hideLists() {
+  taskList.hide();
+}
 
 function exportAll() {
   chrome.storage.local.get(null, (data) => {
@@ -13,45 +18,45 @@ function exportAll() {
 }
 
 function overwriteTasks(tasks) {
-  chrome.storage.local.set({ "tasks" : tasks }, () => {
+  chrome.storage.local.set({ tasks }, () => {
   });
 }
 
 function showTasks(tasks) {
-	const selectiveList = $(".selective-list.task-list");
-	selectiveList.empty();
-	$.each(tasks, function(key, value) {
-		const taskDiv = $("<div>").addClass('task-row');
-		const title = "Title: " + value.title;
-		const desc = "Description: " + value.description;
-		const due = "Due: " + value.due;
-		taskDiv.append(
-				$("<label>").html(title + "<br />" + desc + "<br />" + due)
-				.prepend(
-						$("<input>").attr('type', 'checkbox').val(key)
-								.prop('checked', false)
-								.addClass('selective-checkbox')
-				)
-		);
-		selectiveList.append(taskDiv);
-	});
-	$(".selective-task-list-col").css("visibility", "visible");
-	curTasks = tasks;
+  const selectiveList = $('.selective-list.task-list');
+  selectiveList.empty();
+  $.each(tasks, (key, value) => {
+    const taskDiv = $('<div>').addClass('task-row');
+    const title = `Title: ${value.title}`;
+    const desc = `Description: ${value.description}`;
+    const due = `Due: ${value.due}`;
+    taskDiv.append(
+      $('<label>').html(`${title}<br />${desc}<br />${due}`)
+        .prepend(
+          $('<input>').attr('type', 'checkbox').val(key)
+            .prop('checked', false)
+            .addClass('selective-checkbox'),
+        ),
+    );
+    selectiveList.append(taskDiv);
+  });
+  $('.selective-task-list-col').css('visibility', 'visible');
+  curTasks = tasks;
 }
 
 function restoreSelectedTasks() {
-	if (curTasks) {
-		const toRestore = []
-		const selectiveList = $(".selective-list.task-list");
-		selectiveList.find('.selective-checkbox').each(function _() {
-			const elt = $(this);
-			if (elt.is(':checked')) {
-				const taskId = elt.val();
-				toRestore.push({ ...curTasks[taskId] });
-			}
-		});
-		overwriteTasks(toRestore);
-	}
+  if (curTasks) {
+    const toRestore = [];
+    const selectiveList = $('.selective-list.task-list');
+    selectiveList.find('.selective-checkbox').each(function _() {
+      const elt = $(this);
+      if (elt.is(':checked')) {
+        const taskId = elt.val();
+        toRestore.push({ ...curTasks[taskId] });
+      }
+    });
+    overwriteTasks(toRestore);
+  }
 }
 
 function overwriteIndex(indexArray) {
@@ -66,6 +71,7 @@ function overwriteIndex(indexArray) {
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
+    hideLists();
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
       exportAll();
@@ -74,8 +80,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         $backupBtn.text('Export extension data to backup (JSON)');
       }, 1000);
     });
-		
-		$(document).on('click', '.btn.btn-primary.restore-tasks-btn', (event) => {
+
+    $(document).on('click', '.btn.btn-primary.restore-tasks-btn', (event) => {
       const $restoreBtn = $(event.currentTarget);
       restoreSelectedTasks();
       $restoreBtn.text('Restored!');
@@ -109,7 +115,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
-		
+
     $(document).on('change', '#jsonInputSelective', (event) => {
       const selectedFile = event.target.files[0];
 

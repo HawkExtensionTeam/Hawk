@@ -204,7 +204,8 @@ body {
     border-radius: 3px;
 }
 
-.task-list {
+.task-list,
+.note-list {
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -240,11 +241,13 @@ label {
 }
 
 .btn.btn-primary.index-restore-btn,
-.btn.btn-primary.tasks-restore-btn {
-	margin-left: 0px;
+.btn.btn-primary.tasks-restore-btn,
+.btn.btn-primary.note-restore-btn{
+	margin-left: 0;
 }
 
-.selective-task-list-col {
+.selective-task-list-col,
+.selective-note-list-col {
 	visibility: hidden;
 }
 

@@ -63,12 +63,25 @@
 								<div class="col">
 										<label for="jsonInputSelective" class="btn btn-primary tasks-restore-btn">Upload and select data to restore subset of tasks</label>
 										<input type="file" id="jsonInputSelective" name="jsonInputSelective" accept=".json" style="display: none;" />
-								</div>	
-								<div class="col selective-task-list-col">
+								</div>
+								<div class="col selective-task-list-col" id="selective-task-list">
 										<ul class="selective-list task-list">
 										</ul>
 										<button class="btn btn-primary restore-tasks-btn">Perform overwriting restore with selection</button>
 								</div>
+                                <div class="col">
+                                    <label for="jsonInputSelective" class="btn btn-primary note-restore-btn">Upload data to restore notes</label>
+                                    <input type="file" id="jsonNoteInput" name="jsonNoteInput" accept=".json" style="display: none;" />
+                                </div>
+                                <div class="col">
+                                    <label for="jsonInputSelective" class="btn btn-primary note-restore-btn">Upload and select data to restore subset of notes</label>
+                                    <input type="file" id="jsonNoteInputSelective" name="jsonNoteInputSelective" accept=".json" style="display: none;" />
+                                </div>
+                                <div class="col selective-note-list-col" id="selective-note-list">
+                                    <ul class="selective-list note-list">
+                                    </ul>
+                                    <button class="btn btn-primary restore-notes-btn">Perform overwriting restore with selection</button>
+                                </div>
             </div>
 						<div class="container mt-5 settings-pane hidden" id="about-pane">
 								Hello!
