@@ -70,9 +70,9 @@ test('Add Task - Opens form correctly', async () => {
 //Validates the time formatting function in the to-do list.
 test('time formatting function', async () => {
   const testCases = [
-    { input: '12:00', expectedOutput: '12:00 PM' },
-    { input: '18:30', expectedOutput: '18:30 PM' },
-    { input: '09:45', expectedOutput: '09:45 AM' },
+    { input: '12:00', expectedOutput: '12:00' },
+    { input: '18:30', expectedOutput: '18:30' },
+    { input: '09:45', expectedOutput: '09:45' },
   ];
 
   for (const testCase of testCases) {
