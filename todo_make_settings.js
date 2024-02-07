@@ -1,3 +1,5 @@
+let curTasks = null;
+
 function exportAll() {
   chrome.storage.local.get(null, (data) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -11,8 +13,41 @@ function exportAll() {
 }
 
 function overwriteTasks(tasks) {
-  chrome.storage.local.set({ tasks }, () => {
+  chrome.storage.local.set({ "tasks" : tasks }, () => {
   });
+}
+
+function showTasks(tasks) {
+	const selectiveList = $(".selective-list.task-list");
+	selectiveList.empty();
+	$.each(tasks, function(key, value) {
+		const taskDiv = $("<div>").addClass('task-row');
+		taskDiv.append(
+				$("<label>").html("Title: " + value.title + "<br />" + "Description: " + value.description + "<br />" + "Due: " + value.due).prepend(
+						$("<input>").attr('type', 'checkbox').val(key)
+								.prop('checked', false)
+								.addClass('selective-checkbox')
+				)
+		);
+		selectiveList.append(taskDiv);
+	});
+	$(".selective-task-list-col").css("visibility", "visible");
+	curTasks = tasks;
+}
+
+function restoreSelectedTasks() {
+	if (curTasks) {
+		const toRestore = []
+		const selectiveList = $(".selective-list.task-list");
+		selectiveList.find('.selective-checkbox').each(function() {
+			const elt = $(this);
+			if (elt.is(':checked')) {
+				const taskId = elt.val();
+				toRestore.push({ ...curTasks[taskId] });
+			}
+		});
+		overwriteTasks(toRestore);
+	}
 }
 
 function overwriteIndex(indexArray) {
@@ -33,6 +68,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $backupBtn.text('Downloaded data backup');
       setTimeout(() => {
         $backupBtn.text('Export extension data to backup (JSON)');
+      }, 1000);
+    });
+		
+		$(document).on('click', '.btn.btn-primary.restore-tasks-btn', (event) => {
+      const $restoreBtn = $(event.currentTarget);
+      restoreSelectedTasks();
+      $restoreBtn.text('Restored!');
+      setTimeout(() => {
+        $restoreBtn.text('Perform overwriting restore with selection');
       }, 1000);
     });
 
@@ -56,6 +100,23 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           if (Object.prototype.hasOwnProperty.call(content, 'tasks')) {
             const tasksArray = Object.values(content.tasks);
             overwriteTasks(tasksArray);
+          }
+        };
+        reader.readAsText(selectedFile);
+      }
+    });
+		
+    $(document).on('change', '#jsonInputSelective', (event) => {
+      const selectedFile = event.target.files[0];
+
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = JSON.parse(e.target.result);
+
+          if (Object.prototype.hasOwnProperty.call(content, 'tasks')) {
+            const tasksArray = Object.values(content.tasks);
+            showTasks(tasksArray);
           }
         };
         reader.readAsText(selectedFile);

@@ -221,7 +221,7 @@ body {
     align-items: center;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"]:not(.selective-checkbox) {
     background-color: #DDDDDD;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -244,11 +244,34 @@ label {
 	margin-left: 0px;
 }
 
-input[type="checkbox"] {
-	background-color: #FFFFFF;
+.selective-task-list-col {
+	visibility: hidden;
 }
 
-input[type="checkbox"]:checked {
+.selective-list {
+	border: 2px solid black;
+	background-color: #F5F5F5;
+	border-radius: 0.375rem;
+	padding-bottom: 2rem;
+}
+
+input.selective-checkbox[type="checkbox"] {
+}
+
+input.selective-checkbox[type="checkbox"]:checked {
+}
+
+.task-row {
+	margin-top: 2rem;
+}
+
+.selective-checkbox {
+    display: block;
+		clear: both;
+    margin-bottom: 10px;
+}
+
+input[type="checkbox"]:not(.selective-checkbox):checked {
     background-color: #C45500;
     border: 2px solid #C45500;
     color: #fff;
