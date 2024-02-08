@@ -41,5 +41,11 @@
         "send_content.js"
       ]
     }
-  ]
+  ],
+	"icons": {
+    "16": "logo16x16.png",
+    "32": "logo32x32.png",
+    "48": "logo48x48.png",
+    "128": "logo128x128.png"
+  }
 }
