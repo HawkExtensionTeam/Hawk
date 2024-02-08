@@ -36,15 +36,18 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
           if (dueDate < twentyFourHoursAgo) {
             delete existingTasks[taskId];
-          } else {
+          } 
+					else {
+						const passed = dueDate < new Date();
+						const label = "form-check-label" + (passed ? " text-danger" : "");
             $('#checklist').append(
               `<li class="list-group-item">
                 <div class="form-check">
                   <input type="checkbox" class="form-check-input" id="item${task.id}">
                   <div class="container">
                     <div class="row">
-                      <label class="form-check-label" for="item${task.id}">${task.title}</label>
-                      <label class="form-check-label" for="item${task.id}">${formattedDueDate}</label>
+                      <label class="${label}" for="item${task.id}">${task.title}</label>
+                      <label class="${label}" for="item${task.id}">${formattedDueDate}</label>
                     </div>
                   </div>
                 </div>

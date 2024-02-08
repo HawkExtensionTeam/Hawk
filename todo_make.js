@@ -45,16 +45,17 @@ function updateChecklist(tasks) {
       const task = tasks[taskId];
       const dueDate = new Date(task.due);
       const formattedDueDate = dueDate.toLocaleString();
-
+			const passed = dueDate < new Date();
+			const label = "form-check-label" + (passed ? " text-danger" : "");
       checklist.append(`
         <li class="list-group-item">
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="item${taskId}">
             <div class="container">
               <div class="row">
-                <label class="form-check-label" for="item${taskId}">${task.title}</label>
-                <label class="form-check-label" for="item${taskId}">${task.description}</label>
-                <label class="form-check-label" for="item${taskId}">${formattedDueDate}</label>
+                <label class="${label}" for="item${taskId}">${task.title}</label>
+                <label class="${label}" for="item${taskId}">${task.description}</label>
+                <label class="${label}" for="item${taskId}">${formattedDueDate}</label>
                 <div class="row">
                   <div class="col-sm">
                     <button type="button" class="btn btn-danger delete-btn" delete-task-id="${taskId}">Delete</button>
