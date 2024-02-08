@@ -27,7 +27,7 @@
     "jest-environment-puppeteer": "^9.0.2",
     "jest-puppeteer": "^9.0.2",
     "lint-staged": "^15.2.0",
-    "webpack": "^5.89.0",
+    "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
