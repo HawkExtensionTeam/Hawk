@@ -20,22 +20,28 @@ function sortTasks(tasks) {
   const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
   tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
   const sortedIds = tasksArray.map((task) => task.id);
-  const sortedTasks = {};
+  const sortedTasks = [];
+	let idx = 0;
   sortedIds.forEach((id) => {
-    taskId = Object.keys(sortedTasks).length + 1;
-    sortedTasks[taskId] = tasks[id];
+    sortedTasks[idx] = id;
+		idx++;
   });
-  chrome.storage.local.set({ tasks: sortedTasks }, () => {});
+  return sortedTasks;
 }
 
 function updateChecklist(tasks) {
   const checklist = $('#checklist');
   checklist.empty(); // Clear existing items
   if (Object.keys(tasks).length === 0) {
-    checklist.append('<h1>There are no tasks!</h1>');
-  } else {
-    sortTasks(tasks);
-    Object.keys(tasks).forEach((taskId) => {
+    checklist.append(`
+		<div class="row justify-contents-center text-center">
+			<h1>There are no tasks!</h1>
+		</div>
+		`);
+  } 
+	else {
+    const sortedTasks = sortTasks(tasks);
+    sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
       const dueDate = new Date(task.due);
       const formattedDueDate = dueDate.toLocaleString();
@@ -153,14 +159,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
       $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
         const existingTasks = result.tasks || {};
-        let taskId;
-        let pastTaskIds;
-        if ($.isEmptyObject(existingTasks)) {
-          taskId = '1';
-        } else {
-          pastTaskIds = Object.keys(existingTasks);
-          taskId = (Number(pastTaskIds[pastTaskIds.length - 1]) + 1).toString();
-        }
+        const taskId = Date.now() + taskTitle;
 
         existingTasks[taskId] = {
           title: taskTitle,
@@ -168,7 +167,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           // ISO strings are consistent between JS engines
           due: dueDate.toISOString(),
         };
-
+				
         // don't sync with other machines - extension is local
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
 					chrome.alarms.create(taskId, {when: dueDate.getTime()});
