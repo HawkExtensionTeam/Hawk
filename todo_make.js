@@ -154,6 +154,9 @@ function getTasks() {
 
 function deleteTask(allTasks, taskId) {
   delete allTasks[taskId];
+	if (Object.keys(allTasks).length === 0) {
+		allTasks = {};
+	}
   chrome.storage.local.set({ tasks: allTasks }, () => {
     updateChecklist(allTasks);
   });
