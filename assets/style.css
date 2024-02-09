@@ -1,41 +1,45 @@
 @font-face {
-    font-family: 'Roboto';
-    src: url('fonts/Roboto-Regular-webfont.woff') format('woff');
-    font-weight: 400;
-    font-style: normal;
+	font-family: 'Roboto';
+	src: url('fonts/Roboto-Regular-webfont.woff') format('woff');
+	font-weight: 400;
+	font-style: normal;
 }
 
 @font-face {
-    font-family: 'Roboto Medium';
-    src: url('fonts/Roboto-Medium-webfont.woff') format('woff');
-    font-weight: 500;
-    font-style: normal;
+	font-family: 'Roboto Medium';
+	src: url('fonts/Roboto-Medium-webfont.woff') format('woff');
+	font-weight: 500;
+	font-style: normal;
 }
 
 body {
-    font-family: Roboto, Arial, sans-serif;
-    background-color: white;
-    margin: 0;
-    width: 400px;
-    padding: 0;
+	font-family: Roboto, Arial, sans-serif;
+	background-color: white;
+	margin: 0;
+	width: 400px;
+	padding: 0;
+}
+
+ul {
+	list-style: none;
 }
 
 #main-container {
-    padding: 5px;
-    min-height: 550px;
-    width: 500px;
-    box-shadow: 0 0 5px #DDDDDD;
-    margin: 5px;
-    border-radius: 10px; 
+	padding: 5px;
+	min-height: 550px;
+	width: 500px;
+	box-shadow: 0 0 5px #DDDDDD;
+	margin: 5px;
+	border-radius: 10px; 
 }
 
 #title {
-    background-color: #DDDDDD;
-    color: black;
-    text-align: left;
-    padding: 10px;
-    border-radius: 18px;
-    position: relative;
+	background-color: #DDDDDD;
+	color: black;
+	text-align: left;
+	padding: 10px;
+	border-radius: 18px;
+	position: relative;
 }
 
 .button-div {
@@ -63,50 +67,109 @@ body {
 
 .card-title {
 	font-family: Roboto Medium, Arial, sans-serif;
-	font-size: calc(1.25rem + .9vw);
+	user-select: none;
+}
+
+.card-title-lg {
+	font-family: Roboto Medium, Arial, sans-serif;
+	background-color: #dddddda3;
+	backdrop-filter: blur(8px);
+  box-shadow: 0px 0px 24px #888888;
+	border-radius: 12px;
+	padding-left: 0.6em;
+	padding-right: 0.6em;
+	padding-top: 0.4em;
+	padding-bottom: 0.4em;
+	user-select: none;
 }
 
 #add-todo-btn {
-    margin-left: 10px;
-    background-color: #DDDDDD;
-    border: 2px solid #C45500;
-    width: 3vw;
-    height: 3vw;
-    font-size: 2.5vw;
-    line-height: 3vw;
-    color: #C45500;
-    border-radius: 1.5vw;
-    font-weight: bold;
-    cursor: pointer;
-    position: absolute;
-    top: 50%; 
-    right: 2px;
-    transform: translate(-50%, -50%); 
+	margin-left: 10px;
+	background-color: #DDDDDD;
+	border: 2px solid #C45500;
+	width: 3vw;
+	height: 3vw;
+	font-size: 2.5vw;
+	line-height: 3vw;
+	color: #C45500;
+	border-radius: 1.5vw;
+	font-weight: bold;
+	cursor: pointer;
+	position: absolute;
+	top: 50%; 
+	right: 2px;
+	transform: translate(-50%, -50%); 
 }
 
 .primary-outline-btn{
-    margin-left: 10px;
-    background-color: #DDDDDD;
-    border: 3px solid #C45500;
-    width: 6vw;
-    height: 6vw;
-    font-size: 3vw;
-    padding-left: 1.8vw;
-    line-height: 0;
-    color: #C45500;
-    border-radius: 1.5vw;
-    font-weight: bold;
-    cursor: pointer;
-    position: absolute;
-    top: 50%; 
-    right: 2px;
-    transform: translate(-50%, -50%); 
+	margin-left: 10px;
+	background-color: #DDDDDD;
+	border: 3px solid #C45500;
+	width: 6vw;
+	height: 6vw;
+	font-size: 3vw;
+	padding-left: 1.8vw;
+	line-height: 0;
+	color: #C45500;
+	border-radius: 1.5vw;
+	font-weight: bold;
+	cursor: pointer;
+	position: absolute;
+	top: 50%; 
+	right: 2px;
+	transform: translate(-50%, -50%); 
+}
+
+.btn-circle {
+	border-radius: 50%;
+	height: 85%;
+	font-weight: bold;
+	aspect-ratio: 1;
+	box-shadow: 0px 0px 12px #888888;
 }
 
 #checklist {
 	background-color: #DDDDDD;
 	padding: 5px;
 	overflow-x: hidden;
+	height: 200px;
+	overflow-y: auto;
+}
+
+#checklist-2 {
+	background: none;
+}
+
+#checklist input {
+	margin-right: 5px;
+}
+
+#checklist label {
+	margin-bottom: 5px;
+	display: inline-block;
+}
+
+.form-check {
+	background-color: #DDDDDD;
+}
+
+.form-check-2 {
+	background-color: #dddddda3;
+	backdrop-filter: blur(8px);
+  box-shadow: 0px 0px 24px #888888;
+	display: block;
+	padding: 1.5em;
+	margin-top: 1.5em;
+	border-radius: 12px;
+}
+
+.form-check-2 .form-check-input {
+	float: left;
+}
+
+.task-desc {
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
 }
 
 .card {
@@ -114,14 +177,23 @@ body {
 	background-color: #DDDDDD;
 }
 
+.task-title {
+	font-size: 2rem;
+	margin-top: -0.75rem;
+}
+
 .todo-container {
 	background-color: #DDDDDD;
 	border: None;
-
 }
 
-.form-check {
-	background-color: #DDDDDD;
+.fill-btn {
+	width: 100%;
+	height: 100%;
+}
+
+.edit-col {
+	margin-left: 1rem;
 }
 
 .list-group-item {
@@ -130,115 +202,112 @@ body {
 	border: None;
 }
 
-#checklist {
-    height: 200px;
-    overflow-y: auto;
-}
-
-#checklist input {
-    margin-right: 5px;
-}
-
-#checklist label {
-    margin-bottom: 5px;
-    display: inline-block;
-}
-
 .task-form {
-    background-color: #DDDDDD;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 20px;
+	background-color: #DDDDDD;
+	border-radius: 5px;
+	padding: 15px;
+	margin-bottom: 20px;
 }
 
 .task-input {
-    width: 100%; 
-    padding: 8px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    border-radius: 5px;
+	width: 100%; 
+	padding: 8px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+	border-radius: 5px;
 }
 
 .add-task {
-    background-color: #C45500;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 3px;
+	background-color: #C45500;
+	color: #fff;
+	border: none;
+	padding: 10px 15px;
+	font-size: 1em;
+	cursor: pointer;
+	border-radius: 3px;
 }
 
 .modal {
-    background-color: rgba(221, 221, 221, 0.5); 
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
+	background-color: rgba(221, 221, 221, 0.5); 
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	justify-content: center;
+	align-items: center;
 }
 
 .task-form-modal {
-    background-color: #DDDDDD;
-    border-radius: 5px;
-    padding: 15px;
+	background-color: #DDDDDD;
+	border-radius: 5px;
+	padding: 15px;
 }
 
 #task-input-updated {
-    width: 100%; 
-    padding: 8px;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    border-radius: 5px;
+	width: 100%; 
+	padding: 8px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+	border-radius: 5px;
 }
 
 .add-task-modal {
-    background-color: #C45500;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 3px;
+	background-color: #C45500;
+	color: #fff;
+	border: none;
+	padding: 10px 15px;
+	font-size: 1em;
+	cursor: pointer;
+	border-radius: 3px;
 }
 
 .task-list,
 .note-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.checklist-item {
+  opacity: 0;
+  transform: translateX(-5%);
+}
+
+.checklist-item.appear {
+  opacity: 1;
+  transform: translateX(0);
+	transition: opacity 0.15s ease-out, transform 0.5s ease-out;
 }
 
 .task-item {
-    background-color: #C45500;
-    color: #fff;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+	background-color: #C45500;
+	color: #fff;
+	border-radius: 5px;
+	padding: 15px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 input[type="checkbox"]:not(.selective-checkbox) {
-    background-color: #DDDDDD;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border: 2px solid #C45500;
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
-    outline: none;
+	background-color: #DDDDDD;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	border: 2px solid #C45500;
+	width: 16px;
+	height: 16px;
+	border-radius: 4px;
+	outline: none;
+	margin-right: 8px;
 }
 
 label {
-    font-size: 16px;
-    color: #333;
-    margin-left: 8px;
+	font-size: 16px;
+	color: #333;
 }
 
 .btn.btn-primary.index-restore-btn,
@@ -270,68 +339,84 @@ input.selective-checkbox[type="checkbox"]:checked {
 }
 
 .selective-checkbox {
-    display: block;
-		clear: both;
-    margin-bottom: 10px;
+	display: block;
+	clear: both;
+	margin-bottom: 10px;
 }
 
 input[type="checkbox"]:not(.selective-checkbox):checked {
-    background-color: #C45500;
-    border: 2px solid #C45500;
-    color: #fff;
+	background-color: #C45500;
+	border: 2px solid #C45500;
+	color: #fff;
 }
 
 .form-check .form-check-input:checked + .container .row .form-check-label {
-    text-decoration: line-through;
+	text-decoration: line-through;
+}
+
+.form-check-2 .form-check-input:checked + .container .row .form-check-label {
+	text-decoration: line-through;
 }
 
 #new-tab-button {
-    width: 8vw;
-    height: 8vw;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	width: 8vw;
+	height: 8vw;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .arrow_icon_button {
-    width: 8vw;
-    height: 8vw;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+	width: 8vw;
+	height: 8vw;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
+
+.nt-body {
+	height: 100vh;
+	width: 100vw;
+	background-image: url('../images/comic_bg.png');
+}
+
+#editForm,
 #todoForm {
-    background-color: #DDDDDD; 
-    border-radius: 10px;
-    
+	background-color: #DDDDDD; 
+	border-radius: 10px;
+	padding: 0.5rem;
+}
+
+.modal {
+	background-color: rgb(0 0 0 / 50%);
+	backdrop-filter: blur(6px);
 }
 
 .form-group {
-    margin-bottom: 15px;
+	margin-bottom: 15px;
 }
 
 #new-task-button {
-    width: 35px;
-    height:35px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+	width: 35px;
+	height:35px;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 #editor {
-    width: 300px;
-    height: 300px;
-    float: left;
+	width: 300px;
+	height: 300px;
+	float: left;
 }
 
 .custom-container {
-    width: 300%;
-    border-radius: 10px; 
+	width: 300%;
+	border-radius: 10px; 
 	background-color: #DDDDDD;
 }
 
@@ -344,28 +429,27 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 
 #title {
 	background: white;
-    color: #C45500;
+	color: #C45500;
 }
 
 #notes-list {
-    overflow-y: auto;
-    max-height: 450px;
-    background-color: #DDDDDD; 
-    border-radius: 0;
+	overflow-y: auto;
+	max-height: 450px;
+	background-color: #DDDDDD; 
+	border-radius: 0;
 }
 
-
 .note-item:hover {
-    background-color: #e9ecef; 
+	background-color: #e9ecef; 
 }
 
 #contentDisplay {
-    background-color: transparent; 
-    overflow-x: auto;
-    padding: 10px;
-    margin-top: 10px;
-    height:500px;
-    width:100%;
+	background-color: transparent; 
+	overflow-x: auto;
+	padding: 10px;
+	margin-top: 10px;
+	height:500px;
+	width:100%;
 }
 
 .sidebar {
@@ -373,66 +457,66 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 }
 
 .bold-text{
-    font-weight: bold;
-    border-bottom: 2px solid #000; 
-    padding-bottom: 10px;
+	font-weight: bold;
+	border-bottom: 2px solid #000; 
+	padding-bottom: 10px;
 }
 .no-padding{
-    padding:0;
+	padding:0;
 }
 
 .note-item {
-    cursor: pointer;
-    padding: 10px;
-    border-bottom: 2px solid black;
-    transition: background-color 0.3s;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+	cursor: pointer;
+	padding: 10px;
+	border-bottom: 2px solid black;
+	transition: background-color 0.3s;
+	font-size: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .note-item-icon {
-    width: 40px; 
-    height: auto; 
-    margin-right: 10px; 
+	width: 40px; 
+	height: auto; 
+	margin-right: 10px; 
 }
 
 .note-item-title {
-    margin-right: 10px; 
+	margin-right: 10px; 
 }
 
 .settings-title {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-    margin-right: 6rem;
+	font-size: 3rem;
+	font-weight: bold;
+	margin-bottom: 2rem;
+	margin-right: 6rem;
 }
 
 .settings-entry {
-    font-size: 1.75rem;
-    font-weight: bold;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+	font-size: 1.75rem;
+	font-weight: bold;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
 }
 
 .settings-entry.selected {
-		border-radius: 1rem;
-		background: #0d6efd;
-    font-size: 1.75rem;
-		color: white;
-    font-weight: bold;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+	border-radius: 1rem;
+	background: #0d6efd;
+	font-size: 1.75rem;
+	color: white;
+	font-weight: bold;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
 }
 
 .settings-pane {
-		position: absolute;
+	position: absolute;
 }
 
 .settings-pane.hidden {
-		position: absolute;
-		visibility: hidden;
+	position: absolute;
+	visibility: hidden;
 }
 
 .settings-icon {
@@ -447,8 +531,20 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 	padding-bottom: 1.5rem;
 }
 
+.warn-2 {
+	margin-top: 5rem;
+	width: 12rem;
+	height: 12rem;
+	opacity: 0.75;
+}
+
 .warn-text {
 	padding-top: 3.6rem;
 	font-size: 2rem;
+	font-weight: bold;
+}
+
+.warn-text-2 {
+	font-size: 3rem;
 	font-weight: bold;
 }

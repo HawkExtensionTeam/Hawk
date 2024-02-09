@@ -24,53 +24,125 @@ function sortTasks(tasks) {
 	let idx = 0;
   sortedIds.forEach((id) => {
     sortedTasks[idx] = id;
-		idx++;
+		idx = idx + 1;
   });
   return sortedTasks;
 }
 
 function updateChecklist(tasks) {
-  const checklist = $('#checklist');
+  const checklist = $('#checklist-2');
   checklist.empty(); // Clear existing items
   if (Object.keys(tasks).length === 0) {
     checklist.append(`
-		<div class="row justify-contents-center text-center">
-			<h1>There are no tasks!</h1>
-		</div>
-		`);
+      <div class="row justify-content-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+          </svg>
+      </div>
+      <div class="row justify-contents-center text-center">
+          <div class="warn-text-2">
+              No tasks yet.
+          </div>
+      </div>
+    `);
   } 
 	else {
     const sortedTasks = sortTasks(tasks);
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
       const dueDate = new Date(task.due);
-      const formattedDueDate = dueDate.toLocaleString();
+			const parts = dueDate.toLocaleString().split(",");
+      const formattedDueDate = "Due " + parts[0] + ', at' + parts[1];
 			const passed = dueDate < new Date();
 			const label = "form-check-label" + (passed ? " text-danger" : "");
-      checklist.append(`
-        <li class="list-group-item">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="item${taskId}">
-            <div class="container">
-              <div class="row">
-                <label class="${label}" for="item${taskId}">${task.title}</label>
-                <label class="${label}" for="item${taskId}">${task.description}</label>
-                <label class="${label}" for="item${taskId}">${formattedDueDate}</label>
-                <div class="row">
-                  <div class="col-sm">
-                    <button type="button" class="btn btn-danger delete-btn" delete-task-id="${taskId}">Delete</button>
-                  </div>
-                  <div class="col-sm">
-                    <button type="button" class="btn btn-warning edit-btn" edit-task-id="${taskId}">Edit</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      `);
+			checklist.append(`
+				<li class="checklist-item">
+					<div class="form-check-2 d-flex justify-content-between align-items-center">
+						<input type="checkbox" class="form-check-input" id="item${taskId}">
+						<div class="container">
+							<div class="row">
+								<div class="col">
+									<div class="row">
+										<label class="${label} task-title" for="item${taskId}">${task.title}</label>
+									</div>
+									<div class="row">
+										<label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+									</div>
+									<div class="row">
+										<label class="${label}" for="item${taskId}">${formattedDueDate}</label>
+									</div>
+								</div>
+								<div class="col-lg-2 mt-3 mt-md-0 d-flex">
+									<div class="col">
+										<button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
+									</div>
+									<br>
+									<div class="col edit-col">
+										<button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			`);
+			setTimeout(function() {
+				$(".checklist-item").addClass("appear");
+			}, 200);
     });
   }
+}
+
+function addTaskToChecklist(taskId) {
+	chrome.storage.local.get({ tasks: {} }, (result) => {
+		const tasks = result.tasks || {};
+		if (tasks && tasks[taskId]) {
+			const checklist = $('#checklist-2');
+			if (Object.keys(tasks).length === 1) {
+				checklist.empty();
+			} 
+			const task = tasks[taskId];
+			const dueDate = new Date(task.due);
+			const parts = dueDate.toLocaleString().split(",");
+			const formattedDueDate = "Due " + parts[0] + ', at' + parts[1];
+			const passed = dueDate < new Date();
+			const label = "form-check-label" + (passed ? " text-danger" : "");
+			checklist.append(`
+				<li class="checklist-item">
+					<div class="form-check-2 d-flex justify-content-between align-items-center">
+						<input type="checkbox" class="form-check-input" id="item${taskId}">
+						<div class="container">
+							<div class="row">
+								<div class="col">
+									<div class="row">
+										<label class="${label} task-title" for="item${taskId}">${task.title}</label>
+									</div>
+									<div class="row">
+										<label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+									</div>
+									<div class="row">
+										<label class="${label}" for="item${taskId}">${formattedDueDate}</label>
+									</div>
+								</div>
+								<div class="col-lg-2 d-flex">
+									<div class="col">
+										<button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
+									</div>
+									<br>
+									<div class="col edit-col">
+										<button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			`);
+			setTimeout(function() {
+				$(".checklist-item").addClass("appear");
+			}, 200);
+		}
+	});
 }
 
 function getTasks() {
@@ -92,15 +164,12 @@ function openEditForm(taskId) {
   chrome.storage.local.get({ tasks: {} }, (result) => {
     const allTasks = result.tasks || {};
     const taskToEdit = allTasks[taskId];
-
     $('#editTaskInput').val(taskToEdit.title);
     $('#editDescriptionInput').val(taskToEdit.description);
     const dueDate = new Date(taskToEdit.due);
     $('#editDateInput').val(`${dueDate.getFullYear()}/${String(dueDate.getMonth() + 1).padStart(2, '0')}/${String(dueDate.getDate()).padStart(2, '0')}`);
     $('#editTimeInput').val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
     editForm.attr('edit-task-id', taskId);
-
-    editForm.toggle();
   });
 }
 
@@ -108,9 +177,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     setTime();
     getTasks();
-    $('#new-task-button').click(() => {
-      $('#todoForm').toggle();
-    });
 
     $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
       const $editBtn = $(event.currentTarget);
@@ -172,7 +238,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         // don't sync with other machines - extension is local
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
 					chrome.alarms.create(taskId, {when: dueDate.getTime()});
-          updateChecklist(existingTasks);
+					addTaskToChecklist(taskId);
         });
       });
     });

@@ -1,68 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="assets/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/style.css"> 
-    <title>New Tab To-Do</title>
+	<link rel="stylesheet" href="assets/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/style.css"> 
+	<title>New Tab To-Do</title>
 </head>
-<body class="d-flex justify-content-center align-items-center"> <!-- Center content -->
+<body class="d-flex justify-content-center nt-body">
+	<div class="container mt-5" id="to-do-list-main">
+		<div class="row">
+			<div class="row">
+				<div class="col-8 d-flex">
+						<h2 class="card-title-lg fs-1 text-nowrap">To-Do List</h2>
+				</div>
+				<div class="col-4 d-flex align-items-center justify-content-end">
+						<button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
+				</div>
+			</div>
 
-    <div class="container mt-5" id = "to-do-list-main">
-        <div class="row">
-            <div class="col-6">
-                <h2 class="card-title">To-Do List</h2>
-            </div>
-            <div class="col-6">
-                <img src="images/add_icon_circle.png" alt="New Tab" id="new-task-button">
-            </div>
-        </div>
-        <ul class="list-group round-override list-group-flush" id="checklist">
-        </ul>
-        <div class="task-list" id="task-list">
-        </div>
-        <form id="todoForm" style="display: none;">
-            <div class="form-group">
-                <label for="taskInput">Task Title</label>
-                <input type="text" class="form-control" id="taskInput" placeholder="Enter task title" required>
-            </div>
-            <div class="form-group">
-                <label for="descriptionInput">Task Description</label>
-                <textarea class="form-control" id="descriptionInput" rows="3" placeholder="Enter task description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="dateInput">Due Date</label>
-                <input type="text" class="form-control" id="dateInput" placeholder="YYYY/MM/DD" required>
-            </div>
-            <div class="form-group">
-                <label for="timeInput">Due Time</label>
-                <input type="text" class="form-control" id="timeInput" placeholder="HH:MM" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Add Task</button>
-        </form>
-        <form id="editForm" style="display: none;">
-            <div class="form-group">
-                <label for="editTaskInput">Task Title</label>
-                <input type="text" class="form-control" id="editTaskInput" placeholder="Enter task title" required>
-            </div>
-            <div class="form-group">
-                <label for="editDescriptionInput">Task Description</label>
-                <textarea class="form-control" id="editDescriptionInput" rows="3" placeholder="Enter task description"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="editDateInput">Due Date</label>
-                <input type="text" class="form-control" id="editDateInput" placeholder="YYYY/MM/DD" pattern="\d{4}/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])" required>
-            </div>
-            <div class="form-group">
-                <label for="editTimeInput">Due Time</label>
-                <input type="text" class="form-control" id="editTimeInput" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):([0-5][0-9])" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Edit Task</button>
-        </form>
-    </div>
-
-    <script src="assets/jquery-3.7.1.min.js"></script>
-    <script src="todo_make.js"></script>
-    <script src="assets/bootstrap.min.js"></script>
-
+			<div class="modal fade" id="newTaskModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="modalLabel">Add a new task</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form id="todoForm">
+								<div class="form-group">
+										<label for="taskInput">Title</label>
+										<input type="text" class="form-control" id="taskInput" placeholder="Enter task title" required>
+								</div>
+								<div class="form-group">
+										<label for="descriptionInput">Description</label>
+										<textarea class="form-control" id="descriptionInput" rows="3" placeholder="Enter task description"></textarea>
+								</div>
+								<div class="form-group">
+										<label for="dateInput">Due date</label>
+										<input type="text" class="form-control" id="dateInput" placeholder="YYYY/MM/DD" required>
+								</div>
+								<div class="form-group">
+										<label for="timeInput">Due time</label>
+										<input type="text" class="form-control" id="timeInput" placeholder="HH:MM" required>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+							<button type="submit" form="todoForm" data-bs-dismiss="modal" class="btn btn-primary">Add Task</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<ul class="list-group round-override list-group-flush" id="checklist-2">
+		</ul>
+		<div class="task-list" id="task-list">
+		</div>
+		<div class="modal fade" id="editTaskModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="modalLabel">Edit task</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="editForm">
+							<div class="form-group">
+								<label for="editTaskInput">Task Title</label>
+								<input type="text" class="form-control" id="editTaskInput" placeholder="Enter task title" required>
+							</div>
+							<div class="form-group">
+								<label for="editDescriptionInput">Task Description</label>
+								<textarea class="form-control" id="editDescriptionInput" rows="3" placeholder="Enter task description"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="editDateInput">Due Date</label>
+								<input type="text" class="form-control" id="editDateInput" placeholder="YYYY/MM/DD" pattern="\d{4}/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])" required>
+							</div>
+							<div class="form-group">
+								<label for="editTimeInput">Due Time</label>
+								<input type="text" class="form-control" id="editTimeInput" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):([0-5][0-9])" required>
+							</div>
+						 </form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button type="submit" form="editForm" data-bs-dismiss="modal" class="btn btn-primary">Edit Task</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="assets/jquery-3.7.1.min.js"></script>
+	<script src="todo_make.js"></script>
+	<script src="assets/bootstrap.min.js"></script>
 </body>
 </html>
