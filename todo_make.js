@@ -61,7 +61,7 @@ function updateChecklist(tasks) {
             <input type="checkbox" class="form-check-input" id="item${taskId}">
             <div class="container">
               <div class="row">
-                <div class="col">
+                <div class="col capped">
                   <div class="row">
                     <label class="${label} task-title" for="item${taskId}">${task.title}</label>
                   </div>
@@ -72,7 +72,7 @@ function updateChecklist(tasks) {
                     <label class="${label}" for="item${taskId}">${formattedDueDate}</label>
                   </div>
                 </div>
-                <div class="col-lg-2 mt-3 mt-md-0 d-flex">
+                <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
                   <div class="col">
                     <button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
                   </div>
@@ -113,7 +113,7 @@ function addTaskToChecklist(taskId) {
             <input type="checkbox" class="form-check-input" id="item${taskId}">
             <div class="container">
               <div class="row">
-                <div class="col">
+                <div class="col capped">
                   <div class="row">
                     <label class="${label} task-title" for="item${taskId}">${task.title}</label>
                   </div>
@@ -124,7 +124,7 @@ function addTaskToChecklist(taskId) {
                     <label class="${label}" for="item${taskId}">${formattedDueDate}</label>
                   </div>
                 </div>
-                <div class="col-lg-2 d-flex">
+                <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
                   <div class="col">
                     <button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
                   </div>

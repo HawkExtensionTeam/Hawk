@@ -180,6 +180,13 @@ ul {
 .task-title {
 	font-size: 2rem;
 	margin-top: -0.75rem;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.capped {
+	width: 64%;
 }
 
 .todo-container {
