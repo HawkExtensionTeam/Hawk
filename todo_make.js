@@ -107,37 +107,37 @@ function addTaskToChecklist(taskId) {
 			const formattedDueDate = "Due " + parts[0] + ', at' + parts[1];
 			const passed = dueDate < new Date();
 			const label = "form-check-label" + (passed ? " text-danger" : "");
-			checklist.append(`
-				<li class="checklist-item">
-					<div class="form-check-2 d-flex justify-content-between align-items-center">
-						<input type="checkbox" class="form-check-input" id="item${taskId}">
-						<div class="container">
-							<div class="row">
-								<div class="col">
-									<div class="row">
-										<label class="${label} task-title" for="item${taskId}">${task.title}</label>
-									</div>
-									<div class="row">
-										<label class="${label} task-desc" for="item${taskId}">${task.description}</label>
-									</div>
-									<div class="row">
-										<label class="${label}" for="item${taskId}">${formattedDueDate}</label>
-									</div>
-								</div>
-								<div class="col-lg-2 d-flex">
-									<div class="col">
-										<button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
-									</div>
-									<br>
-									<div class="col edit-col">
-										<button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</li>
-			`);
+      checklist.append(`
+        <li class="checklist-item">
+          <div class="form-check-2 d-flex justify-content-between align-items-center">
+            <input type="checkbox" class="form-check-input" id="item${taskId}">
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <div class="row">
+                    <label class="${label} task-title" for="item${taskId}">${task.title}</label>
+                  </div>
+                  <div class="row">
+                    <label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+                  </div>
+                  <div class="row">
+                    <label class="${label}" for="item${taskId}">${formattedDueDate}</label>
+                  </div>
+                </div>
+                <div class="col-lg-2 d-flex">
+                  <div class="col">
+                    <button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}">Delete</button>
+                  </div>
+                  <br>
+                  <div class="col edit-col">
+                    <button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">Edit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      `);
 			setTimeout(function() {
 				$(".checklist-item").addClass("appear");
 			}, 200);
