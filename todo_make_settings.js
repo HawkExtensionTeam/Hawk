@@ -40,7 +40,7 @@ function showTasks(tasks) {
     );
     selectiveList.append(taskDiv);
   });
-  $('.selective-task-list-col').css('visibility', 'visible');
+  $('.selective-task-list-col').css('display', 'block');
   curTasks = tasks;
 }
 

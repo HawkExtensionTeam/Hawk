@@ -355,7 +355,7 @@ label {
 
 .selective-task-list-col,
 .selective-note-list-col {
-	visibility: hidden;
+	display: none;
 }
 
 .selective-list {
