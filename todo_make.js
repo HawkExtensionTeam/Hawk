@@ -189,7 +189,7 @@ $('#task-input').on('input', function _() {
 	const query = $(this).val().toLowerCase();
 	let toHide = [];
 	let toShow = [];
-	visibleItems.each(function _() {
+	visibleItems.each(function determineResults() {
 		let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
 		allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
 		if (allText.indexOf(query) >= 0) {
@@ -199,10 +199,10 @@ $('#task-input').on('input', function _() {
 			toHide.push($(this));
 		}
 	});
-	$.each(toHide, function _() {
+	$.each(toHide, function hideNonMatches() {
 		$(this).removeClass("appear");
 	});
-	$.each(toShow, function _() {
+	$.each(toShow, function showMatches() {
 		$(this).addClass("appear");
 	});
 });
