@@ -10,7 +10,19 @@
 		<div class="row">
 			<div class="row">
 				<div class="col-8 d-flex">
-						<h2 class="card-title-lg fs-1 text-nowrap">To-Do List</h2>
+						<div class="card-title-lg fs-1 text-nowrap">To-Do List
+						</div>
+						<div class="row panel-lg flex-nowrap align-items-center">
+							<div class="col">
+								<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+									<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+								</svg>
+							</div>
+							<div class="col src-col">
+								<input type="text" placeholder="Type to search tasks" class="search-bar-lg text-nowrap" id="task-input">
+								</input>
+							</div>
+						</div>
 				</div>
 				<div class="col-4 d-flex align-items-center justify-content-end">
 						<button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
