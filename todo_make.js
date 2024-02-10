@@ -175,7 +175,7 @@ function getTasks() {
 }
 
 function deleteTask(allTasks, taskId) {
-  delete allTasks[taskId];
+  allTasks.splice(taskId, 1);
 	if (Object.keys(allTasks).length === 0) {
 		allTasks = {};
 	}
