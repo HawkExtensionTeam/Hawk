@@ -184,12 +184,12 @@ function deleteTask(allTasks, taskId) {
   });
 }
 
-$('#task-input').on('input', function() {
+$('#task-input').on('input', function _() {
 	const visibleItems = $('.checklist-item');
 	const query = $(this).val().toLowerCase();
 	let toHide = [];
 	let toShow = [];
-	visibleItems.each(function(index) {
+	visibleItems.each(function _() {
 		let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
 		allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
 		if (allText.indexOf(query) >= 0) {
@@ -199,10 +199,10 @@ $('#task-input').on('input', function() {
 			toHide.push($(this));
 		}
 	});
-	$.each(toHide, function(index) {
+	$.each(toHide, function _() {
 		$(this).removeClass("appear");
 	});
-	$.each(toShow, function(index) {
+	$.each(toShow, function _() {
 		$(this).addClass("appear");
 	});
 });
