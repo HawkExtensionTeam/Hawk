@@ -16,15 +16,33 @@ function setTime() {
   $('#dateInput').val(date);
 }
 
+function populateTagsDropdown() {
+  chrome.storage.local.get('tags', (data) => {
+    const dropdownMenu = $('#tags-dropdown');
+    if (data.tags && Array.isArray(data.tags)) {
+      dropdownMenu.empty();
+      data.tags.forEach((tag) => {
+        const listItem = $('<li></li>');
+        const checkbox = $(`<input type="checkbox" class="form-check-input" id="${tag}" value="${tag}">`);
+        const label = $(`<label class="form-check-label" for="${tag}">${tag}</label>`);
+        listItem.addClass('form-check');
+        listItem.append(checkbox);
+        listItem.append(label);
+        dropdownMenu.append(listItem);
+      });
+    }
+  });
+}
+
 function sortTasks(tasks) {
   const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
   tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
   const sortedIds = tasksArray.map((task) => task.id);
   const sortedTasks = [];
-	let idx = 0;
+  let idx = 0;
   sortedIds.forEach((id) => {
     sortedTasks[idx] = id;
-		idx = idx + 1;
+    idx += 1;
   });
   return sortedTasks;
 }
@@ -45,16 +63,16 @@ function updateChecklist(tasks) {
           </div>
       </div>
     `);
-  } 
-	else {
+  } else {
     const sortedTasks = sortTasks(tasks);
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
       const dueDate = new Date(task.due);
-			const parts = dueDate.toLocaleString().split(",");
-      const formattedDueDate = "Due " + parts[0] + ', at' + parts[1];
-			const passed = dueDate < new Date();
-			const label = "form-check-label" + (passed ? " text-danger" : "");
+      const parts = dueDate.toLocaleString().split(',');
+      const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
+      const tags = `Tags: ${task.tags}`;
+      const passed = dueDate < new Date();
+      const label = `form-check-label${passed ? ' text-danger' : ''}`;
       checklist.append(`
         <li class="checklist-item">
           <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -70,6 +88,9 @@ function updateChecklist(tasks) {
                   </div>
                   <div class="row">
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
+                  </div>
+                  <div class="row">
+                    <label class="${label} tags" for="item${taskId}">${tags}</label>
                   </div>
                 </div>
                 <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
@@ -97,27 +118,28 @@ function updateChecklist(tasks) {
           </div>
         </li>
       `);
-			setTimeout(function() {
-				$(".checklist-item").addClass("appear");
-			}, 200);
+      setTimeout(() => {
+        $('.checklist-item').addClass('appear');
+      }, 200);
     });
   }
 }
 
 function addTaskToChecklist(taskId) {
-	chrome.storage.local.get({ tasks: {} }, (result) => {
-		const tasks = result.tasks || {};
-		if (tasks && tasks[taskId]) {
-			const checklist = $('#checklist-2');
-			if (Object.keys(tasks).length === 1) {
-				checklist.empty();
-			} 
-			const task = tasks[taskId];
-			const dueDate = new Date(task.due);
-			const parts = dueDate.toLocaleString().split(",");
-			const formattedDueDate = "Due " + parts[0] + ', at' + parts[1];
-			const passed = dueDate < new Date();
-			const label = "form-check-label" + (passed ? " text-danger" : "");
+  chrome.storage.local.get({ tasks: {} }, (result) => {
+    const tasks = result.tasks || {};
+    if (tasks && tasks[taskId]) {
+      const checklist = $('#checklist-2');
+      if (Object.keys(tasks).length === 1) {
+        checklist.empty();
+      }
+      const task = tasks[taskId];
+      const dueDate = new Date(task.due);
+      const parts = dueDate.toLocaleString().split(',');
+      const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
+      const tags = `Tags: ${task.tags}`;
+      const passed = dueDate < new Date();
+      const label = `form-check-label${passed ? ' text-danger' : ''}`;
       checklist.append(`
         <li class="checklist-item">
           <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -134,6 +156,9 @@ function addTaskToChecklist(taskId) {
                   <div class="row">
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                   </div>
+                  <div class="row">
+                  <label class="${label} tags" for="item${taskId}">${tags}</label>
+                </div>
                 </div>
                 <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
                   <div class="col">
@@ -160,11 +185,11 @@ function addTaskToChecklist(taskId) {
           </div>
         </li>
       `);
-			setTimeout(function() {
-				$(".checklist-item").addClass("appear");
-			}, 200);
-		}
-	});
+      setTimeout(() => {
+        $('.checklist-item').addClass('appear');
+      }, 200);
+    }
+  });
 }
 
 function getTasks() {
@@ -176,12 +201,11 @@ function getTasks() {
 
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
-    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove)
+    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-	if (Object.keys(updatedTasks).length === 0) {
-		allTasks = {};
-	}
-  else {
+  if (Object.keys(updatedTasks).length === 0) {
+    allTasks = {};
+  } else {
     allTasks = updatedTasks;
   }
   chrome.storage.local.set({ tasks: allTasks }, () => {
@@ -190,26 +214,25 @@ function deleteTask(allTasks, taskIdToRemove) {
 }
 
 $('#task-input').on('input', function _() {
-	const visibleItems = $('.checklist-item');
-	const query = $(this).val().toLowerCase();
-	let toHide = [];
-	let toShow = [];
-	visibleItems.each(function determineResults() {
-		let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
-		allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
-		if (allText.indexOf(query) >= 0) {
-			toShow.push($(this));
-		}			
-		else {
-			toHide.push($(this));
-		}
-	});
-	$.each(toHide, function hideNonMatches() {
-		$(this).removeClass("appear");
-	});
-	$.each(toShow, function showMatches() {
-		$(this).addClass("appear");
-	});
+  const visibleItems = $('.checklist-item');
+  const query = $(this).val().toLowerCase();
+  const toHide = [];
+  const toShow = [];
+  visibleItems.each(function determineResults() {
+    let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
+    allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
+    if (allText.indexOf(query) >= 0) {
+      toShow.push($(this));
+    } else {
+      toHide.push($(this));
+    }
+  });
+  $.each(toHide, function hideNonMatches() {
+    $(this).removeClass('appear');
+  });
+  $.each(toShow, function showMatches() {
+    $(this).addClass('appear');
+  });
 });
 
 function openEditForm(taskId) {
@@ -230,6 +253,27 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     setTime();
     getTasks();
+    populateTagsDropdown();
+
+    $('.show-create-tag-modal-btn').click(() => {
+      $('#newTaskModal').modal('hide');
+      $('#createTagModal').modal('show');
+    });
+
+    $('#createTagBtn').click(() => {
+      const tagName = $('#tagName').val().trim();
+      if (tagName) {
+        chrome.storage.local.get('tags', (data) => {
+          const tags = data.tags || [];
+          tags.push(tagName);
+          chrome.storage.local.set({ tags }, () => {
+            populateTagsDropdown();
+          });
+        });
+      }
+      $('#createTagModal').modal('hide');
+      $('#newTaskModal').modal('show');
+    });
 
     $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
       const $editBtn = $(event.currentTarget);
@@ -240,9 +284,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.btn.btn-danger.delete-btn', (event) => {
       const $delBtn = $(event.currentTarget);
-      $("#confirm-delete-btn").attr('delete-task-id', $delBtn.attr('delete-task-id'));
+      $('#confirm-delete-btn').attr('delete-task-id', $delBtn.attr('delete-task-id'));
     });
-    
+
     $(document).on('click', '.btn.btn-danger.confirm-del-btn', (event) => {
       const $delBtn = $(event.currentTarget);
       chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -259,8 +303,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const taskDescription = $('#descriptionInput').val().trim();
       const taskDate = $('#dateInput').val().trim();
       const taskTime = $('#timeInput').val().trim();
+      const selectedTags = [];
+      $('#tags-dropdown').find('.form-check-input:checked').each(function collectSelectedTags() {
+        selectedTags.push($(this).val());
+      });
 
-      const taskData = [taskTitle, taskDescription, taskDate, taskTime];
+      const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
       if (taskData.some((data) => data === '')) return;
 
       const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -291,12 +339,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           description: taskDescription,
           // ISO strings are consistent between JS engines
           due: dueDate.toISOString(),
+          tags: selectedTags,
         };
-				
+
         // don't sync with other machines - extension is local
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
-					chrome.alarms.create(taskId, {when: dueDate.getTime()});
-					addTaskToChecklist(taskId);
+          chrome.alarms.create(taskId, { when: dueDate.getTime() });
+          addTaskToChecklist(taskId);
         });
       });
     });
