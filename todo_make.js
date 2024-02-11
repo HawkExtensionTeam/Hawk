@@ -90,7 +90,7 @@ function updateChecklist(tasks) {
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                   </div>
                   <div class="row">
-                    <label class="${label} task-due" for="item${taskId}">${tags}</label>
+                    <label class="${label} tags" for="item${taskId}">${tags}</label>
                   </div>
                 </div>
                 <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
@@ -137,6 +137,7 @@ function addTaskToChecklist(taskId) {
       const dueDate = new Date(task.due);
       const parts = dueDate.toLocaleString().split(',');
       const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
+      const tags = `Tags: ${task.tags}`;
       const passed = dueDate < new Date();
       const label = `form-check-label${passed ? ' text-danger' : ''}`;
       checklist.append(`
@@ -155,6 +156,9 @@ function addTaskToChecklist(taskId) {
                   <div class="row">
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                   </div>
+                  <div class="row">
+                  <label class="${label} tags" for="item${taskId}">${tags}</label>
+                </div>
                 </div>
                 <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
                   <div class="col">
