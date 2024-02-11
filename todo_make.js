@@ -174,11 +174,16 @@ function getTasks() {
   });
 }
 
-function deleteTask(allTasks, taskId) {
-  allTasks.splice(taskId, 1);
-	if (Object.keys(allTasks).length === 0) {
+function deleteTask(allTasks, taskIdToRemove) {
+  const updatedTasks = Object.fromEntries(
+    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove)
+  );
+	if (Object.keys(updatedTasks).length === 0) {
 		allTasks = {};
 	}
+  else {
+    allTasks = updatedTasks;
+  }
   chrome.storage.local.set({ tasks: allTasks }, () => {
     updateChecklist(allTasks);
   });
