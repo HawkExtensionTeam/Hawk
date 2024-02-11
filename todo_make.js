@@ -16,6 +16,33 @@ function setTime() {
   $('#dateInput').val(date);
 }
 
+function populateTagsDropdown() {
+  chrome.storage.local.get("tags", function(data) {
+    const dropdownMenu = $("#tags-dropdown");
+    if (data.tags && Array.isArray(data.tags)) {
+      dropdownMenu.empty();
+      data.tags.forEach(function(tag) {
+        const listItem = $("<li></li>");
+        const checkbox = $(`<input type="checkbox" class="form-check-input" id="${tag}" value="${tag}">`);
+        const label = $(`<label class="form-check-label" for="${tag}">${tag}</label>`);
+        listItem.addClass("form-check");
+        listItem.append(checkbox);
+        listItem.append(label);
+        dropdownMenu.append(listItem);
+      });
+    }
+  });
+}
+
+
+function getTags(){
+  $.when(chrome.storage.local.get({ tags: [] })).done((result) => {
+    const tags = result.tasks || [];
+    populateTagsDropdown(tags);
+  });
+}
+
+
 function sortTasks(tasks) {
   const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
   tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
@@ -230,6 +257,28 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     setTime();
     getTasks();
+    populateTagsDropdown();
+
+    $(".create-tag-btn").click(function() {
+      console.log("button press");
+      $("#newTaskModal").modal("hide");
+      $("#createTagModal").modal("show");
+    });
+
+    $("#createTagBtn").click(function() {
+      const tagName = $("#tagName").val().trim();
+      if (tagName) {
+          chrome.storage.local.get("tags", function(data) {
+              const tags = data.tags || [];
+              tags.push(tagName);
+              chrome.storage.local.set({ "tags": tags }, function() {
+              });
+          });
+        }
+      $("#createTagModal").modal("hide");  
+      populateTagsDropdown();
+      $("#newTaskModal").modal("show");
+    });
 
     $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
       const $editBtn = $(event.currentTarget);
@@ -255,12 +304,19 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       // prevents default page reload
       event.preventDefault();
 
+
+
       const taskTitle = $('#taskInput').val().trim();
       const taskDescription = $('#descriptionInput').val().trim();
       const taskDate = $('#dateInput').val().trim();
       const taskTime = $('#timeInput').val().trim();
+      const selectedTags = [];
+      $("#tags-dropdown").find(".form-check-input:checked").each(function() {
+          selectedTags.push($(this).val());
+      });
 
-      const taskData = [taskTitle, taskDescription, taskDate, taskTime];
+
+      const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
       if (taskData.some((data) => data === '')) return;
 
       const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
@@ -291,6 +347,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           description: taskDescription,
           // ISO strings are consistent between JS engines
           due: dueDate.toISOString(),
+          tags: selectedTags,
         };
 				
         // don't sync with other machines - extension is local

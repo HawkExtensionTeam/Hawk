@@ -28,7 +28,29 @@
 						<button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
 				</div>
 			</div>
-
+			<div class="modal fade" id="createTagModal">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title">Create New Tag</h5>
+					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+					  <form>
+						<div class="mb-3">
+						  <label for="tagName" class="form-label">Tag Name</label>
+						  <input type="text" class="form-control" id="tagName" placeholder="Enter tag name">
+						</div>
+					  </form>
+					</div>
+					<div class="modal-footer">
+					  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					  <button type="button" class="btn btn-primary" id="createTagBtn">Create Tag</button>
+					</div>
+				  </div>
+				</div>
+			  </div>
+			  
 			<div class="modal fade" id="newTaskModal">
 				<div class="modal-dialog">
 					<div class="modal-content">
@@ -53,6 +75,17 @@
 								<div class="form-group">
 										<label for="timeInput">Due time</label>
 										<input type="text" class="form-control" id="timeInput" placeholder="HH:MM" required>
+								</div>
+								<div class="form-group">
+									<label for="tagInput">Tags</label>
+									<div class="dropdown">
+										<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+										  Select Tags
+										</button>
+										<div class="dropdown-menu dropdown-menu-dark" id="tags-dropdown">
+										</div>
+									</div>
+									<button type="button" class="btn btn-primary create-tag-btn mt-1">Create Tag</button>
 								</div>
 							</form>
 						</div>
@@ -122,6 +155,6 @@
 	</div>
 	<script src="assets/jquery-3.7.1.min.js"></script>
 	<script src="todo_make.js"></script>
-	<script src="assets/bootstrap.min.js"></script>
+	<script src="assets/bootstrap.bundle.min.js"></script>
 </body>
 </html>
