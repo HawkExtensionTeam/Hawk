@@ -251,7 +251,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     getTasks();
     populateTagsDropdown();
 
-    $('.create-tag-btn').click(() => {
+    $('.show-create-tag-modal-btn').click(() => {
       $('#newTaskModal').modal('hide');
       $('#createTagModal').modal('show');
     });
@@ -263,11 +263,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           const tags = data.tags || [];
           tags.push(tagName);
           chrome.storage.local.set({ tags }, () => {
+            populateTagsDropdown();
           });
         });
       }
       $('#createTagModal').modal('hide');
-      populateTagsDropdown();
       $('#newTaskModal').modal('show');
     });
 
