@@ -296,7 +296,18 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const $delBtn = $(event.currentTarget);
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = result.tasks || {};
-      deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
+      const taskId = $delBtn.attr('delete-task-id');
+      existingTasks[taskId].recentlyDeleted = true;
+
+      // Save the updated tasks object
+      chrome.storage.local.set({ tasks: existingTasks }, () => {
+        // Set an alarm to delete the task after 30 days
+        const now = new Date();
+        const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
+        const alarmName = `${taskId}_deletion_alarm`;
+        chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+        deleteTask(existingTasks, taskId);
+      });
     });
   });
 
@@ -344,6 +355,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         // ISO strings are consistent between JS engines
         due: dueDate.toISOString(),
         tags: selectedTags,
+        recentlyDeleted: false,
       };
 
       // don't sync with other machines - extension is local
