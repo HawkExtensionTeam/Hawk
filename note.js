@@ -43,7 +43,7 @@ $(() => {
     `);
     } else {
       Object.values(notes).forEach((note) => {
-        const noteItem = $('<div>').addClass('note-item');
+        const noteItem = $('<div>').addClass('note-item').data('content', note.content.toLowerCase());
 
         // Create image element and append it to noteItem
         const noteItemImage = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C45500" class="bi bi-chevron-right" viewBox="0 0 16 16">
@@ -73,6 +73,17 @@ $(() => {
       updateNotesList(existingNotes);
     });
   }
+
+  $('#search').on('input', function handleInput() {
+    const searchValue = $(this).val().toLowerCase();
+    $('#notes-list .note-item').filter(function filterNotes() {
+      const noteText = $(this).text().toLowerCase();
+      const noteContent = $(this).data('content');
+      const isMatch = noteText.indexOf(searchValue) > -1 || noteContent.indexOf(searchValue) > -1;
+      $(this).toggle(isMatch);
+      return isMatch;
+    });
+  });
 
   if (editorElement.length > 0) {
     const simplemde = new SimpleMDE({
