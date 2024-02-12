@@ -34,13 +34,23 @@ $(() => {
     notesListElement.empty();
 
     if (notes.length === 0) {
-      notesListElement.append('<p>No notes yet</p>');
-    } else {
+      notesListElement.append(`
+      <div class="row justify-contents-center overflow-hidden text-center zero-margin">
+          <div class="overflow-hidden warn-text-3">
+              No notes yet.
+          </div>
+      </div>
+    `);
+    }
+    else {
       Object.values(notes).forEach((note) => {
         const noteItem = $('<div>').addClass('note-item');
 
         // Create image element and append it to noteItem
-        const noteItemImage = $('<img>').attr('src', 'images/arrowIconButton.png').addClass('note-item-icon');
+        const noteItemImage =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C45500" class="bi bi-chevron-right" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+        </svg>`;
         noteItem.append(noteItemImage);
 
         // Create span element for the title and append it to noteItem
@@ -54,6 +64,8 @@ $(() => {
 
         notesListElement.append(noteItem);
       });
+      currentNote = notes[0];
+      viewNote(notes[0]);
     }
   }
 

@@ -12,13 +12,17 @@
 	font-style: normal;
 }
 
-body {
+body, html {
 	font-family: Roboto, Arial, sans-serif;
 	background-color: white;
 	margin: 0;
-	width: 400px;
+	max-width: 100%;
 	padding: 0!important;
-  overflow-x: hidden;
+	overflow-x: hidden;
+}
+
+.popup {
+	width: 400px;
 }
 
 ul {
@@ -75,7 +79,7 @@ ul {
 	font-family: Roboto Medium, Arial, sans-serif;
 	background-color: #dddddda3;
 	backdrop-filter: blur(8px);
-  box-shadow: 0px 0px 24px #888888;
+	box-shadow: 0px 0px 24px #888888;
 	border-radius: 12px;
 	padding-left: 0.6em;
 	padding-right: 0.6em;
@@ -87,7 +91,7 @@ ul {
 .panel-lg {
 	background-color: #dddddda3;
 	backdrop-filter: blur(8px);
-  box-shadow: 0px 0px 24px #888888;
+	box-shadow: 0px 0px 24px #888888;
 	border-radius: 12px;
 	margin-left: 1.5em;
 	padding-left: 0.6em;
@@ -181,10 +185,32 @@ ul {
 	background-color: #DDDDDD;
 }
 
+.note-container {
+	background-color: #dddddda3;
+	backdrop-filter: blur(8px);
+	box-shadow: 0px 0px 24px #888888;
+	padding: 1.5em;
+	border-radius: 12px;
+}
+
+.note-main {
+	padding-left: 2em;
+}
+
+#add-note-button {
+	background-color: #C45500;
+	color: #fff;
+	border: none;
+	padding: 10px 15px;
+	font-size: 1em;
+	cursor: pointer;
+	border-radius: 0.375rem;
+}
+
 .form-check-2 {
 	background-color: #dddddda3;
 	backdrop-filter: blur(8px);
-  box-shadow: 0px 0px 24px #888888;
+	box-shadow: 0px 0px 24px #888888;
 	display: block;
 	padding: 1.5em;
 	margin-top: 1.5em;
@@ -421,6 +447,17 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 	height: 100vh;
 	width: 100vw;
 	background-image: url('../images/comic_bg.png');
+	background-size: cover;
+	max-width: 100%;
+}
+
+#edit, #delete {
+	display: flex;
+	align-items: center;
+}
+
+.icon-margin {
+	margin-right: 0.25em;
 }
 
 #editForm,
@@ -472,7 +509,6 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 #notes-list {
 	overflow-y: auto;
 	max-height: 450px;
-	background-color: #DDDDDD; 
 	border-radius: 0;
 }
 
@@ -483,20 +519,23 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 #contentDisplay {
 	background-color: transparent; 
 	overflow-x: auto;
-	padding: 10px;
-	margin-top: 10px;
+	margin-top: 2em;
 	height:500px;
 	width:100%;
 }
 
 .sidebar {
-	border-right: 2px solid black;
+	border-right: 2px solid #0000003d;
+}
+
+#my-notes-label {
+	font-size: 2.5rem;
 }
 
 .bold-text{
 	font-weight: bold;
-	border-bottom: 2px solid #000; 
-	padding-bottom: 10px;
+	border-bottom: 2px solid #0000003d;
+	padding-bottom: 0.5em;
 }
 .no-padding{
 	padding:0;
@@ -505,7 +544,7 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 .note-item {
 	cursor: pointer;
 	padding: 10px;
-	border-bottom: 2px solid black;
+	border-bottom: 2px solid #0000003d;
 	transition: background-color 0.3s;
 	font-size: 24px;
 	display: flex;
@@ -584,4 +623,15 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 .warn-text-2 {
 	font-size: 3rem;
 	font-weight: bold;
+}
+
+.warn-text-3 {
+	font-size: 2rem;
+	font-weight: bold;
+	margin-top: 200px;
+}
+
+.zero-margin {
+	margin-left: 0;
+	margin-right: 0;
 }
