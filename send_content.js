@@ -49,11 +49,56 @@ $(document).on('click', 'a', (event) => {
   }
 });
 
+const quipRegex = /^https?:\/\/(?:www\.)?quip\.com(?:\/|$)/;
+
+const indexQuip = function indexQuip() {
+  if (quipRegex.test(currentURL)) {
+    try {
+      chrome.storage.local.get(['indexed']).then((result) => {
+        const indexed = result.indexed || {};
+        if (Object.keys(indexed).length > 0) {
+          indexed.links = new Set(indexed.links);
+          if (indexed.links.has(currentURL)) {
+            for (let i = 0; i < indexed.corpus.length; i += 1) {
+              const page = indexed.corpus[i];
+              if (page.url === currentURL) {
+                const documentEditor = document.getElementsByClassName('document-editor');
+                if (documentEditor.length === 1) {
+                  const quipContent = documentEditor[0].innerText;
+                  page.body = quipContent;
+                  return;
+                }
+              }
+            }
+          }
+        }
+
+        const documentEditor = document.getElementsByClassName('document-editor');
+        if (documentEditor.length === 1) {
+          const visibleTextContent = documentEditor[0].innerText;
+          chrome.runtime.sendMessage({
+            action: 'sendVisibleTextContent',
+            visibleTextContent,
+            currentURL,
+          });
+        }
+      });
+    } catch (error) {
+      // extension will have been reloaded, ignore
+    }
+  }
+};
+
 $(document).ready(() => {
-  const visibleTextContent = document.body.innerText;
-  chrome.runtime.sendMessage({
-    action: 'sendVisibleTextContent',
-    visibleTextContent,
-    currentURL,
-  });
+  if (quipRegex.test(currentURL)) {
+    indexQuip();
+    setInterval(indexQuip, 60000);
+  } else {
+    const visibleTextContent = document.body.innerText;
+    chrome.runtime.sendMessage({
+      action: 'sendVisibleTextContent',
+      visibleTextContent,
+      currentURL,
+    });
+  }
 });

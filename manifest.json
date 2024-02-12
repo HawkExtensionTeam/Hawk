@@ -35,7 +35,9 @@
     {
       "matches": [
         "https://*.amazon.com/*",
-        "https://atoz.amazon.work/*"
+        "https://atoz.amazon.work/*",
+        "https://quip-amazon.com/*",
+        "https://quip.com/*" 
       ],
       "js": [
         "assets/jquery-3.7.1.min.js",
