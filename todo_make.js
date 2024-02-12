@@ -306,9 +306,19 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
         const alarmName = `${taskId}_deletion_alarm`;
         chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-        deleteTask(existingTasks, taskId);
       });
     });
+  });
+
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    const alarmName = alarm.name;
+    if (alarmName.endsWith('_deletion_alarm')) {
+      const taskId = alarmName.split('_')[0];
+      chrome.storage.local.get({ tasks: {} }, (result) => {
+        const existingTasks = result.tasks || {};
+        deleteTask(existingTasks, taskId);
+      });
+    }
   });
 
   $('#todoForm').on('submit', (event) => {
