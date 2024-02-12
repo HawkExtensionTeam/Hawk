@@ -17,14 +17,16 @@ function setTime() {
 }
 
 function populateTagsDropdown() {
-  chrome.storage.local.get('tags', (data) => {
+  chrome.storage.local.get({ tags: {} }, (data) => {
     const dropdownMenu = $('#tags-dropdown');
-    if (data.tags && Array.isArray(data.tags)) {
+    const { tags } = data;
+    if (tags && Object.keys(tags).length > 0) {
       dropdownMenu.empty();
-      data.tags.forEach((tag) => {
+      Object.keys(tags).forEach((key) => {
+        const tag = tags[key];
         const listItem = $('<li></li>');
-        const checkbox = $(`<input type="checkbox" class="form-check-input" id="${tag}" value="${tag}">`);
-        const label = $(`<label class="form-check-label" for="${tag}">${tag}</label>`);
+        const checkbox = $(`<input type="checkbox" class="form-check-input" id="${key}" value="${key}">`);
+        const label = $(`<label class="form-check-label" for="${key}">${tag.tagName}</label>`);
         listItem.addClass('form-check');
         listItem.append(checkbox);
         listItem.append(label);
@@ -262,11 +264,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $('#createTagBtn').click(() => {
       const tagName = $('#tagName').val().trim();
+      const tagColour = $('#tagColour').val().trim();
       if (tagName) {
-        chrome.storage.local.get('tags', (data) => {
-          const tags = data.tags || [];
-          tags.push(tagName);
-          chrome.storage.local.set({ tags }, () => {
+        chrome.storage.local.get({ tags: {} }, (data) => {
+          const newTag = `${tagName}-${typeof tagColour === 'string' ? tagColour : ''}`;
+          data.tags[newTag] = {
+            tagColour,
+            tagName,
+          };
+          chrome.storage.local.set({ tags: data.tags }, () => {
             populateTagsDropdown();
           });
         });
@@ -307,7 +313,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('#tags-dropdown').find('.form-check-input:checked').each(function collectSelectedTags() {
         selectedTags.push($(this).val());
       });
-
       const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
       if (taskData.some((data) => data === '')) return;
 
