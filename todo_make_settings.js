@@ -105,17 +105,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
-          const tasksArray = Object.values(content.tasks);
-          
+          const tasks = content.tasks;
+          console.log(tasks);
           // Check if 'tasks' property exists
-          if (!Object.prototype.hasOwnProperty.call(content, 'tasks')) {
-            $.when(chrome.storage.local.set({ tasks: {} })).done(() => {
-              overwriteTasks(tasksArray);
-            });
-          }
-          else {
-            overwriteTasks(tasksArray);
-          }
+          overwriteTasks(tasks);
         };
         reader.readAsText(selectedFile);
       }
