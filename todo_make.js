@@ -16,6 +16,18 @@ function setTime() {
   $('#dateInput').val(date);
 }
 
+function allDeleted(allTasks) {
+  let allRecentlyDeleted = true;
+  if (Array.isArray(allTasks)) {
+    allTasks.forEach((task) => {
+      if (!task.recentlyDeleted) {
+        allRecentlyDeleted = false;
+      }
+    });
+  }
+  return allRecentlyDeleted;
+}
+
 function populateTagsDropdown() {
   chrome.storage.local.get({ tags: {} }, (data) => {
     const dropdownMenu = $('#tags-dropdown');
@@ -65,7 +77,7 @@ function sortTasks(tasks) {
 function updateChecklist(tasks) {
   const checklist = $('#checklist-2');
   checklist.empty(); // Clear existing items
-  if (Object.keys(tasks).length === 0) {
+  if (Object.keys(tasks).length === 0 || allDeleted(tasks)) {
     checklist.append(`
       <div class="row justify-content-center">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">

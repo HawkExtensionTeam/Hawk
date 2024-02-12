@@ -1,3 +1,15 @@
+function allDeleted(allTasks) {
+  let allRecentlyDeleted = true;
+  if (Array.isArray(allTasks)) {
+    allTasks.forEach((task) => {
+      if (!task.recentlyDeleted) {
+        allRecentlyDeleted = false;
+      }
+    });
+  }
+  return allRecentlyDeleted;
+}
+
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     $('#new-tab-button').on('click', () => {
@@ -14,7 +26,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     chrome.storage.local.get({ tasks: [] }, (result) => {
       // avoid pushing to undefined if there are no previous tasks
       const existingTasks = result.tasks || [];
-      if (Object.keys(existingTasks).length === 0) {
+      if (Object.keys(existingTasks).length === 0 || allDeleted(existingTasks)) {
         $('#checklist').append(`
         <div class="row justify-content-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
