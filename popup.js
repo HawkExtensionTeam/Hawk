@@ -15,7 +15,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       // avoid pushing to undefined if there are no previous tasks
       const existingTasks = result.tasks || [];
       if (Object.keys(existingTasks).length === 0) {
-      $('#checklist').append(`
+        $('#checklist').append(`
         <div class="row justify-content-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
                 <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
@@ -36,10 +36,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
           if (dueDate < twentyFourHoursAgo) {
             delete existingTasks[taskId];
-          } 
-					else {
-						const passed = dueDate < new Date();
-						const label = "form-check-label" + (passed ? " text-danger" : "");
+          } else {
+            const passed = dueDate < new Date();
+            const label = `form-check-label${passed ? ' text-danger' : ''}`;
             $('#checklist').append(
               `<li class="list-group-item">
                 <div class="form-check">

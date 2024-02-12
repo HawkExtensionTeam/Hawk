@@ -105,7 +105,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
-          const tasks = content.tasks;
+          const { tasks } = content;
           // Check if 'tasks' property exists
           overwriteTasks(tasks);
         };

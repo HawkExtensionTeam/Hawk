@@ -256,12 +256,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   getTasks();
   populateTagsDropdown();
 
-  $('.show-create-tag-modal-btn').click(() => {
+  $(document).on('click', '.show-create-tag-modal-btn', () => {
     $('#newTaskModal').modal('hide');
     $('#createTagModal').modal('show');
   });
 
-  $('#createTagBtn').click(() => {
+  $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
     const tagColour = $('#tagColour').val().trim();
     if (tagName) {

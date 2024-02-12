@@ -107,21 +107,20 @@ chrome.omnibox.onInputEntered.addListener((text) => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-	chrome.storage.local.get("tasks").then((result) => {
-		const existingTasks = result || {};
-		const foundTask = existingTasks.tasks[alarm.name];
-		if (Object.keys(existingTasks).length !== 0 && foundTask) {
-			let notification = {
-					type: "basic",
-					iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
-					title: "Your task " + foundTask.title + " is due",
-					message: foundTask.description
-			};
-			chrome.notifications.create(alarm.name, notification);
-		}
-	});
+  chrome.storage.local.get('tasks').then((result) => {
+    const existingTasks = result || {};
+    const foundTask = existingTasks.tasks[alarm.name];
+    if (Object.keys(existingTasks).length !== 0 && foundTask) {
+      const notification = {
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
+        title: `Your task ${foundTask.title} is due`,
+        message: foundTask.description,
+      };
+      chrome.notifications.create(alarm.name, notification);
+    }
+  });
 });
-
 
 function setURL(request) {
   return new Promise((resolve) => {
