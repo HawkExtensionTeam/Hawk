@@ -252,164 +252,162 @@ function openEditForm(taskId) {
 }
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
-  $(() => {
-    setTime();
-    getTasks();
-    populateTagsDropdown();
+  setTime();
+  getTasks();
+  populateTagsDropdown();
 
-    $('.show-create-tag-modal-btn').click(() => {
-      $('#newTaskModal').modal('hide');
-      $('#createTagModal').modal('show');
-    });
+  $('.show-create-tag-modal-btn').click(() => {
+    $('#newTaskModal').modal('hide');
+    $('#createTagModal').modal('show');
+  });
 
-    $('#createTagBtn').click(() => {
-      const tagName = $('#tagName').val().trim();
-      const tagColour = $('#tagColour').val().trim();
-      if (tagName) {
-        chrome.storage.local.get({ tags: {} }, (data) => {
-          const newTag = `${tagName}-${typeof tagColour === 'string' ? tagColour : ''}`;
-          data.tags[newTag] = {
-            tagColour,
-            tagName,
-          };
-          chrome.storage.local.set({ tags: data.tags }, () => {
-            populateTagsDropdown();
-          });
+  $('#createTagBtn').click(() => {
+    const tagName = $('#tagName').val().trim();
+    const tagColour = $('#tagColour').val().trim();
+    if (tagName) {
+      chrome.storage.local.get({ tags: {} }, (data) => {
+        const newTag = `${tagName}-${typeof tagColour === 'string' ? tagColour : ''}`;
+        data.tags[newTag] = {
+          tagColour,
+          tagName,
+        };
+        chrome.storage.local.set({ tags: data.tags }, () => {
+          populateTagsDropdown();
         });
-      }
-      $('#createTagModal').modal('hide');
-      $('#newTaskModal').modal('show');
+      });
+    }
+    $('#createTagModal').modal('hide');
+    $('#newTaskModal').modal('show');
+  });
+
+  $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
+    const $editBtn = $(event.currentTarget);
+    const taskId = $editBtn.attr('edit-task-id');
+
+    openEditForm(taskId);
+  });
+
+  $(document).on('click', '.btn.btn-danger.delete-btn', (event) => {
+    const $delBtn = $(event.currentTarget);
+    $('#confirm-delete-btn').attr('delete-task-id', $delBtn.attr('delete-task-id'));
+  });
+
+  $(document).on('click', '.btn.btn-danger.confirm-del-btn', (event) => {
+    const $delBtn = $(event.currentTarget);
+    chrome.storage.local.get({ tasks: {} }, (result) => {
+      const existingTasks = result.tasks || {};
+      deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
     });
+  });
 
-    $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
-      const $editBtn = $(event.currentTarget);
-      const taskId = $editBtn.attr('edit-task-id');
+  $('#todoForm').on('submit', (event) => {
+    // prevents default page reload
+    event.preventDefault();
 
-      openEditForm(taskId);
+    const taskTitle = $('#taskInput').val().trim();
+    const taskDescription = $('#descriptionInput').val().trim();
+    const taskDate = $('#dateInput').val().trim();
+    const taskTime = $('#timeInput').val().trim();
+    const selectedTags = [];
+    $('#tags-dropdown').find('.form-check-input:checked').each(function collectSelectedTags() {
+      selectedTags.push($(this).val());
     });
+    const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
+    if (taskData.some((data) => data === '')) return;
 
-    $(document).on('click', '.btn.btn-danger.delete-btn', (event) => {
-      const $delBtn = $(event.currentTarget);
-      $('#confirm-delete-btn').attr('delete-task-id', $delBtn.attr('delete-task-id'));
-    });
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(taskTime)) return;
 
-    $(document).on('click', '.btn.btn-danger.confirm-del-btn', (event) => {
-      const $delBtn = $(event.currentTarget);
-      chrome.storage.local.get({ tasks: {} }, (result) => {
-        const existingTasks = result.tasks || {};
-        deleteTask(existingTasks, $delBtn.attr('delete-task-id'));
+    const [hoursStr, minutesStr] = taskTime.split(':');
+    const hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+
+    const dateRegex = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+    if (!dateRegex.test(taskDate)) return;
+
+    const [yearsStr, monthsStr, daysStr] = taskDate.split('/');
+    const years = parseInt(yearsStr, 10);
+    const months = parseInt(monthsStr, 10);
+    const days = parseInt(daysStr, 10);
+
+    // months start from 0
+    const dueDate = new Date(years, months - 1, days, hours, minutes, 0);
+    if (dueDate.toString() === 'Invalid Date') return;
+
+    $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
+      const existingTasks = result.tasks || {};
+      const taskId = Date.now() + taskTitle;
+
+      existingTasks[taskId] = {
+        title: taskTitle,
+        description: taskDescription,
+        // ISO strings are consistent between JS engines
+        due: dueDate.toISOString(),
+        tags: selectedTags,
+      };
+
+      // don't sync with other machines - extension is local
+      $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
+        chrome.alarms.create(taskId, { when: dueDate.getTime() });
+        addTaskToChecklist(taskId);
       });
     });
+  });
 
-    $('#todoForm').on('submit', (event) => {
-      // prevents default page reload
-      event.preventDefault();
+  $('#editForm').on('submit', (event) => {
+    event.preventDefault();
+    const editedTaskTitle = $('#editTaskInput').val().trim();
+    const editedTaskDescription = $('#editDescriptionInput').val().trim();
+    const editedTaskDate = $('#editDateInput').val().trim();
+    const editedTaskTime = $('#editTimeInput').val().trim();
 
-      const taskTitle = $('#taskInput').val().trim();
-      const taskDescription = $('#descriptionInput').val().trim();
-      const taskDate = $('#dateInput').val().trim();
-      const taskTime = $('#timeInput').val().trim();
-      const selectedTags = [];
-      $('#tags-dropdown').find('.form-check-input:checked').each(function collectSelectedTags() {
-        selectedTags.push($(this).val());
-      });
-      const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
-      if (taskData.some((data) => data === '')) return;
+    const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!editedTimeRegex.test(editedTaskTime)) {
+      return;
+    }
 
-      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-      if (!timeRegex.test(taskTime)) return;
+    const [editedHoursStr, editedMinutesStr] = editedTaskTime.split(':');
+    const editedHours = parseInt(editedHoursStr, 10);
+    const editedMinutes = parseInt(editedMinutesStr, 10);
+    const editedDateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+    if (!editedDateRegex.test(editedTaskDate)) {
+      return;
+    }
 
-      const [hoursStr, minutesStr] = taskTime.split(':');
-      const hours = parseInt(hoursStr, 10);
-      const minutes = parseInt(minutesStr, 10);
+    const [editedYearsStr, editedMonthsStr, editedDaysStr] = editedTaskDate.split('/');
+    const editedYears = parseInt(editedYearsStr, 10);
+    const editedMonths = parseInt(editedMonthsStr, 10);
+    const editedDays = parseInt(editedDaysStr, 10);
 
-      const dateRegex = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
-      if (!dateRegex.test(taskDate)) return;
+    const editedDueDate = new Date(
+      editedYears,
+      editedMonths - 1,
+      editedDays,
+      editedHours,
+      editedMinutes,
+      0,
+    );
+    if (editedDueDate.toString() === 'Invalid Date') {
+      return;
+    }
 
-      const [yearsStr, monthsStr, daysStr] = taskDate.split('/');
-      const years = parseInt(yearsStr, 10);
-      const months = parseInt(monthsStr, 10);
-      const days = parseInt(daysStr, 10);
+    $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
+      const existingTasks = result.tasks || {};
+      const taskIdToEdit = $('#editForm').attr('edit-task-id');
 
-      // months start from 0
-      const dueDate = new Date(years, months - 1, days, hours, minutes, 0);
-      if (dueDate.toString() === 'Invalid Date') return;
-
-      $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
-        const existingTasks = result.tasks || {};
-        const taskId = Date.now() + taskTitle;
-
-        existingTasks[taskId] = {
-          title: taskTitle,
-          description: taskDescription,
-          // ISO strings are consistent between JS engines
-          due: dueDate.toISOString(),
-          tags: selectedTags,
+      if (existingTasks[taskIdToEdit]) {
+        existingTasks[taskIdToEdit] = {
+          title: editedTaskTitle,
+          description: editedTaskDescription,
+          due: editedDueDate.toISOString(),
         };
 
-        // don't sync with other machines - extension is local
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
-          chrome.alarms.create(taskId, { when: dueDate.getTime() });
-          addTaskToChecklist(taskId);
+          updateChecklist(existingTasks);
+
+          $('#editForm').hide();
         });
-      });
-    });
-
-    $('#editForm').on('submit', (event) => {
-      event.preventDefault();
-      const editedTaskTitle = $('#editTaskInput').val().trim();
-      const editedTaskDescription = $('#editDescriptionInput').val().trim();
-      const editedTaskDate = $('#editDateInput').val().trim();
-      const editedTaskTime = $('#editTimeInput').val().trim();
-
-      const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-      if (!editedTimeRegex.test(editedTaskTime)) {
-        return;
       }
-
-      const [editedHoursStr, editedMinutesStr] = editedTaskTime.split(':');
-      const editedHours = parseInt(editedHoursStr, 10);
-      const editedMinutes = parseInt(editedMinutesStr, 10);
-      const editedDateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
-      if (!editedDateRegex.test(editedTaskDate)) {
-        return;
-      }
-
-      const [editedYearsStr, editedMonthsStr, editedDaysStr] = editedTaskDate.split('/');
-      const editedYears = parseInt(editedYearsStr, 10);
-      const editedMonths = parseInt(editedMonthsStr, 10);
-      const editedDays = parseInt(editedDaysStr, 10);
-
-      const editedDueDate = new Date(
-        editedYears,
-        editedMonths - 1,
-        editedDays,
-        editedHours,
-        editedMinutes,
-        0,
-      );
-      if (editedDueDate.toString() === 'Invalid Date') {
-        return;
-      }
-
-      $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
-        const existingTasks = result.tasks || {};
-        const taskIdToEdit = $('#editForm').attr('edit-task-id');
-
-        if (existingTasks[taskIdToEdit]) {
-          existingTasks[taskIdToEdit] = {
-            title: editedTaskTitle,
-            description: editedTaskDescription,
-            due: editedDueDate.toISOString(),
-          };
-
-          $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
-            updateChecklist(existingTasks);
-
-            $('#editForm').hide();
-          });
-        }
-      });
     });
   });
 }

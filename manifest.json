@@ -24,7 +24,8 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "*://*/hello.html",
+        "*://*/new_tab.html"
       ],
       "js": [
         "popup.js",

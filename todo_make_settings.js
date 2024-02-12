@@ -106,7 +106,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
           const tasks = content.tasks;
-          console.log(tasks);
           // Check if 'tasks' property exists
           overwriteTasks(tasks);
         };
