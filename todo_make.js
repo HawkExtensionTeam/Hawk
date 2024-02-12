@@ -36,6 +36,19 @@ function populateTagsDropdown() {
   });
 }
 
+function setTaskDeleted(allTasks, task) {
+  task.recentlyDeleted = true;
+
+  // Save the updated tasks object
+  chrome.storage.local.set({ tasks: allTasks }, () => {
+    // Set an alarm to delete the task after 30 days
+    const now = new Date();
+    const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
+    const alarmName = `${task.id}_deletion_alarm`;
+    chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+  });
+}
+
 function sortTasks(tasks) {
   const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
   tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
@@ -69,13 +82,14 @@ function updateChecklist(tasks) {
     const sortedTasks = sortTasks(tasks);
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
-      const dueDate = new Date(task.due);
-      const parts = dueDate.toLocaleString().split(',');
-      const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
-      const tags = `Tags: ${task.tags}`;
-      const passed = dueDate < new Date();
-      const label = `form-check-label${passed ? ' text-danger' : ''}`;
-      checklist.append(`
+      if (!task.recentlyDeleted) {
+        const dueDate = new Date(task.due);
+        const parts = dueDate.toLocaleString().split(',');
+        const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
+        const tags = `Tags: ${task.tags}`;
+        const passed = dueDate < new Date();
+        const label = `form-check-label${passed ? ' text-danger' : ''}`;
+        checklist.append(`
         <li class="checklist-item">
           <div class="form-check-2 d-flex justify-content-between align-items-center">
             <input type="checkbox" class="form-check-input" id="item${taskId}">
@@ -120,6 +134,7 @@ function updateChecklist(tasks) {
           </div>
         </li>
       `);
+      }
       setTimeout(() => {
         $('.checklist-item').addClass('appear');
       }, 200);
@@ -297,16 +312,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = result.tasks || {};
       const taskId = $delBtn.attr('delete-task-id');
-      existingTasks[taskId].recentlyDeleted = true;
-
-      // Save the updated tasks object
-      chrome.storage.local.set({ tasks: existingTasks }, () => {
-        // Set an alarm to delete the task after 30 days
-        const now = new Date();
-        const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-        const alarmName = `${taskId}_deletion_alarm`;
-        chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-      });
+      setTaskDeleted(existingTasks, existingTasks[taskId]);
     });
   });
 
