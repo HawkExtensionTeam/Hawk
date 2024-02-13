@@ -23,6 +23,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#notebook').on('click', () => {
       chrome.tabs.create({ url: 'add_note.html' });
     });
+    
+    $('#indexing').on('click', () => {
+      chrome.tabs.create({ url: 'settings.html#indexing' });
+    });    
+    
     chrome.storage.local.get({ tasks: [] }, (result) => {
       // avoid pushing to undefined if there are no previous tasks
       const existingTasks = result.tasks || [];
