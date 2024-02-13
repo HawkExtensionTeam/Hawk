@@ -12,6 +12,12 @@
             <div class="settings-title">
                 Settings
             </div>
+            <div class="settings-entry selected" id="appearance">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-display-fill settings-icon" viewBox="0 0 16 16">
+                    <path d="M5 3.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-7zM0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H1z"/>
+                </svg>
+                Appearance
+            </div>
             <div class="settings-entry selected" id="backup">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-device-ssd settings-icon" viewBox="0 0 16 16">
                   <path d="M4.75 4a.75.75 0 0 0-.75.75v3.5c0 .414.336.75.75.75h6.5a.75.75 0 0 0 .75-.75v-3.5a.75.75 0 0 0-.75-.75zM5 8V5h6v3zm0-5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m7 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4.5 11a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m7 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
@@ -45,6 +51,47 @@
             </div>
 
             <div class="container mt-5 settings-pane" id="backup-pane">
+                <div class="col">
+                    <button class="btn btn-primary restore-all-btn">Restore All</button>
+                    <button class="btn btn-primary import-selection-btn">Import Data for Selection</button>
+                </div>
+                <div class="col">
+                    <ul class="nav nav-tabs" id="backupTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Notes</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="tasks-tab" data-bs-toggle="tab" href="#tasks" role="tab">Tasks</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="index-tab" data-bs-toggle="tab" href="#index" role="tab">Index</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-2">
+                        <div class="tab-pane fade show active" id="notes" role="tabpanel">
+                            <input type="checkbox" id="notesCheckbox"> Note 1
+                            <br>
+                            <input type="checkbox" id="notesCheckbox"> Note 2
+                            <br>
+                            <input type="checkbox" id="notesCheckbox"> Note 3
+                        </div>
+                        <div class="tab-pane fade" id="tasks" role="tabpanel">
+                            <input type="checkbox" id="tasksCheckbox"> Task 1
+                            <br>
+                            <input type="checkbox" id="tasksCheckbox"> Task 2
+                            <br>
+                            <input type="checkbox" id="tasksCheckbox"> Task 3
+                        </div>
+                        <div class="tab-pane fade" id="index" role="tabpanel">
+                            <input type="checkbox" id="indexCheckbox"> Index 1
+                            <br>
+                            <input type="checkbox" id="indexCheckbox"> Index 2
+                            <br>
+                            <input type="checkbox" id="indexCheckbox"> Index 3
+                        </div>
+                    </div>
+                </div>
+                    <div class="container mt-5 settings-pane" id="backup-pane">
 								<div class="col">
 										<button class="btn btn-primary backup-btn">Export extension data to backup (JSON)</button>
 								</div>
