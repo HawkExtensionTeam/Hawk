@@ -1,3 +1,60 @@
+let tagFilter = {};
+let currentlyAllFalse = true;
+let tasksObj = {};
+let tagsObj = {};
+
+function areAllTagsFalse() {
+  for (const key in tagFilter) {
+    if (tagFilter.hasOwnProperty(key) && tagFilter[key] !== false) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function checkTagsAgainstFilter(task) {
+  const taskTags = task.tags || [];
+  for (const tagID of taskTags) {
+    const filterValue = tagFilter[tagID];
+    if (filterValue !== undefined && filterValue) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function cleanupTagsInTasks() {
+  chrome.storage.local.get({ tasks: {}, tagsObject: {} }, (result) => {
+    const { tasks, tagsObject } = result;
+
+    if (!tasks || !tagsObject) {
+      return;
+    }
+
+    const updatedTasks = {};
+    Object.keys(tasks).forEach((taskId) => {
+      const task = tasks[taskId];
+
+      console.log(`Original tags for task ${taskId}:`, task.tags);
+
+      // Filter the tags array
+      const updatedTags = task.tags.filter((tag) => tagsObj.tags[tag]);
+
+      console.log(`Updated tags for task ${taskId}:`, updatedTags);
+
+      // Update the task with cleaned-up tags
+      const updatedTask = { ...task, tags: updatedTags };
+      updatedTasks[taskId] = updatedTask;
+    });
+
+    console.log("Updated tasks:", updatedTasks);
+
+    chrome.storage.local.set({ tasks: updatedTasks }, () => {
+      console.log("Tag cleanup completed.");
+    });
+  });
+}
+
 function formatTime(time) {
   return time < 10 ? `0${time}` : time;
 }
@@ -16,48 +73,26 @@ function setTime() {
   $('#dateInput').val(date);
 }
 
-function allDeleted(allTasks) {
-  let allRecentlyDeleted = true;
-  if (Array.isArray(allTasks)) {
-    allTasks.forEach((task) => {
-      if (!task.recentlyDeleted) {
-        allRecentlyDeleted = false;
-      }
-    });
-  }
-  return allRecentlyDeleted;
-}
-
-function populateTagsDropdown() {
-  chrome.storage.local.get({ tags: {} }, (data) => {
-    const dropdownMenu = $('#tags-dropdown');
-    const { tags } = data;
-    if (tags && Object.keys(tags).length > 0) {
-      dropdownMenu.empty();
-      Object.keys(tags).forEach((key) => {
-        const tag = tags[key];
-        const listItem = $('<li></li>');
-        const checkbox = $(`<input type="checkbox" class="form-check-input" id="${key}" value="${key}">`);
-        const label = $(`<label class="form-check-label" for="${key}">${tag.tagName}</label>`);
-        listItem.addClass('form-check');
-        listItem.append(checkbox);
-        listItem.append(label);
-        dropdownMenu.append(listItem);
-      });
+function getNonDeletedCount(allTasks) {
+  let count = 0
+  $.each(allTasks, function _(index, task) {
+    if (!task.recentlyDeleted) {
+      count = count + 1;
     }
   });
+  return count;
 }
 
 function setTaskDeleted(allTasks, task) {
   task.recentlyDeleted = true;
 
-  // Save the updated tasks object
   chrome.storage.local.set({ tasks: allTasks }, () => {
-    // Set an alarm to delete the task after 30 days
     const now = new Date();
     const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
     const alarmName = `${task.id}_deletion_alarm`;
     chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+    tasksObj = allTasks;
+    updateChecklist(allTasks);
   });
 }
 
@@ -75,34 +110,55 @@ function sortTasks(tasks) {
 }
 
 function updateChecklist(tasks) {
+  const noTasks = `
+    <div class="row justify-content-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+        </svg>
+    </div>
+    <div class="row justify-contents-center text-center">
+        <div class="warn-text-2">
+            No tasks found.
+        </div>
+    </div>
+  `
   const checklist = $('#checklist-2');
   checklist.empty(); // Clear existing items
-  if (Object.keys(tasks).length === 0 || allDeleted(tasks)) {
-    checklist.append(`
-      <div class="row justify-content-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-              <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-          </svg>
-      </div>
-      <div class="row justify-contents-center text-center">
-          <div class="warn-text-2">
-              No tasks yet.
-          </div>
-      </div>
-    `);
-  } else {
+  if (getNonDeletedCount(tasks) === 0) {
+    checklist.append(noTasks);
+  } 
+  else {
     const sortedTasks = sortTasks(tasks);
+    const allTagsFalse = areAllTagsFalse();
+    let insertedTasks = 0;
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
-      if (!task.recentlyDeleted) {
+      if ((!task.recentlyDeleted) && (currentlyAllFalse || checkTagsAgainstFilter(task))) {
+        insertedTasks = insertedTasks + 1;
         const dueDate = new Date(task.due);
         const parts = dueDate.toLocaleString().split(',');
         const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
-        const tags = `Tags: ${task.tags}`;
         const passed = dueDate < new Date();
         const label = `form-check-label${passed ? ' text-danger' : ''}`;
+        let tagElements = ``;
+        for (const key in tagsObj.tags) {
+          console.log(key);
+          console.log(task.tags);
+          console.log(tagsObj.tags);
+          if (task.tags.includes(key)) {
+            const tagObject = tagsObj.tags[key];
+            const colourToUse = getCorrectTextColour(tagsObj.tags[key].tagColour);
+            tagElements = tagElements + `
+              <div class="col-auto mb-2 zero-margin zero-padding">
+                <div class="tag-item d-flex" associatedTag="${key}">
+                  <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
+                </div>
+              </div>
+            `;
+          }
+        }
         checklist.append(`
-        <li class="checklist-item">
+        <li class="checklist-item" associatedTask="${taskId}">
           <div class="form-check-2 d-flex justify-content-between align-items-center">
             <input type="checkbox" class="form-check-input" id="item${taskId}">
             <div class="container">
@@ -117,8 +173,8 @@ function updateChecklist(tasks) {
                   <div class="row">
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                   </div>
-                  <div class="row">
-                    <label class="${label} tags" for="item${taskId}">${tags}</label>
+                  <div class="row tag-cont">
+                    ${tagElements}
                   </div>
                 </div>
                 <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
@@ -151,72 +207,180 @@ function updateChecklist(tasks) {
         $('.checklist-item').addClass('appear');
       }, 200);
     });
+    if (insertedTasks === 0) {
+      checklist.append(noTasks);
+    }
   }
 }
 
+function getCorrectTextColour(colour) {
+  var r = parseInt(colour.substring(1, 3), 16); 
+  var g = parseInt(colour.substring(3, 5), 16); 
+  var b = parseInt(colour.substring(5, 7), 16);
+  console.log(r + " " + g + " " + b);
+  return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ? '#000000' : '#ffffff';
+}
+
+function populateTags() {
+  chrome.storage.local.get({ tags: {} }, (data) => {
+    const tagRow = $('.tag-row');
+    const { tags } = data;
+    if (tags && Object.keys(tags).length > 0) {
+      tagRow.empty();
+      tagFilter = {};
+      Object.keys(tags).forEach((key) => {
+        const tag = tags[key];
+        tagFilter[key] = false;
+        const colourToUse = getCorrectTextColour(tag.tagColour);
+        tagRow.append(`
+          <div class="col-auto mb-2">
+            <div class="tag-item d-flex align-items-center" associatedTag="${key}">
+              <input type="checkbox" class="selective-checkbox" id="${key}">
+              <span class="tag" style="background-color: ${tag.tagColour}; color: ${colourToUse};">${tag.tagName}</span>
+            </div>
+          </div>  
+        `);
+      });
+    }
+  });
+}
+
+function processFilter() {
+  let changed = false
+  Object.keys(tagFilter).forEach((key) => {
+    const result = $('#tag-select-target').find(`[id="${key}"]`);
+    if (result.length > 0) {
+      if (tagFilter[key] !== result[0].checked) {
+        changed = true;
+      }
+      tagFilter[key] = result[0].checked;
+    }
+  });
+  currentlyAllFalse = areAllTagsFalse();
+  if (changed) {
+    getTasks();
+  }
+  console.log(tagFilter);
+}
+
+function getSelectedTags(selector) {
+  let insIdx = 0;
+  let selected = [];
+  console.log("WOW");
+  console.log(tagFilter);
+  Object.keys(tagFilter).forEach((key) => {
+    console.log(`[id='${key}']`);
+    const result = $(selector).find(`[id="${key}"]`);
+    if (result.length > 0 && result[0].checked) {
+      selected[insIdx] = key;
+      insIdx = insIdx + 1;
+    }
+  });
+  return selected;
+}
+
+function addTag(tagID, tagObject) {
+  const tagRow = $('.tag-row');
+  const tagKey = tagID;
+  tagFilter[tagID] = false;
+  const colourToUse = getCorrectTextColour(tagObject.tagColour);
+  tagRow.append(`
+    <div class="col-auto mb-2">
+      <div class="tag-item d-flex align-items-center" associatedTag="${tagID}">
+        <input type="checkbox" class="selective-checkbox" id="${tagID}">
+        <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
+      </div>
+    </div>  
+  `);
+}
+
+function removeTag(key) {
+  $(`.tag-item[associatedTag="${key}"]`).closest('.col-auto.mb-2').remove();
+}
+
 function addTaskToChecklist(taskId) {
+  getTagsObj().then((obj) => {
+    tagsObj = obj;
+  });
   chrome.storage.local.get({ tasks: {} }, (result) => {
     const tasks = result.tasks || {};
     if (tasks && tasks[taskId]) {
       const checklist = $('#checklist-2');
-      if (Object.keys(tasks).length === 1) {
+      if (getNonDeletedCount(tasks) === 1) {
         checklist.empty();
       }
       const task = tasks[taskId];
       const dueDate = new Date(task.due);
       const parts = dueDate.toLocaleString().split(',');
       const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
-      const tags = `Tags: ${task.tags}`;
       const passed = dueDate < new Date();
       const label = `form-check-label${passed ? ' text-danger' : ''}`;
-      checklist.append(`
-        <li class="checklist-item">
-          <div class="form-check-2 d-flex justify-content-between align-items-center">
-            <input type="checkbox" class="form-check-input" id="item${taskId}">
-            <div class="container">
-              <div class="row">
-                <div class="col capped">
-                  <div class="row">
-                    <label class="${label} task-title" for="item${taskId}">${task.title}</label>
-                  </div>
-                  <div class="row">
-                    <label class="${label} task-desc" for="item${taskId}">${task.description}</label>
-                  </div>
-                  <div class="row">
-                    <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
-                  </div>
-                  <div class="row">
-                  <label class="${label} tags" for="item${taskId}">${tags}</label>
+      if (currentlyAllFalse || checkTagsAgainstFilter(task)) {
+        let tagElements = ``;
+        for (const key in tagsObj.tags) {
+          console.log(task.tags)
+          console.log(tagsObj.tags);
+          if (task.tags.includes(key)) {
+            const tagObject = tagsObj.tags[key];
+            const colourToUse = getCorrectTextColour(tagsObj.tags[key].tagColour);
+            tagElements = tagElements + `
+              <div class="col-auto mb-2 zero-margin zero-padding">
+                <div class="tag-item d-flex" associatedTag="${tagObject.tagName}-${tagObject.tagColour}">
+                  <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
                 </div>
-                </div>
-                <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
-                  <div class="col">
-                    <button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"></path>
-                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"></path>
-                      </svg>
-                      <br>Delete
-                    </button>
+              </div>
+            `;
+          }
+        }
+        checklist.append(`
+          <li class="checklist-item" associatedTask="${taskId}">
+            <div class="form-check-2 d-flex justify-content-between align-items-center">
+              <input type="checkbox" class="form-check-input" id="item${taskId}">
+              <div class="container">
+                <div class="row">
+                  <div class="col capped">
+                    <div class="row">
+                      <label class="${label} task-title" for="item${taskId}">${task.title}</label>
+                    </div>
+                    <div class="row">
+                      <label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+                    </div>
+                    <div class="row">
+                      <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
+                    </div>
+                    <div class="row tag-cont">
+                      ${tagElements}
+                    </div>
                   </div>
-                  <br>
-                  <div class="col edit-col">
-                    <button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                      </svg>
-                      <br>Edit
-                    </button>
+                  <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
+                    <div class="col">
+                      <button type="button" class="btn btn-danger delete-btn fill-btn" delete-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"></path>
+                          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"></path>
+                        </svg>
+                        <br>Delete
+                      </button>
+                    </div>
+                    <br>
+                    <div class="col edit-col">
+                      <button type="button" class="btn btn-warning edit-btn fill-btn" edit-task-id="${taskId}" data-bs-toggle="modal" data-bs-target="#editTaskModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                          <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                        </svg>
+                        <br>Edit
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </li>
-      `);
-      setTimeout(() => {
-        $('.checklist-item').addClass('appear');
-      }, 200);
+          </li>
+        `);
+        setTimeout(() => {
+          $('.checklist-item').addClass('appear');
+        }, 200);
+      }
     }
   });
 }
@@ -228,31 +392,70 @@ function getTasks() {
   });
 }
 
+function getTasksObj() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ tasks: {} }, (result) => {
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+
+function getTagsObj() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ tags: {} }, (result) => {
+      console.log(result);
+      resolve(result);
+    });
+  });
+}
+
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
   if (Object.keys(updatedTasks).length === 0) {
     allTasks = {};
-  } else {
+  } 
+  else {
     allTasks = updatedTasks;
   }
   chrome.storage.local.set({ tasks: allTasks }, () => {
     updateChecklist(allTasks);
+    tasksObj = allTasks;
+  });
+}
+
+function deleteTag(allTags, tagIdToRemove) {
+  const updatedTags = Object.fromEntries(
+    Object.entries(allTags).filter(([tagId]) => tagId !== tagIdToRemove),
+  );
+  if (Object.keys(updatedTags).length === 0) {
+    allTags = {};
+  } 
+  else {
+    allTags = updatedTags;
+  }
+  chrome.storage.local.set({ tags: allTags }, () => {
+    removeTag(tagIdToRemove);
+    tagsObj = allTags;
   });
 }
 
 $('#task-input').on('input', function _() {
   const visibleItems = $('.checklist-item');
   const query = $(this).val().toLowerCase();
+  const trimmedQuery = query.trim();
   const toHide = [];
   const toShow = [];
+  console.log(tasksObj);
   visibleItems.each(function determineResults() {
     let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
     allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
-    if (allText.indexOf(query) >= 0) {
+    if ((trimmedQuery === '' || allText.indexOf(query) >= 0) && (currentlyAllFalse || checkTagsAgainstFilter(tasksObj.tasks[$(this).attr('associatedTask')]))) {
       toShow.push($(this));
-    } else {
+    } 
+    else {
       toHide.push($(this));
     }
   });
@@ -268,6 +471,7 @@ function openEditForm(taskId) {
   const editForm = $('#editForm');
   chrome.storage.local.get({ tasks: {} }, (result) => {
     const allTasks = result.tasks || {};
+    const allTags = result.tasks[taskId].tags || {};
     const taskToEdit = allTasks[taskId];
     $('#editTaskInput').val(taskToEdit.title);
     $('#editDescriptionInput').val(taskToEdit.description);
@@ -275,36 +479,79 @@ function openEditForm(taskId) {
     $('#editDateInput').val(`${dueDate.getFullYear()}/${String(dueDate.getMonth() + 1).padStart(2, '0')}/${String(dueDate.getDate()).padStart(2, '0')}`);
     $('#editTimeInput').val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
     editForm.attr('edit-task-id', taskId);
+    console.log("POW");
+    console.log(allTags);
+    $('#creation-tags-2').find('input').prop('checked', false);
+    for (const key in allTags) {
+      $('#creation-tags-2').find('.selective-checkbox[id="' + allTags[key] + '"]').prop('checked', true);
+    }
   });
 }
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
+  getTasksObj().then((obj) => {
+    tasksObj = obj;
+  });
+  getTagsObj().then((obj) => {
+    tagsObj = obj;
+  });
   setTime();
+  cleanupTagsInTasks();
   getTasks();
-  populateTagsDropdown();
+  populateTags();
 
   $(document).on('click', '.show-create-tag-modal-btn', () => {
+    const tagName = $('#tagName').val('');
+    const tagColour = $('#tagColour').val('');    
     $('#newTaskModal').modal('hide');
     $('#createTagModal').modal('show');
+  });
+  
+  $(document).on('click', '.colour-square', (event) => {
+    const eTarget = $(event.currentTarget);
+    $('.colour-square').css('outline', 'none');
+    eTarget.css('outline', '2px solid #007bff');
+    $('#tagColour').val($(event.currentTarget).attr('assignedColour'));
   });
 
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
     const tagColour = $('#tagColour').val().trim();
+    
     if (tagName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
-        const newTag = `${tagName}-${typeof tagColour === 'string' ? tagColour : ''}`;
+        const timestamp = new Date().getTime();
+        const randomId = Math.floor(Math.random() * 1000);
+        const newTag = `${timestamp}-${randomId}`;
+        
         data.tags[newTag] = {
           tagColour,
           tagName,
         };
+        
         chrome.storage.local.set({ tags: data.tags }, () => {
-          populateTagsDropdown();
+          addTag(newTag, data.tags[newTag]);
+          tagsObj = data;
         });
       });
     }
-    $('#createTagModal').modal('hide');
     $('#newTaskModal').modal('show');
+    $('#createTagModal').modal('hide');
+  });
+  
+  $(document).on('click', '.create-tag-cancel', () => {
+    $('#newTaskModal').modal('show');
+  });
+  
+  $(document).on('contextmenu', '#tag-select-target .tag-item', function (e) {
+    e.preventDefault();
+    const associatedTag = $(this).attr('associatedtag');
+    const foundTagName = tagsObj.tags[associatedTag].tagName;
+    if (confirm(`Are you sure you want to delete the tag "${foundTagName}"?`)) {
+      chrome.storage.local.get({ tags: {} }, (data) => {
+        deleteTag(data.tags, associatedTag);
+      });
+    }
   });
 
   $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
@@ -312,6 +559,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const taskId = $editBtn.attr('edit-task-id');
 
     openEditForm(taskId);
+  });
+  
+  $(document).on('click', '.filter-trigger', (event) => {
+    processFilter();
   });
 
   $(document).on('click', '.btn.btn-danger.delete-btn', (event) => {
@@ -328,18 +579,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
   });
 
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    const alarmName = alarm.name;
-    if (alarmName.endsWith('_deletion_alarm')) {
-      const taskId = alarmName.split('_')[0];
-      chrome.storage.local.get({ tasks: {} }, (result) => {
-        const existingTasks = result.tasks || {};
-        deleteTask(existingTasks, taskId);
-      });
-    }
-  });
-
   $('#todoForm').on('submit', (event) => {
+    console.log("WOW");
     // prevents default page reload
     event.preventDefault();
 
@@ -347,10 +588,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const taskDescription = $('#descriptionInput').val().trim();
     const taskDate = $('#dateInput').val().trim();
     const taskTime = $('#timeInput').val().trim();
-    const selectedTags = [];
-    $('#tags-dropdown').find('.form-check-input:checked').each(function collectSelectedTags() {
-      selectedTags.push($(this).val());
-    });
+    let selectedTags = getSelectedTags('#creation-tags');
+    console.log("SELECTED TAGS");
+    console.log(selectedTags);
     const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
     if (taskData.some((data) => data === '')) return;
 
@@ -376,7 +616,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
       const existingTasks = result.tasks || {};
       const taskId = Date.now() + taskTitle;
-
+      console.log("WOW");
       existingTasks[taskId] = {
         title: taskTitle,
         description: taskDescription,
@@ -390,6 +630,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
         chrome.alarms.create(taskId, { when: dueDate.getTime() });
         addTaskToChecklist(taskId);
+        tasksObj = existingTasks;
       });
     });
   });
@@ -400,7 +641,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const editedTaskDescription = $('#editDescriptionInput').val().trim();
     const editedTaskDate = $('#editDateInput').val().trim();
     const editedTaskTime = $('#editTimeInput').val().trim();
-
+    let selectedTags = getSelectedTags('#creation-tags-2');
     const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     if (!editedTimeRegex.test(editedTaskTime)) {
       return;
@@ -440,12 +681,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           title: editedTaskTitle,
           description: editedTaskDescription,
           due: editedDueDate.toISOString(),
+          tags: selectedTags,
         };
 
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
           updateChecklist(existingTasks);
-
-          $('#editForm').hide();
+          tasksObj = existingTasks;
         });
       }
     });

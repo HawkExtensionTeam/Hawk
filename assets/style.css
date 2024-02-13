@@ -21,6 +21,10 @@ body, html {
 	overflow-x: hidden;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
 .popup {
 	width: 400px;
 }
@@ -85,6 +89,9 @@ ul {
 	padding-right: 0.6em;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
+  min-height: 96px;
+  display: flex;
+  align-items: center;
 	user-select: none;
 }
 
@@ -95,9 +102,54 @@ ul {
 	border-radius: 12px;
 	margin-left: 1.5em;
 	padding-left: 0.6em;
-	padding-right: 0.6em;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
+}
+
+.filter-btn {
+	background-color: #dddddda3;
+	backdrop-filter: blur(8px);
+	box-shadow: 0px 0px 12px #888888;
+	border-radius: 12px;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
+	padding-top: 1.5em;
+	padding-bottom: 1.5em;
+  outline: none;
+  border: none;
+}
+
+.fb-pad {
+  padding-right: 0.4em;
+}
+
+.filter-btn:hover {
+	background-color: #6c757d2e;
+}
+
+.filter-btn:active svg {
+  fill: white;
+}
+
+.search-bar {
+	font-family: Roboto, Arial, sans-serif;
+	background-color: #ffffff69;
+	backdrop-filter: blur(8px);
+	border: none;
+  font-size: 1rem;
+  width: 96%;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: start;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
+  margin-top: 1.2em;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+}
+
+.search-bar:focus {
+	outline: none;
 }
 
 .search-bar-lg {
@@ -404,7 +456,7 @@ input.selective-checkbox[type="checkbox"]:checked {
 .selective-checkbox {
 	display: block;
 	clear: both;
-	margin-bottom: 10px;
+  vertical-align: middle;
 }
 
 input[type="checkbox"]:not(.selective-checkbox):checked {
@@ -634,4 +686,42 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 .zero-margin {
 	margin-left: 0;
 	margin-right: 0;
+}
+
+.zero-padding {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.tag {
+  border-radius: 2rem;
+  background-color: grey;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.tag.white {
+  color: white;
+}
+
+.colour-square {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.375rem;
+  margin-right: 0.185rem;
+  margin-bottom: 0.75rem;
+}
+
+.tag-cont {
+  background-color: #dddddd;
+  padding: 0.375rem;
+  border-radius: 10px;
+}
+
+.tag-caption {
+  margin-bottom: 1em;
 }

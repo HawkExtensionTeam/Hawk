@@ -8,52 +8,96 @@
 <body class="d-flex justify-content-center nt-body">
 	<div class="container mt-5" id="to-do-list-main">
 		<div class="row">
-			<div class="row">
-				<div class="col-8 d-flex">
-						<div class="card-title-lg fs-1 text-nowrap">To-Do List
-						</div>
-						<div class="row panel-lg flex-nowrap align-items-center">
-							<div class="col">
-								<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-									<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-								</svg>
-							</div>
-							<div class="col src-col">
-								<input type="text" placeholder="Type to search tasks" class="search-bar-lg text-nowrap" id="task-input">
-								</input>
-							</div>
-						</div>
-				</div>
-				<div class="col-4 d-flex align-items-center justify-content-end">
-						<button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
-				</div>
-			</div>
+      <div class="row">
+          <div class="col-8 d-flex align-items-center">
+              <div class="card-title-lg fs-1 text-nowrap">To-Do List</div>
+              <div class="row panel-lg flex-nowrap align-items-center">
+                  <div class="col">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+                      </svg>
+                  </div>
+                  <div class="col src-col flex-nowrap">
+                    <input type="text" placeholder="Type to search tasks" class="search-bar-lg text-nowrap" id="task-input">
+                  </div>
+                  <div class="col flex-nowrap justify-content-end align-items-center fb-pad">
+                      <button type="button" class="filter-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagFilterModal" id="tag-filter-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="black" class="bi bi-filter-left" viewBox="0 0 16 16">
+                            <path d="M2 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"></path>
+                        </svg>
+                      </button>
+                  </div>
+              </div>
+          </div>
+          <div class="col-4 mt-2 mt-md-0 d-flex justify-content-end align-items-center">
+              <button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1 ml-2" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
+          </div>
+      </div>
 			<div class="modal fade" id="createTagModal">
 				<div class="modal-dialog">
 				  <div class="modal-content">
-					<div class="modal-header">
-					  <h5 class="modal-title">Create New Tag</h5>
-					  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-					  <form>
-						<div class="mb-3">
-						  <label for="tagName" class="form-label">Tag Name</label>
-						  <input type="text" class="form-control" id="tagName" placeholder="Enter tag name">
-						</div>
-						<div class="mb-3">
-							<label for="colour" class="form-label">Pick a colour</label>
-							<input type="text" class="form-control" id="tagColour" placeholder="Colour">
-						  </div>
-					  </form>
-					</div>
-					<div class="modal-footer">
-					  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					  <button type="button" class="btn btn-primary" id="createTagBtn">Create Tag</button>
-					</div>
+            <div class="modal-header">
+              <h5 class="modal-title">Create New Tag</h5>
+              <button type="button" class="btn-close create-tag-cancel" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form class="tag-cont">
+                <div class="mb-3">
+                  <label for="tagName" class="form-label">Tag Name</label>
+                  <input type="text" class="form-control" id="tagName" placeholder="Enter tag name">
+                </div>
+                <div class="mb-3">
+                  <label for="colour" class="form-label">Pick a colour</label>
+                  <div class="container d-flex zero-padding justify-content-start">
+                    <div class="colour-square" style="background-color: #cc338b" assignedColour="#cc338b"></div>
+                    <div class="colour-square" style="background-color: #dc143c" assignedColour="#dc143c"></div>
+                    <div class="colour-square" style="background-color: #c21e56" assignedColour="#c21e56"></div>
+                    <div class="colour-square" style="background-color: #cd5b45" assignedColour="#cd5b45"></div>
+                    <div class="colour-square" style="background-color: #ed9121" assignedColour="#ed9121"></div>
+                    <div class="colour-square" style="background-color: #eeE600" assignedColour="#eeE600"></div>
+                    <div class="colour-square" style="background-color: #009966" assignedColour="#009966"></div>
+                    <div class="colour-square" style="background-color: #8fbc8f" assignedColour="#8fbc8f"></div>
+                    <div class="colour-square" style="background-color: #6699cc" assignedColour="#6699cc"></div>
+                    <div class="colour-square" style="background-color: #e6e6fa" assignedColour="#e6e6fa"></div>
+                    <div class="colour-square" style="background-color: #9400d3" assignedColour="#9400d3"></div>
+                    <div class="colour-square" style="background-color: #330066" assignedColour="#330066"></div>
+                    <div class="colour-square" style="background-color: #36454f" assignedColour="#36454f"></div>
+                    <div class="colour-square" style="background-color: #808080" assignedColour="#808080"></div>
+                  </div>
+                  <input type="text" class="form-control" id="tagColour" placeholder="Colour">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary create-tag-cancel" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="createTagBtn">Create Tag</button>
+            </div>
 				  </div>
 				</div>
-			  </div>
+			</div>
+
+			<div class="modal fade" id="tagFilterModal">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Tags</h5>
+              <button type="button" class="btn-close filter-trigger" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3 tag-cont">
+                <label for="tagName" class="form-label tag-caption">Tick a tag to include it in the filter.<br>Right click and confirm to delete tags.</label>
+                <div class="container tag-container zero-padding" id="tag-select-target">
+                  <div class="row tag-row">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary filter-trigger" data-bs-dismiss="modal">Close</button>
+            </div>
+				  </div>
+				</div>
+			</div>
 			  
 			<div class="modal fade" id="newTaskModal">
 				<div class="modal-dialog">
@@ -82,13 +126,12 @@
 								</div>
 								<div class="form-group">
 									<label for="tagInput">Tags</label>
-									<div class="dropdown">
-										<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-										  Select Tags
-										</button>
-										<div class="dropdown-menu dropdown-menu-dark" id="tags-dropdown">
-										</div>
-									</div>
+                  <div class="mb-3 tag-cont">
+                    <div class="container tag-container zero-padding" id="creation-tags">
+                      <div class="row tag-row">
+                      </div>
+                    </div>
+                  </div>
 									<button type="button" class="btn btn-primary show-create-tag-modal-btn mt-1">Create Tag</button>
 								</div>
 							</form>
@@ -130,7 +173,16 @@
 								<label for="editTimeInput">Due Time</label>
 								<input type="text" class="form-control" id="editTimeInput" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):([0-5][0-9])" required>
 							</div>
-						 </form>
+              <div class="form-group">
+                <label for="tagInput">Tags</label>
+                <div class="mb-3 tag-cont">
+                  <div class="container tag-container zero-padding" id="creation-tags-2">
+                    <div class="row tag-row">
+                    </div>
+                  </div>
+                </div>
+              </div>
+						</form>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

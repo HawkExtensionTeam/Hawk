@@ -122,6 +122,31 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   });
 });
 
+function deleteTask(allTasks, taskIdToRemove) {
+  const updatedTasks = Object.fromEntries(
+    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
+  );
+  if (Object.keys(updatedTasks).length === 0) {
+    allTasks = {};
+  } 
+  else {
+    allTasks = updatedTasks;
+  }
+  chrome.storage.local.set({ tasks: allTasks }, () => {
+  });
+}
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  const alarmName = alarm.name;
+  if (alarmName.endsWith('_deletion_alarm')) {
+    const taskId = alarmName.split('_')[0];
+    chrome.storage.local.get({ tasks: {} }, (result) => {
+      const existingTasks = result.tasks || {};
+      deleteTask(existingTasks, taskId);
+    });
+  }
+});
+
 function setURL(request) {
   return new Promise((resolve) => {
     if (request.clickedURL) {
