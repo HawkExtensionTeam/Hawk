@@ -114,6 +114,14 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     });
+    
+    if (window.location.hash) {
+      const $entry = $(window.location.hash);
+      $('.settings-entry').removeClass('selected');
+      $entry.addClass('selected');
+      $('.settings-pane').addClass('hidden');
+      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');      
+    }
 
     $(document).on('change', '#jsonInput', (event) => {
       const selectedFile = event.target.files[0];
