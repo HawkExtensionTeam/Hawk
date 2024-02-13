@@ -90,6 +90,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }, 1000);
     });
 
+    // eslint-disable-next-line no-unused-vars
     $(document).on('click', '.btn.btn-primary.background-reset-btn', (event) => {
       chrome.storage.local.set({ bg: '' }, () => {
       });
@@ -114,13 +115,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     });
-    
+
     if (window.location.hash) {
       const $entry = $(window.location.hash);
       $('.settings-entry').removeClass('selected');
       $entry.addClass('selected');
       $('.settings-pane').addClass('hidden');
-      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');      
+      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     }
 
     $(document).on('change', '#jsonInput', (event) => {

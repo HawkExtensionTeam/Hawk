@@ -17,18 +17,17 @@ $(() => {
   //     titleElement.val(note.title);
   //     editor.value(note.content);
   // }
-  
+
   function loadCustomBackground() {
-    chrome.storage.local.get("bg", (result) => {
+    chrome.storage.local.get('bg', (result) => {
       if (result.bg !== '' && result.bg !== undefined) {
         $('body').css('background-image', `url(${result.bg})`);
-      }
-      else {
-        $('body').css('background-image', `url('../images/comic_bg.png`);
+      } else {
+        $('body').css('background-image', 'url(\'../images/comic_bg.png');
       }
     });
   }
-  
+
   loadCustomBackground();
 
   function viewNote(note) {
@@ -54,8 +53,7 @@ $(() => {
           </div>
       </div>
     `);
-    } 
-    else {
+    } else {
       Object.values(notes).forEach((note) => {
         const noteItem = $('<div>').addClass('note-item').data('content', note.content.toLowerCase());
 

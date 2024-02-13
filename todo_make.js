@@ -4,23 +4,22 @@ let tasksObj = {};
 let tagsObj = {};
 
 function getCorrectTextColour(colour) {
-  var r = parseInt(colour.substring(1, 3), 16); 
-  var g = parseInt(colour.substring(3, 5), 16); 
-  var b = parseInt(colour.substring(5, 7), 16);
+  const r = parseInt(colour.substring(1, 3), 16);
+  const g = parseInt(colour.substring(3, 5), 16);
+  const b = parseInt(colour.substring(5, 7), 16);
   return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ? '#000000' : '#ffffff';
 }
 
 function areAllTagsFalse() {
-  return Object.keys(tagFilter).every(key => tagFilter[key] === false);
+  return Object.keys(tagFilter).every((key) => tagFilter[key] === false);
 }
 
 function loadCustomBackground() {
-  chrome.storage.local.get("bg", (result) => {
+  chrome.storage.local.get('bg', (result) => {
     if (result.bg !== '' && result.bg !== undefined) {
       $('body').css('background-image', `url(${result.bg})`);
-    }
-    else {
-      $('body').css('background-image', `url('../images/comic_bg.png`);
+    } else {
+      $('body').css('background-image', 'url(\'../images/comic_bg.png');
     }
   });
 }
@@ -43,8 +42,8 @@ function getTagsObj() {
 
 function checkTagsAgainstFilter(task) {
   const taskTags = task.tags || [];
-  
-  return Object.keys(tagFilter).some(tagID => {
+
+  return Object.keys(tagFilter).some((tagID) => {
     const filterValue = tagFilter[tagID];
     return taskTags.includes(tagID) && filterValue;
   });
@@ -94,10 +93,10 @@ function setTime() {
 }
 
 function getNonDeletedCount(allTasks) {
-  let count = 0
-  $.each(allTasks, function _(index, task) {
+  let count = 0;
+  $.each(allTasks, (index, task) => {
     if (!task.recentlyDeleted) {
-      count = count + 1;
+      count += 1;
     }
   });
   return count;
@@ -128,32 +127,31 @@ function updateChecklist(tasks) {
             No tasks found.
         </div>
     </div>
-  `
+  `;
   const checklist = $('#checklist-2');
   checklist.empty(); // Clear existing items
   if (getNonDeletedCount(tasks) === 0) {
     checklist.append(noTasks);
-  } 
-  else {
+  } else {
     const sortedTasks = sortTasks(tasks);
     const allTagsFalse = areAllTagsFalse();
     let insertedTasks = 0;
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
       if ((!task.recentlyDeleted) && (allTagsFalse || checkTagsAgainstFilter(task))) {
-        insertedTasks = insertedTasks + 1;
+        insertedTasks += 1;
         const dueDate = new Date(task.due);
         const parts = dueDate.toLocaleString().split(',');
         const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
         const passed = dueDate < new Date();
         const label = `form-check-label${passed ? ' text-danger' : ''}`;
-        let tagElements = ``;
-        Object.keys(tagsObj.tags).forEach(key => {
+        let tagElements = '';
+        Object.keys(tagsObj.tags).forEach((key) => {
           if (task.tags.includes(key)) {
             const tagObject = tagsObj.tags[key];
             const colourToUse = getCorrectTextColour(tagObject.tagColour);
 
-            tagElements = tagElements + `
+            tagElements += `
               <div class="col-auto mb-2 zero-margin zero-padding">
                 <div class="tag-item d-flex" associatedTag="${key}">
                   <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
@@ -263,7 +261,7 @@ function populateTags() {
 }
 
 function processFilter() {
-  let changed = false
+  let changed = false;
   Object.keys(tagFilter).forEach((key) => {
     const result = $('#tag-select-target').find(`[id="${key}"]`);
     if (result.length > 0) {
@@ -281,12 +279,12 @@ function processFilter() {
 
 function getSelectedTags(selector) {
   let insIdx = 0;
-  let selected = [];
+  const selected = [];
   Object.keys(tagFilter).forEach((key) => {
     const result = $(selector).find(`[id="${key}"]`);
     if (result.length > 0 && result[0].checked) {
       selected[insIdx] = key;
-      insIdx = insIdx + 1;
+      insIdx += 1;
     }
   });
   return selected;
@@ -328,13 +326,13 @@ function addTaskToChecklist(taskId) {
       const passed = dueDate < new Date();
       const label = `form-check-label${passed ? ' text-danger' : ''}`;
       if (currentlyAllFalse || checkTagsAgainstFilter(task)) {
-        let tagElements = ``;
-        Object.keys(tagsObj.tags).forEach(key => {
+        let tagElements = '';
+        Object.keys(tagsObj.tags).forEach((key) => {
           if (task.tags.includes(key)) {
             const tagObject = tagsObj.tags[key];
             const colourToUse = getCorrectTextColour(tagsObj.tags[key].tagColour);
 
-            tagElements = tagElements + `
+            tagElements += `
               <div class="col-auto mb-2 zero-margin zero-padding">
                 <div class="tag-item d-flex" associatedTag="${key}">
                   <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
@@ -402,8 +400,7 @@ function deleteTag(allTags, tagIdToRemove) {
   );
   if (Object.keys(updatedTags).length === 0) {
     allTags = {};
-  } 
-  else {
+  } else {
     allTags = updatedTags;
   }
   chrome.storage.local.set({ tags: allTags }, () => {
@@ -423,8 +420,7 @@ $('#task-input').on('input', function _() {
     allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
     if ((trimmedQuery === '' || allText.indexOf(query) >= 0) && (currentlyAllFalse || checkTagsAgainstFilter(tasksObj.tasks[$(this).attr('associatedTask')]))) {
       toShow.push($(this));
-    } 
-    else {
+    } else {
       toHide.push($(this));
     }
   });
@@ -449,8 +445,8 @@ function openEditForm(taskId) {
     $('#editTimeInput').val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
     editForm.attr('edit-task-id', taskId);
     $('#creation-tags-2').find('input').prop('checked', false);
-    Object.keys(allTags).forEach(key => {
-      $('#creation-tags-2').find('.selective-checkbox[id="' + allTags[key] + '"]').prop('checked', true);
+    Object.keys(allTags).forEach((key) => {
+      $('#creation-tags-2').find(`.selective-checkbox[id="${allTags[key]}"]`).prop('checked', true);
     });
   });
 }
@@ -470,11 +466,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
   $(document).on('click', '.show-create-tag-modal-btn', () => {
     $('#tagName').val('');
-    $('#tagColour').val('');    
+    $('#tagColour').val('');
     $('#newTaskModal').modal('hide');
     $('#createTagModal').modal('show');
   });
-  
+
   $(document).on('click', '.colour-square', (event) => {
     const eTarget = $(event.currentTarget);
     $('.colour-square').css('outline', 'none');
@@ -485,18 +481,18 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
     const tagColour = $('#tagColour').val().trim();
-    
+
     if (tagName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
         const timestamp = new Date().getTime();
         const randomId = Math.floor(Math.random() * 1000);
         const newTag = `${timestamp}-${randomId}`;
-        
+
         data.tags[newTag] = {
           tagColour,
           tagName,
         };
-        
+
         chrome.storage.local.set({ tags: data.tags }, () => {
           addTag(newTag, data.tags[newTag]);
           tagsObj = data;
@@ -506,11 +502,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#newTaskModal').modal('show');
     $('#createTagModal').modal('hide');
   });
-  
+
   $(document).on('click', '.create-tag-cancel', () => {
     $('#newTaskModal').modal('show');
   });
-  
+
   $(document).on('contextmenu', '#tag-select-target .tag-item', function _(e) {
     e.preventDefault();
     const associatedTag = $(this).attr('associatedtag');
@@ -528,7 +524,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     openEditForm(taskId);
   });
-  
+
   $(document).on('click', '.filter-trigger', () => {
     processFilter();
   });
@@ -555,7 +551,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const taskDescription = $('#descriptionInput').val().trim();
     const taskDate = $('#dateInput').val().trim();
     const taskTime = $('#timeInput').val().trim();
-    let selectedTags = getSelectedTags('#creation-tags');
+    const selectedTags = getSelectedTags('#creation-tags');
     const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
     if (taskData.some((data) => data === '')) return;
 
@@ -605,7 +601,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const editedTaskDescription = $('#editDescriptionInput').val().trim();
     const editedTaskDate = $('#editDateInput').val().trim();
     const editedTaskTime = $('#editTimeInput').val().trim();
-    let selectedTags = getSelectedTags('#creation-tags-2');
+    const selectedTags = getSelectedTags('#creation-tags-2');
     const editedTimeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     if (!editedTimeRegex.test(editedTaskTime)) {
       return;

@@ -134,8 +134,7 @@ function deleteTask(allTasks, taskIdToRemove) {
   );
   if (Object.keys(updatedTasks).length === 0) {
     allTasks = {};
-  } 
-  else {
+  } else {
     allTasks = updatedTasks;
   }
   chrome.storage.local.set({ tasks: allTasks }, () => {
