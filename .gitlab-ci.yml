@@ -9,3 +9,4 @@ eslint:
   script:
     - npm install
     - npx eslint --fix .
+    
