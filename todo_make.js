@@ -14,6 +14,17 @@ function areAllTagsFalse() {
   return Object.keys(tagFilter).every(key => tagFilter[key] === false);
 }
 
+function loadCustomBackground() {
+  chrome.storage.local.get("bg", (result) => {
+    if (result.bg !== '') {
+      $('body').css('background-image', `url(${result.bg})`);
+    }
+    else {
+      $('body').css('background-image', `url('../images/comic_bg.png`);
+    }
+  });
+}
+
 function getTasksObj() {
   return new Promise((resolve) => {
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -167,7 +178,7 @@ function updateChecklist(tasks) {
                   <div class="row">
                     <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                   </div>
-                  <div class="row tag-cont">
+                  <div class="row tag-cont cont-clear">
                     ${tagElements}
                   </div>
                 </div>
@@ -348,7 +359,7 @@ function addTaskToChecklist(taskId) {
                     <div class="row">
                       <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
                     </div>
-                    <div class="row tag-cont">
+                    <div class="row tag-cont cont-clear">
                       ${tagElements}
                     </div>
                   </div>
@@ -451,6 +462,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   getTagsObj().then((obj) => {
     tagsObj = obj;
   });
+  loadCustomBackground();
   setTime();
   cleanupTagsInTasks();
   getTasks();

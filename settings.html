@@ -43,12 +43,25 @@
                 About
             </div>
         </div>
-        <div class="col-auto">
-            <div class="container settings-pane" id="appearance-pane">
-                <h3>Change background on To-Do List and Notebook pages</h3>
+        <div class="col-8">
+            <div class="settings-pane" id="appearance-pane">
+                <div class="section-heading">
+                    Wallpaper
+                </div>
+                <div class="row flex settings-section align-contents-center">
+                    <div class="col-auto zero-margin zero-padding">Change background on To-Do List and Notebook pages
+                    </div>
+                    <div class="col-auto zero-margin zero-padding">
+                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
+                    </div>
+                    <div class="col-auto zero-margin zero-padding">
+                        <label for="backgroundInput" class="btn btn-primary browse-background-btn">Browse for background</label>
+                        <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
+                    </div>
+                </div>
             </div>
 
-            <div class="container settings-pane hidden" id="backup-pane">
+            <div class="settings-pane hidden" id="backup-pane">
                 <div class="col">
                     <button class="btn btn-primary restore-all-btn">Restore All</button>
                     <button class="btn btn-primary import-selection-btn">Import Data for Selection</button>
@@ -127,10 +140,10 @@
                     </div>
                 </div>
             </div>
-            <div class="container settings-pane hidden" id="indexing-pane">
+            <div class="settings-pane hidden" id="indexing-pane">
                 <button class="btn btn-primary">Change allowed sites</button>
             </div>
-            <div class="container settings-pane hidden" id="about-pane">
+            <div class="settings-pane hidden" id="about-pane">
                 Hello!
             </div>
         </div>

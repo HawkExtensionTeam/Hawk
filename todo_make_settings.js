@@ -90,6 +90,23 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }, 1000);
     });
 
+    $(document).on('click', '.btn.btn-primary.background-reset-btn', (event) => {
+      chrome.storage.local.set({ bg: '' }, () => {
+      });
+    });
+
+    $(document).on('change', '#backgroundInput', (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          chrome.storage.local.set({ bg: e.target.result }, () => {
+          });
+        };
+        reader.readAsDataURL(selectedFile);
+      }
+    });
+
     $(document).on('click', '.settings-entry', (event) => {
       const $entry = $(event.currentTarget);
       $('.settings-entry').removeClass('selected');
