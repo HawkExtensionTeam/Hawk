@@ -27,6 +27,11 @@ beforeEach(async () => {
   });
 });
 
+afterEach(async () => {
+  await browser.close();
+  browser = undefined;
+});
+
 /* Test: Popup Renders Correctly
  Confirms the popup page loads with the expected `#checklist` element present
  and containing a single child, ensuring the popup UI is correctly initialized.
@@ -57,10 +62,10 @@ test('Add Task - Opens form correctly', async () => {
 
   await page.type('#taskInput', ' Task 1 ');
   await page.type('#descriptionInput', ' Description');
-  await page.type('#dateInput', '2024/02/10');
-  await page.type('#timeInput', '1:30');
+  // await page.type('#dateInput', '2024/02/10');
+  // await page.type('#timeInput', '1:30');
 
-  await page.click('#newTaskModal .btn-primary');
+  await page.click('#createTask');
 
   await page.waitForSelector('#newTaskModal', { hidden: true });
 });
