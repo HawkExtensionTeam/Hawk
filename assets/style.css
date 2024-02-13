@@ -503,6 +503,27 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 	max-width: 100%;
 }
 
+.settings-body {
+	height: 100vh;
+	width: 100vw;
+	background-image: url('../images/comic_cogs_bg.png');
+	background-size: cover;
+	max-width: 100%;
+}
+
+.settings-container {
+  background: #dddddda3;
+  margin-top: 3em;
+	backdrop-filter: blur(8px);
+	box-shadow: 0px 0px 24px #888888;
+	border-radius: 12px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  height: 75vh;
+}
+
 #edit, #delete {
 	display: flex;
 	align-items: center;
@@ -615,14 +636,14 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 }
 
 .settings-title {
-	font-size: 3rem;
+	font-size: 2.8vw;
 	font-weight: bold;
-	margin-bottom: 2rem;
+	margin-bottom: 1rem;
 	margin-right: 6rem;
 }
 
 .settings-entry {
-	font-size: 1.75rem;
+	font-size: 1.6vw;
 	font-weight: bold;
 	padding-top: 1rem;
 	padding-bottom: 1rem;
@@ -631,7 +652,7 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 .settings-entry.selected {
 	border-radius: 1rem;
 	background: #0d6efd;
-	font-size: 1.75rem;
+	font-size: 1.75vw;
 	color: white;
 	font-weight: bold;
 	padding-top: 1rem;
@@ -639,11 +660,11 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 }
 
 .settings-pane {
-	position: absolute;
+  margin-top: 6em;
 }
 
 .settings-pane.hidden {
-	position: absolute;
+  position: absolute;
 	visibility: hidden;
 }
 
