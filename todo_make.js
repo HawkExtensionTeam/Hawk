@@ -14,13 +14,6 @@ function areAllTagsFalse() {
   return Object.keys(tagFilter).every(key => tagFilter[key] === false);
 }
 
-function getTasks() {
-  $.when(chrome.storage.local.get({ tasks: [] })).done((result) => {
-    const existingTasks = result.tasks || [];
-    updateChecklist(existingTasks);
-  });
-}
-
 function getTasksObj() {
   return new Promise((resolve) => {
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -214,6 +207,13 @@ function updateChecklist(tasks) {
   }
 }
 
+function getTasks() {
+  $.when(chrome.storage.local.get({ tasks: [] })).done((result) => {
+    const existingTasks = result.tasks || [];
+    updateChecklist(existingTasks);
+  });
+}
+
 function setTaskDeleted(allTasks, task) {
   task.recentlyDeleted = true;
 
@@ -283,7 +283,6 @@ function getSelectedTags(selector) {
 
 function addTag(tagID, tagObject) {
   const tagRow = $('.tag-row');
-  const tagKey = tagID;
   tagFilter[tagID] = false;
   const colourToUse = getCorrectTextColour(tagObject.tagColour);
   tagRow.append(`
@@ -383,22 +382,6 @@ function addTaskToChecklist(taskId) {
         }, 200);
       }
     }
-  });
-}
-
-function deleteTask(allTasks, taskIdToRemove) {
-  const updatedTasks = Object.fromEntries(
-    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
-  );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } 
-  else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
-    tasksObj = allTasks;
   });
 }
 
