@@ -2,9 +2,11 @@ image: node:latest
 
 stages:
   - lint
+  - test
 
 eslint:
   stage: lint
   script:
     - npm install
     - npx eslint --fix .
+    
