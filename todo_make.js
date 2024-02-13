@@ -16,7 +16,7 @@ function areAllTagsFalse() {
 
 function loadCustomBackground() {
   chrome.storage.local.get("bg", (result) => {
-    if (result.bg !== '') {
+    if (result.bg !== '' && result.bg !== undefined) {
       $('body').css('background-image', `url(${result.bg})`);
     }
     else {
