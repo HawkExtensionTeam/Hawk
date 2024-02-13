@@ -3,24 +3,47 @@ let currentlyAllFalse = true;
 let tasksObj = {};
 let tagsObj = {};
 
+function getCorrectTextColour(colour) {
+  var r = parseInt(colour.substring(1, 3), 16); 
+  var g = parseInt(colour.substring(3, 5), 16); 
+  var b = parseInt(colour.substring(5, 7), 16);
+  return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ? '#000000' : '#ffffff';
+}
+
 function areAllTagsFalse() {
-  for (const key in tagFilter) {
-    if (tagFilter.hasOwnProperty(key) && tagFilter[key] !== false) {
-      return false;
-    }
-  }
-  return true;
+  return Object.keys(tagFilter).every(key => tagFilter[key] === false);
+}
+
+function getTasks() {
+  $.when(chrome.storage.local.get({ tasks: [] })).done((result) => {
+    const existingTasks = result.tasks || [];
+    updateChecklist(existingTasks);
+  });
+}
+
+function getTasksObj() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ tasks: {} }, (result) => {
+      resolve(result);
+    });
+  });
+}
+
+function getTagsObj() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get({ tags: {} }, (result) => {
+      resolve(result);
+    });
+  });
 }
 
 function checkTagsAgainstFilter(task) {
   const taskTags = task.tags || [];
-  for (const tagID of taskTags) {
+  
+  return Object.keys(tagFilter).some(tagID => {
     const filterValue = tagFilter[tagID];
-    if (filterValue !== undefined && filterValue) {
-      return true;
-    }
-  }
-  return false;
+    return taskTags.includes(tagID) && filterValue;
+  });
 }
 
 function cleanupTagsInTasks() {
@@ -35,22 +58,15 @@ function cleanupTagsInTasks() {
     Object.keys(tasks).forEach((taskId) => {
       const task = tasks[taskId];
 
-      console.log(`Original tags for task ${taskId}:`, task.tags);
-
       // Filter the tags array
       const updatedTags = task.tags.filter((tag) => tagsObj.tags[tag]);
 
-      console.log(`Updated tags for task ${taskId}:`, updatedTags);
-
-      // Update the task with cleaned-up tags
+      // Update the task with cleaned up tags
       const updatedTask = { ...task, tags: updatedTags };
       updatedTasks[taskId] = updatedTask;
     });
 
-    console.log("Updated tasks:", updatedTasks);
-
     chrome.storage.local.set({ tasks: updatedTasks }, () => {
-      console.log("Tag cleanup completed.");
     });
   });
 }
@@ -81,19 +97,6 @@ function getNonDeletedCount(allTasks) {
     }
   });
   return count;
-}
-
-function setTaskDeleted(allTasks, task) {
-  task.recentlyDeleted = true;
-
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    const now = new Date();
-    const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-    const alarmName = `${task.id}_deletion_alarm`;
-    chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-    tasksObj = allTasks;
-    updateChecklist(allTasks);
-  });
 }
 
 function sortTasks(tasks) {
@@ -133,7 +136,7 @@ function updateChecklist(tasks) {
     let insertedTasks = 0;
     sortedTasks.forEach((taskId) => {
       const task = tasks[taskId];
-      if ((!task.recentlyDeleted) && (currentlyAllFalse || checkTagsAgainstFilter(task))) {
+      if ((!task.recentlyDeleted) && (allTagsFalse || checkTagsAgainstFilter(task))) {
         insertedTasks = insertedTasks + 1;
         const dueDate = new Date(task.due);
         const parts = dueDate.toLocaleString().split(',');
@@ -141,13 +144,11 @@ function updateChecklist(tasks) {
         const passed = dueDate < new Date();
         const label = `form-check-label${passed ? ' text-danger' : ''}`;
         let tagElements = ``;
-        for (const key in tagsObj.tags) {
-          console.log(key);
-          console.log(task.tags);
-          console.log(tagsObj.tags);
+        Object.keys(tagsObj.tags).forEach(key => {
           if (task.tags.includes(key)) {
             const tagObject = tagsObj.tags[key];
-            const colourToUse = getCorrectTextColour(tagsObj.tags[key].tagColour);
+            const colourToUse = getCorrectTextColour(tagObject.tagColour);
+
             tagElements = tagElements + `
               <div class="col-auto mb-2 zero-margin zero-padding">
                 <div class="tag-item d-flex" associatedTag="${key}">
@@ -156,7 +157,7 @@ function updateChecklist(tasks) {
               </div>
             `;
           }
-        }
+        });
         checklist.append(`
         <li class="checklist-item" associatedTask="${taskId}">
           <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -213,12 +214,17 @@ function updateChecklist(tasks) {
   }
 }
 
-function getCorrectTextColour(colour) {
-  var r = parseInt(colour.substring(1, 3), 16); 
-  var g = parseInt(colour.substring(3, 5), 16); 
-  var b = parseInt(colour.substring(5, 7), 16);
-  console.log(r + " " + g + " " + b);
-  return (((r * 0.299) + (g * 0.587) + (b * 0.114)) > 186) ? '#000000' : '#ffffff';
+function setTaskDeleted(allTasks, task) {
+  task.recentlyDeleted = true;
+
+  chrome.storage.local.set({ tasks: allTasks }, () => {
+    const now = new Date();
+    const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
+    const alarmName = `${task.id}_deletion_alarm`;
+    chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+    tasksObj = allTasks;
+    updateChecklist(allTasks);
+  });
 }
 
 function populateTags() {
@@ -260,16 +266,12 @@ function processFilter() {
   if (changed) {
     getTasks();
   }
-  console.log(tagFilter);
 }
 
 function getSelectedTags(selector) {
   let insIdx = 0;
   let selected = [];
-  console.log("WOW");
-  console.log(tagFilter);
   Object.keys(tagFilter).forEach((key) => {
-    console.log(`[id='${key}']`);
     const result = $(selector).find(`[id="${key}"]`);
     if (result.length > 0 && result[0].checked) {
       selected[insIdx] = key;
@@ -317,21 +319,20 @@ function addTaskToChecklist(taskId) {
       const label = `form-check-label${passed ? ' text-danger' : ''}`;
       if (currentlyAllFalse || checkTagsAgainstFilter(task)) {
         let tagElements = ``;
-        for (const key in tagsObj.tags) {
-          console.log(task.tags)
-          console.log(tagsObj.tags);
+        Object.keys(tagsObj.tags).forEach(key => {
           if (task.tags.includes(key)) {
             const tagObject = tagsObj.tags[key];
             const colourToUse = getCorrectTextColour(tagsObj.tags[key].tagColour);
+
             tagElements = tagElements + `
               <div class="col-auto mb-2 zero-margin zero-padding">
-                <div class="tag-item d-flex" associatedTag="${tagObject.tagName}-${tagObject.tagColour}">
+                <div class="tag-item d-flex" associatedTag="${key}">
                   <span class="tag" style="background-color: ${tagObject.tagColour}; color: ${colourToUse};">${tagObject.tagName}</span>
                 </div>
               </div>
             `;
           }
-        }
+        });
         checklist.append(`
           <li class="checklist-item" associatedTask="${taskId}">
             <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -385,31 +386,6 @@ function addTaskToChecklist(taskId) {
   });
 }
 
-function getTasks() {
-  $.when(chrome.storage.local.get({ tasks: [] })).done((result) => {
-    const existingTasks = result.tasks || [];
-    updateChecklist(existingTasks);
-  });
-}
-
-function getTasksObj() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get({ tasks: {} }, (result) => {
-      console.log(result);
-      resolve(result);
-    });
-  });
-}
-
-function getTagsObj() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get({ tags: {} }, (result) => {
-      console.log(result);
-      resolve(result);
-    });
-  });
-}
-
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
@@ -448,7 +424,6 @@ $('#task-input').on('input', function _() {
   const trimmedQuery = query.trim();
   const toHide = [];
   const toShow = [];
-  console.log(tasksObj);
   visibleItems.each(function determineResults() {
     let allText = $(this).find('.task-title').text() + $(this).find('.task-desc').text().toLowerCase();
     allText += $(this).find('.task-due').text().replace(/Due|at/g, '');
@@ -479,12 +454,10 @@ function openEditForm(taskId) {
     $('#editDateInput').val(`${dueDate.getFullYear()}/${String(dueDate.getMonth() + 1).padStart(2, '0')}/${String(dueDate.getDate()).padStart(2, '0')}`);
     $('#editTimeInput').val(`${String(dueDate.getHours()).padStart(2, '0')}:${String(dueDate.getMinutes()).padStart(2, '0')}`);
     editForm.attr('edit-task-id', taskId);
-    console.log("POW");
-    console.log(allTags);
     $('#creation-tags-2').find('input').prop('checked', false);
-    for (const key in allTags) {
+    Object.keys(allTags).forEach(key => {
       $('#creation-tags-2').find('.selective-checkbox[id="' + allTags[key] + '"]').prop('checked', true);
-    }
+    });
   });
 }
 
@@ -501,8 +474,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   populateTags();
 
   $(document).on('click', '.show-create-tag-modal-btn', () => {
-    const tagName = $('#tagName').val('');
-    const tagColour = $('#tagColour').val('');    
+    $('#tagName').val('');
+    $('#tagColour').val('');    
     $('#newTaskModal').modal('hide');
     $('#createTagModal').modal('show');
   });
@@ -543,11 +516,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#newTaskModal').modal('show');
   });
   
-  $(document).on('contextmenu', '#tag-select-target .tag-item', function (e) {
+  $(document).on('contextmenu', '#tag-select-target .tag-item', function _(e) {
     e.preventDefault();
     const associatedTag = $(this).attr('associatedtag');
     const foundTagName = tagsObj.tags[associatedTag].tagName;
-    if (confirm(`Are you sure you want to delete the tag "${foundTagName}"?`)) {
+    if (window.confirm(`Are you sure you want to delete the tag "${foundTagName}"?`)) {
       chrome.storage.local.get({ tags: {} }, (data) => {
         deleteTag(data.tags, associatedTag);
       });
@@ -561,7 +534,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     openEditForm(taskId);
   });
   
-  $(document).on('click', '.filter-trigger', (event) => {
+  $(document).on('click', '.filter-trigger', () => {
     processFilter();
   });
 
@@ -580,7 +553,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   });
 
   $('#todoForm').on('submit', (event) => {
-    console.log("WOW");
     // prevents default page reload
     event.preventDefault();
 
@@ -589,8 +561,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const taskDate = $('#dateInput').val().trim();
     const taskTime = $('#timeInput').val().trim();
     let selectedTags = getSelectedTags('#creation-tags');
-    console.log("SELECTED TAGS");
-    console.log(selectedTags);
     const taskData = [taskTitle, taskDescription, taskDate, taskTime, selectedTags];
     if (taskData.some((data) => data === '')) return;
 
@@ -616,7 +586,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
       const existingTasks = result.tasks || {};
       const taskId = Date.now() + taskTitle;
-      console.log("WOW");
       existingTasks[taskId] = {
         title: taskTitle,
         description: taskDescription,
