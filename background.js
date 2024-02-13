@@ -1,7 +1,7 @@
 import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
 
-const engine = new BM25F();
+let engine;
 const winkNLP = require('wink-nlp');
 const model = require('wink-eng-lite-web-model');
 
@@ -21,25 +21,31 @@ const prepTask = function prepTask(text) {
 };
 
 let docs;
-await chrome.storage.local.get(['indexed']).then((result) => {
-  if (result && result.indexed) {
-    docs = result.indexed.corpus;
-  }
-});
-
 let runningEngine;
 
-engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
-engine.definePrepTasks([prepTask]);
-if (docs && docs.length) {
-  docs.forEach((doc, i) => {
-    engine.addDoc(doc, i + 1);
+async function setupBM25F() {
+  engine = new BM25F();
+
+  await chrome.storage.local.get(['indexed']).then((result) => {
+    if (result && result.indexed) {
+      docs = result.indexed.corpus;
+    }
   });
-  if (docs.length >= 3) {
-    runningEngine = _.cloneDeep(engine);
-    runningEngine.consolidate();
+
+  engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
+  engine.definePrepTasks([prepTask]);
+  if (docs && docs.length) {
+    docs.forEach((doc, i) => {
+      engine.addDoc(doc, i + 1);
+    });
+    if (docs.length >= 3) {
+      runningEngine = _.cloneDeep(engine);
+      runningEngine.consolidate();
+    }
   }
 }
+
+setupBM25F();
 
 const miniSearch = new MiniSearch({
   fields: ['title', 'body'],
@@ -212,5 +218,11 @@ chrome.runtime.onMessage.addListener(async (request) => {
         }
       });
     }
+  } else if (request.action === 'updateIndexing') {
+    miniSearch.removeAll();
+    chrome.storage.local.get(['indexed']).then((result) => {
+      miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
+    });
+    setupBM25F();
   }
 });

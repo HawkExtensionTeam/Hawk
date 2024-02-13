@@ -65,8 +65,13 @@ const indexQuip = function indexQuip() {
                 const documentEditor = document.getElementsByClassName('document-editor');
                 if (documentEditor.length === 1) {
                   const quipContent = documentEditor[0].innerText;
-                  page.body = quipContent;
-                  return;
+                  if (page.body !== quipContent) {
+                    page.body = quipContent;
+                    indexed.links = Array.from(indexed.links);
+                    chrome.storage.local.set({ indexed });
+                    chrome.runtime.sendMessage({ action: 'updateIndexing' });
+                    return;
+                  }
                 }
               }
             }
