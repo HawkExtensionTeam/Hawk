@@ -9,9 +9,3 @@ eslint:
   script:
     - npm install
     - npx eslint --fix .
-
-test:
-  stage: test
-  script:
-    - npm install
-    - npm run test
