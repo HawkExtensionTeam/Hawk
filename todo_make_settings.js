@@ -132,7 +132,32 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     }
+    
+    $(document).on('change', '#jsonAllInput', (event) => {
+      const selectedFile = event.target.files[0];
 
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = JSON.parse(e.target.result);
+          const { tasks } = content;
+          if (Object.prototype.hasOwnProperty.call(content, 'tags')) {
+            restoreTags(content.tags);
+          }
+          overwriteTasks(tasks);
+          if (Object.prototype.hasOwnProperty.call(content, 'indexed')) {
+            const indexArray = Object.values(content.indexed);
+            overwriteIndex(indexArray);
+          }
+          if (Object.prototype.hasOwnProperty.call(content, 'notes')) {
+            const notesArray = Object.values(content.notes);
+            overwriteNotes(notesArray);
+          }
+        };
+        reader.readAsText(selectedFile);
+      }
+    });
+    
     $(document).on('change', '#jsonInput', (event) => {
       const selectedFile = event.target.files[0];
 
