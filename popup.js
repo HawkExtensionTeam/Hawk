@@ -1,12 +1,10 @@
 function allDeleted(allTasks) {
   let allRecentlyDeleted = true;
-  if (Array.isArray(allTasks)) {
-    allTasks.forEach((task) => {
-      if (!task.recentlyDeleted) {
-        allRecentlyDeleted = false;
-      }
-    });
-  }
+  Object.keys(allTasks).forEach((key) => {
+    if (!allTasks[key].recentlyDeleted) {
+      allRecentlyDeleted = false;
+    }
+  });
   return allRecentlyDeleted;
 }
 
@@ -28,9 +26,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.tabs.create({ url: 'settings.html#indexing' });
     });
 
-    chrome.storage.local.get({ tasks: [] }, (result) => {
+    chrome.storage.local.get({ tasks: {} }, (result) => {
       // avoid pushing to undefined if there are no previous tasks
-      const existingTasks = result.tasks || [];
+      const existingTasks = result.tasks || {};
       if (Object.keys(existingTasks).length === 0 || allDeleted(existingTasks)) {
         $('#checklist').append(`
         <div class="row justify-content-center">
