@@ -30,7 +30,7 @@
               </div>
           </div>
           <div class="col-4 mt-2 mt-md-0 d-flex justify-content-end align-items-center">
-              <button type="button" class="btn btn-warning btn-circle fs-2 fs-lg-1 ml-2" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
+              <button type="button" class="btn btn-warning btn-circle add-task-btn fs-2 fs-lg-1 ml-2" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
           </div>
       </div>
 			<div class="modal fade" id="createTagModal">
@@ -158,19 +158,19 @@
 					<div class="modal-body">
 						<form id="editForm">
 							<div class="form-group">
-								<label for="editTaskInput">Task Title</label>
+								<label for="editTaskInput">Title</label>
 								<input type="text" class="form-control" id="editTaskInput" placeholder="Enter task title" required>
 							</div>
 							<div class="form-group">
-								<label for="editDescriptionInput">Task Description</label>
+								<label for="editDescriptionInput">Description</label>
 								<textarea class="form-control" id="editDescriptionInput" rows="3" placeholder="Enter task description"></textarea>
 							</div>
 							<div class="form-group">
-								<label for="editDateInput">Due Date</label>
+								<label for="editDateInput">Due date</label>
 								<input type="text" class="form-control" id="editDateInput" placeholder="YYYY/MM/DD" pattern="\d{4}/(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])" required>
 							</div>
 							<div class="form-group">
-								<label for="editTimeInput">Due Time</label>
+								<label for="editTimeInput">Due time</label>
 								<input type="text" class="form-control" id="editTimeInput" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):([0-5][0-9])" required>
 							</div>
               <div class="form-group">

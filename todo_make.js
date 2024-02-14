@@ -341,7 +341,7 @@ function addTaskToChecklist(taskId) {
             `;
           }
         });
-        checklist.append(`
+        checklist.prepend(`
           <li class="checklist-item" associatedTask="${taskId}">
             <div class="form-check-2 d-flex justify-content-between align-items-center">
               <input type="checkbox" class="form-check-input" id="item${taskId}">
@@ -521,10 +521,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(document).on('click', '.btn.btn-warning.edit-btn', (event) => {
     const $editBtn = $(event.currentTarget);
     const taskId = $editBtn.attr('edit-task-id');
-
     openEditForm(taskId);
   });
-
+  
+  $(document).on('click', '.btn.btn-warning.btn-circle.add-task-btn', () => {
+    setTime();
+  });
+  
   $(document).on('click', '.filter-trigger', () => {
     processFilter();
   });
