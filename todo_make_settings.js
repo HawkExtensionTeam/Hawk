@@ -22,6 +22,11 @@ function overwriteTasks(tasks) {
   });
 }
 
+function restoreTags(tagsObj) {
+  chrome.storage.local.set({ tags : tagsObj }, () => {
+  });
+}
+
 function showTasks(tasks) {
   const selectiveList = $('.selective-list.task-list');
   selectiveList.empty();
@@ -66,6 +71,11 @@ function overwriteIndex(indexArray) {
       links: indexArray[1],
     };
     chrome.storage.local.set({ indexed: newIndexed });
+  });
+}
+
+function overwriteNotes(notesArray) {
+  chrome.storage.local.set({ notes : notesArray }, () => {
   });
 }
 
@@ -131,7 +141,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
           const { tasks } = content;
-          // Check if 'tasks' property exists
+          if (Object.prototype.hasOwnProperty.call(content, 'tags')) {
+            restoreTags(content.tags);
+          }
           overwriteTasks(tasks);
         };
         reader.readAsText(selectedFile);
@@ -163,10 +175,26 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
 
-          // Check if 'indexed' property exists
           if (Object.prototype.hasOwnProperty.call(content, 'indexed')) {
             const indexArray = Object.values(content.indexed);
             overwriteIndex(indexArray);
+          }
+        };
+        reader.readAsText(selectedFile);
+      }
+    });
+    
+    $(document).on('change', '#jsonNoteInput', (event) => {
+      const selectedFile = event.target.files[0];
+
+      if (selectedFile) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = JSON.parse(e.target.result);
+
+          if (Object.prototype.hasOwnProperty.call(content, 'notes')) {
+            const notesArray = Object.values(content.notes);
+            overwriteNotes(notesArray);
           }
         };
         reader.readAsText(selectedFile);
