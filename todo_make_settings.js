@@ -90,8 +90,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }, 1000);
     });
 
-    // eslint-disable-next-line no-unused-vars
-    $(document).on('click', '.btn.btn-primary.background-reset-btn', (event) => {
+    $(document).on('click', '.btn.btn-primary.background-reset-btn', () => {
       chrome.storage.local.set({ bg: '' }, () => {
       });
     });
