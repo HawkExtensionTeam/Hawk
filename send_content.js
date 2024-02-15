@@ -1,3 +1,41 @@
+const currentURL = window.location.href;
+
+const quipRegex = /^https?:\/\/(?:www\.)?quip\.com(?:\/|$)/;
+
+function checkSitesList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedSites'], (result) => {
+      const storedSiteList = result.allowedSites;
+      const sitesList = storedSiteList || [];
+      const currentHostname = window.location.hostname;
+      resolve(sitesList.includes(currentHostname));
+    });
+  });
+}
+
+function checkUrlsList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedURLs'], (result) => {
+      const storedUrlsList = result.allowedURLs;
+      const urlsList = storedUrlsList || [];
+      resolve(urlsList.includes(currentURL));
+    });
+  });
+}
+
+function checkRegexList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedRegex'], (result) => {
+      const storedRegexList = result.allowedRegex;
+      const regexList = storedRegexList || [];
+
+      const isMatch = regexList.some((regex) => regex.test(currentURL));
+
+      resolve(isMatch);
+    });
+  });
+}
+
 // sometimes params contain invalid characters like underscores
 // encode them to avoid the URL constructor throwing an error
 const parseURLWithParams = function parseURLWithParams(parts) {
@@ -18,38 +56,6 @@ const parseURLWithParams = function parseURLWithParams(parts) {
 
   return newURL;
 };
-
-const currentURL = window.location.href;
-
-$(document).on('click', 'a', (event) => {
-  let link = $(event.target).prop('href');
-  if (!link) return;
-  const parts = link.split('?');
-  if (parts.length > 1) {
-    link = parseURLWithParams(parts);
-  }
-  const clickedURL = new URL(link);
-  const clickedURLPath = clickedURL.pathname.replace(/\/[^\/]+$/, '');
-  const currentURLPath = new URL(currentURL).pathname.replace(/\/[^\/]+$/, '');
-
-  // Check if the clicked link is not an anchor link within the same page
-  if (clickedURL.origin === new URL(currentURL).origin && clickedURLPath === currentURLPath) {
-    const visibleTextContent = document.body.innerText;
-
-    // Send a message indicating that the page has navigated
-    try {
-      chrome.runtime.sendMessage({
-        action: 'sendVisibleTextContent',
-        visibleTextContent,
-        clickedURL,
-      });
-    } catch (error) {
-      // extension will have been reloaded, ignore
-    }
-  }
-});
-
-const quipRegex = /^https?:\/\/(?:www\.)?quip\.com(?:\/|$)/;
 
 const indexQuip = function indexQuip() {
   if (quipRegex.test(currentURL)) {
@@ -95,15 +101,48 @@ const indexQuip = function indexQuip() {
 };
 
 $(document).ready(() => {
-  if (quipRegex.test(currentURL)) {
-    indexQuip();
-    setInterval(indexQuip, 60000);
-  } else {
-    const visibleTextContent = document.body.innerText;
-    chrome.runtime.sendMessage({
-      action: 'sendVisibleTextContent',
-      visibleTextContent,
-      currentURL,
+  Promise.all([checkSitesList(), checkUrlsList(), checkRegexList()])
+    .then((results) => {
+      if (results.some((result) => result)) {
+        $(document).on('click', 'a', (event) => {
+          let link = $(event.target).prop('href');
+          if (!link) return;
+          const parts = link.split('?');
+          if (parts.length > 1) {
+            link = parseURLWithParams(parts);
+          }
+          const clickedURL = new URL(link);
+          const clickedURLPath = clickedURL.pathname.replace(/\/[^\/]+$/, '');
+          const currentURLPath = new URL(currentURL).pathname.replace(/\/[^\/]+$/, '');
+
+          // Check if the clicked link is not an anchor link within the same page
+          if (clickedURL.origin === new URL(currentURL).origin
+          && clickedURLPath === currentURLPath) {
+            const visibleTextContent = document.body.innerText;
+
+            // Send a message indicating that the page has navigated
+            try {
+              chrome.runtime.sendMessage({
+                action: 'sendVisibleTextContent',
+                visibleTextContent,
+                clickedURL,
+              });
+            } catch (error) {
+            // extension will have been reloaded, ignore
+            }
+          }
+        });
+        if (quipRegex.test(currentURL)) {
+          indexQuip();
+          setInterval(indexQuip, 60000);
+        } else {
+          const visibleTextContent = document.body.innerText;
+          chrome.runtime.sendMessage({
+            action: 'sendVisibleTextContent',
+            visibleTextContent,
+            currentURL,
+          });
+        }
+      }
     });
-  }
 });

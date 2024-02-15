@@ -11,6 +11,13 @@ const _ = require('lodash');
 
 const { removeStopwords } = require('stopword');
 
+const defaultRegexList = [
+  'https://*.amazon.com/*',
+  'https://atoz.amazon.work/*',
+  'https://quip-amazon.com/*',
+  'https://quip.com/*',
+];
+
 const prepTask = function prepTask(text) {
   const tokens = [];
   nlp.readDoc(text)
@@ -223,5 +230,18 @@ chrome.runtime.onMessage.addListener(async (request) => {
       miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
     });
     setupBM25F();
+  }
+});
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.storage.local.set({ allowedSites: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedURLs: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
+    });
   }
 });

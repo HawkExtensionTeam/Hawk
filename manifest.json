@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "To-Do Make",
-  "description": "Base Level Extension",
+  "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
   "version": "1.0",
   "omnibox": { "keyword": "@i\t" },
   "permissions": [
@@ -33,12 +33,7 @@
       ]
     },
     {
-      "matches": [
-        "https://*.amazon.com/*",
-        "https://atoz.amazon.work/*",
-        "https://quip-amazon.com/*",
-        "https://quip.com/*" 
-      ],
+      "matches": ["<all_urls>"],
       "js": [
         "assets/jquery-3.7.1.min.js",
         "send_content.js"
