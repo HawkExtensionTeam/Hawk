@@ -29,7 +29,7 @@ function checkRegexList() {
       const storedRegexList = result.allowedRegex;
       const regexList = storedRegexList || [];
 
-      const isMatch = regexList.some((regex) => regex.test(currentURL));
+      const isMatch = regexList.some((regex) => new RegExp(regex).test(currentURL));
 
       resolve(isMatch);
     });
