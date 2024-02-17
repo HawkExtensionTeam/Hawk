@@ -7,31 +7,31 @@
 </head>
 <body class="d-flex justify-content-center nt-body">
 	<div class="container mt-5" id="to-do-list-main">
-		<div class="row">
-      <div class="row">
-          <div class="col-8 d-flex align-items-center">
-              <div class="card-title-lg fs-1 text-nowrap">To-Do List</div>
-              <div class="row panel-lg flex-nowrap align-items-center">
-                  <div class="col">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
-                      </svg>
-                  </div>
-                  <div class="col src-col flex-nowrap">
-                    <input type="text" placeholder="Type to search tasks" class="search-bar-lg text-nowrap" id="task-input">
-                  </div>
-                  <div class="col flex-nowrap justify-content-end align-items-center fb-pad">
-                      <button type="button" class="filter-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagFilterModal" id="tag-filter-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="black" class="bi bi-filter-left" viewBox="0 0 16 16">
-                            <path d="M2 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"></path>
-                        </svg>
-                      </button>
-                  </div>
-              </div>
+		<div class="row controls">
+      <div class="col-lg-2 zero-padding d-flex align-items-center order-lg-first mb-md-4 mb-sm-4 mb-xs-4 mb-4">
+        <div class="card-title-lg text-nowrap">To-Do List</div>
+        <div class="col-lg-auto px-4 d-flex order-sm-first justify-content-end align-items-center order-lg-last order-sm-last">
+          <button type="button" class="btn btn-warning btn-circle add-task-btn fs-2 fs-lg-1 ml-2" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
+        </div>
+      </div>
+      <div class="col-fluid-lg-10 panel-lg d-flex align-items-center">
+        <div class="row order-first px-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search search-svg" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </div>
+        <div class="row src-col flex-nowrap align-items-center order-sm-last order-lg-first order-last">
+          <div class="col">
+            <input type="text" placeholder="Type to search tasks" class="search-bar-lg text-nowrap" id="task-input">
           </div>
-          <div class="col-4 mt-2 mt-md-0 d-flex justify-content-end align-items-center">
-              <button type="button" class="btn btn-warning btn-circle add-task-btn fs-2 fs-lg-1 ml-2" data-bs-toggle="modal" data-bs-target="#newTaskModal" id="new-tab-btn">+</button>
-          </div>
+        </div>
+        <div class="col d-flex justify-content-end order-last">
+          <button type="button" class="filter-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagFilterModal" id="tag-filter-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="black" class="bi bi-filter-left filter-svg" viewBox="0 0 16 16">
+                <path d="M2 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 			<div class="modal fade" id="createTagModal">
 				<div class="modal-dialog">
