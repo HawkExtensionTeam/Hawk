@@ -163,8 +163,6 @@ function updateChecklist(tasks) {
   const sortedTasks = sortTasks(tasks);
   const allTagsFalse = areAllTagsFalse();
   const now = new Date();
-  let insertedTasks = 0;
-  let insertedRdTasks = 0;
   if (getNonDeletedCount(tasks) === 0) {
     checklist.append(noTasks);
   }
@@ -175,10 +173,7 @@ function updateChecklist(tasks) {
     const task = tasks[taskId];
     let toInsert = checklist;
     if (allTagsFalse || checkTagsAgainstFilter(task)) {
-      if (!task.recentlyDeleted) {
-        insertedTasks += 1;
-      } else {
-        insertedRdTasks += 1;
+      if (task.recentlyDeleted) {
         toInsert = rdChecklist;
       }
       const dueDate = new Date(task.due);
@@ -246,7 +241,7 @@ function updateChecklist(tasks) {
           </div>
         </div>
       `;
-      const taskTitle = toInsert == checklist ? task.title : task.title + ' (' + getDaysBetweenString(now, new Date(task.scheduledDeletion)) + ')';
+      const taskTitle = toInsert === checklist ? task.title : task.title + ' (' + getDaysBetweenString(now, new Date(task.scheduledDeletion)) + ')';
       toInsert.append(`
       <li class="checklist-item" associatedTask="${taskId}">
         <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -320,7 +315,6 @@ function restoreTask(allTasks, taskIdToRestore) {
   const task = allTasks[taskIdToRestore]
   task.recentlyDeleted = false;
   task.scheduledDeletion = '';
-  console.log(task);
   chrome.alarms.clear(`${task.id}_deletion_alarm`);
   chrome.storage.local.set({ tasks: allTasks }, () => {
     updateChecklist(allTasks);
