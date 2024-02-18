@@ -116,7 +116,8 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   chrome.storage.local.get('tasks').then((result) => {
     const existingTasks = result || {};
     const foundTask = existingTasks.tasks[alarm.name];
-    if (Object.keys(existingTasks).length !== 0 && foundTask) {
+    console.log(foundTask);
+    if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
       const notification = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
