@@ -869,6 +869,6 @@ svg {
   margin-bottom: 0.3rem;
 }
 
-.import-col {
-  padding-left: 1.15rem;
+#import-md-btn {
+	margin-right: 0.425em;
 }
