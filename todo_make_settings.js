@@ -23,7 +23,7 @@ function overwriteTasks(tasks) {
 }
 
 function restoreTags(tagsObj) {
-  chrome.storage.local.set({ tags : tagsObj }, () => {
+  chrome.storage.local.set({ tags: tagsObj }, () => {
   });
 }
 
@@ -75,7 +75,7 @@ function overwriteIndex(indexArray) {
 }
 
 function overwriteNotes(notesArray) {
-  chrome.storage.local.set({ notes : notesArray }, () => {
+  chrome.storage.local.set({ notes: notesArray }, () => {
   });
 }
 
@@ -132,7 +132,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
     }
-    
+
     $(document).on('change', '#jsonAllInput', (event) => {
       const selectedFile = event.target.files[0];
 
@@ -157,7 +157,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
-    
+
     $(document).on('change', '#jsonInput', (event) => {
       const selectedFile = event.target.files[0];
 
@@ -208,7 +208,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
-    
+
     $(document).on('change', '#jsonNoteInput', (event) => {
       const selectedFile = event.target.files[0];
 

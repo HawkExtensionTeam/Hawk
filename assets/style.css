@@ -863,3 +863,12 @@ svg {
 .back-svg {
   margin-bottom: 0.25rem;
 }
+
+.arrow-svg {
+  margin-right: 0.25rem;
+  margin-bottom: 0.3rem;
+}
+
+.import-col {
+  padding-left: 1.15rem;
+}

@@ -168,7 +168,7 @@ function updateChecklist(tasks) {
   }
   if (getDeletedCount(tasks) === 0) {
     rdChecklist.append(noRdTasks);
-  } 
+  }
   sortedTasks.forEach((taskId) => {
     const task = tasks[taskId];
     let toInsert = checklist;
@@ -196,7 +196,7 @@ function updateChecklist(tasks) {
           `;
         }
       });
-      const tickbox = toInsert === checklist ? `<input type="checkbox" class="form-check-input" id="item${taskId}">` : ''; 
+      const tickbox = toInsert === checklist ? `<input type="checkbox" class="form-check-input" id="item${taskId}">` : '';
       const buttons = toInsert === checklist ? `
         <div class="col-lg-2 mt-3 mt-md-3 mt-lg-0 d-flex">
           <div class="col">
@@ -241,7 +241,7 @@ function updateChecklist(tasks) {
           </div>
         </div>
       `;
-      const taskTitle = toInsert === checklist ? task.title : task.title + ' (' + getDaysBetweenString(now, new Date(task.scheduledDeletion)) + ')';
+      const taskTitle = toInsert === checklist ? task.title : `${task.title} (${getDaysBetweenString(now, new Date(task.scheduledDeletion))})`;
       toInsert.append(`
       <li class="checklist-item" associatedTask="${taskId}">
         <div class="form-check-2 d-flex justify-content-between align-items-center">
@@ -312,7 +312,7 @@ function deleteTask(allTasks, taskIdToRemove) {
 }
 
 function restoreTask(allTasks, taskIdToRestore) {
-  const task = allTasks[taskIdToRestore]
+  const task = allTasks[taskIdToRestore];
   task.recentlyDeleted = false;
   task.scheduledDeletion = '';
   chrome.alarms.clear(`${task.id}_deletion_alarm`);
@@ -631,13 +631,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.add-task-btn').addClass('collapsed');
     }
   });
-  
+
   $(document).on('click', '.btn.btn-success.btn-circle.add-task-btn', () => {
     $('#taskInput').val('');
     $('#descriptionInput').val('');
     setTime();
   });
-  
+
   $(document).on('click', '.filter-trigger', () => {
     processFilter();
   });
@@ -646,7 +646,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const $delBtn = $(event.currentTarget);
     $('#confirm-delete-btn').attr('delete-task-id', $delBtn.attr('delete-task-id'));
   });
-  
+
   $(document).on('click', '.btn.btn-danger.delete-forever-btn', (event) => {
     const $delBtn = $(event.currentTarget);
     $('#confirm-delete-forever-btn').attr('delete-task-id', $delBtn.attr('delete-task-id'));
@@ -660,7 +660,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       setTaskDeleted(existingTasks, existingTasks[taskId]);
     });
   });
-  
+
   $(document).on('click', '.btn.btn-danger.confirm-del-forever-btn', (event) => {
     const $delBtn = $(event.currentTarget);
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -669,7 +669,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       deleteTask(existingTasks, taskId);
     });
   });
-  
+
   $(document).on('click', '.btn.btn-success.restore-btn', (event) => {
     const $resBtn = $(event.currentTarget);
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -720,7 +720,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         due: dueDate.toISOString(),
         tags: selectedTags,
         recentlyDeleted: false,
-        scheduledDeletion: "",
+        scheduledDeletion: '',
         id: taskId,
       };
 
