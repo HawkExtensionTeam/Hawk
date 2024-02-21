@@ -164,9 +164,14 @@ function setURL(request) {
   });
 }
 
+function removeAnchorLink(url) {
+  return url.split('#')[0];
+}
+
 chrome.runtime.onMessage.addListener(async (request) => {
   if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
-    const url = await setURL(request);
+    let url = await setURL(request);
+    url = removeAnchorLink(url);
     const tabs = await new Promise((resolve) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
         resolve(allTabs);
