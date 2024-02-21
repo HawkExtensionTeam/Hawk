@@ -787,3 +787,8 @@ svg {
 	font-size: 0.6rem;
 	margin-bottom: 0;
 }
+
+.temp {
+	height: 25%;
+	text-overflow: clip;
+}
