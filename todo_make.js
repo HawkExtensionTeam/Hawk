@@ -731,6 +731,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         tasksObj = existingTasks;
       });
     });
+    $('#newTaskModal').modal('hide');
   });
 
   $('#editForm').on('submit', (event) => {
@@ -789,5 +790,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       }
     });
+    $('#editTaskModal').modal('hide');
   });
 }
