@@ -36,6 +36,7 @@
       "matches": [
         "https://*.amazon.com/*",
         "https://atoz.amazon.work/*",
+        "https://*.a2z.com/*",
         "https://quip-amazon.com/*",
         "https://quip.com/*" 
       ],
