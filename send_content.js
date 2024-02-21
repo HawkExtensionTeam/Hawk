@@ -28,6 +28,7 @@ function checkRegexList() {
     chrome.storage.local.get(['allowedRegex'], (result) => {
       const storedRegexList = result.allowedRegex;
       const regexList = storedRegexList || [];
+
       const isMatch = regexList.some((regex) => new RegExp(regex).test(currentURL));
       resolve(isMatch);
     });
