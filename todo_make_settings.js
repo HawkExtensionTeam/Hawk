@@ -27,6 +27,90 @@ function restoreTags(tagsObj) {
   });
 }
 
+function retrieveSitesList() {
+  chrome.storage.local.get(['allowedSites'], (result) => {
+    const storedSiteList = result.allowedSites;
+    const sitesList = storedSiteList || [];
+    $('#sites-list').empty();
+    Object.values(sitesList).forEach((expr) => {
+      $('#sites-list').append(`
+        <div class="row sites-item align-items-center mt-2"> 
+            <div class="col-8">${expr}</div>
+            <div class="col-4 d-flex justify-content-end">
+                <button class="btn btn-danger sites-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                  Delete
+                </button>
+            </div>
+        </div>
+      `);
+    });
+  });
+}
+
+function retrieveUrlsList() {
+  chrome.storage.local.get(['allowedURLs'], (result) => {
+    const storedUrlsList = result.allowedURLs;
+    const urlsList = storedUrlsList || [];
+    $('#urls-list').empty();
+    Object.values(urlsList).forEach((expr) => {
+      $('#urls-list').append(`
+        <div class="row urls-item align-items-center mt-2"> 
+            <div class="col-8">${expr}</div>
+            <div class="col-4 d-flex justify-content-end">
+                <button class="btn btn-danger urls-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                  Delete
+                </button>
+            </div>
+        </div>
+      `);
+    });
+  });
+}
+
+function retrieveRegexList() {
+  chrome.storage.local.get(['allowedRegex'], (result) => {
+    const storedRegexList = result.allowedRegex;
+    const regexList = storedRegexList || [];
+    $('#regex-list').empty();
+    Object.values(regexList).forEach((expr) => {
+      $('#regex-list').append(`
+        <div class="row regex-item align-items-center mt-2"> 
+            <div class="col-8">${expr}</div>
+            <div class="col-4 d-flex justify-content-end">
+                <button class="btn btn-danger regex-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                  Delete
+                </button>
+            </div>
+        </div>
+      `);
+    });
+  });
+}
+
+function deleteRule(ruleLoc, rule) {
+  chrome.storage.local.get([ruleLoc], (result) => {
+    const storedList = result[ruleLoc];
+    if (storedList) {
+      const updatedList = storedList.filter((expr) => expr !== rule);
+      chrome.storage.local.set({ [ruleLoc]: updatedList }, () => {
+        switch (ruleLoc) {
+          case 'allowedSites':
+            retrieveSitesList();
+            break;
+          case 'allowedURLs':
+            retrieveUrlsList();
+            break;
+          case 'allowedRegex':
+            retrieveRegexList();
+            break;
+          default:
+            break;
+        }
+      });
+    }
+  });
+}
+
 function showTasks(tasks) {
   const selectiveList = $('.selective-list.task-list');
   selectiveList.empty();
@@ -82,6 +166,103 @@ function overwriteNotes(notesArray) {
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     hideLists();
+    retrieveSitesList();
+    retrieveUrlsList();
+    retrieveRegexList();
+
+    $('#rule-search').on('input', function _() {
+      const query = $(this).val();
+      $('#urls-list, #sites-list, #regex-list').filter(function filterLists() {
+        const ruleText = $(this).text();
+        const found = ruleText.indexOf(query) > -1;
+        $(this).toggle(found);
+        return found;
+      });
+    });
+
+    $(document).on('click', '.sites-del', (event) => {
+      const $delBtn = $(event.currentTarget);
+      $('#deleteRuleModal').attr('rule-loc', 'allowedSites');
+      $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
+    });
+
+    $(document).on('click', '#sites-tab', () => {
+      $('.index-heading').text('Allowed sites');
+      $('.index-info').text('Indexing will occur whenever these host names are visited.');
+      $('#addRuleModal').attr('rule-loc', 'allowedSites');
+    });
+
+    $(document).on('click', '.urls-del', (event) => {
+      const $delBtn = $(event.currentTarget);
+      $('#deleteRuleModal').attr('rule-loc', 'allowedURLs');
+      $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
+    });
+
+    $(document).on('click', '#urls-tab', () => {
+      $('.index-heading').text('Allowed URLs');
+      $('.index-info').text('Indexing will occur whenever these specific URLs are visited.');
+      $('#addRuleModal').attr('rule-loc', 'allowedURLs');
+    });
+
+    $(document).on('click', '.regex-del', (event) => {
+      const $delBtn = $(event.currentTarget);
+      $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
+      $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
+    });
+
+    $(document).on('click', '.sites-delete-btn', () => {
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 0);
+    });
+
+    $(document).on('click', '.urls-delete-btn', () => {
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 1);
+    });
+
+    $(document).on('click', '.regex-delete-btn', () => {
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 2);
+    });
+
+    $(document).on('click', '#regex-tab', () => {
+      $('.index-heading').text('Allowed RegEx');
+      $('.index-info').text('Indexing will occur whenever the visited URL matches any one of these regular expressions.');
+      $('#addRuleModal').attr('rule-loc', 'allowedRegex');
+    });
+
+    $(document).on('click', '.add-rule-btn', () => {
+      $('#addRuleInput').val('');
+    });
+
+    $('#addRuleForm').on('submit', (event) => {
+      event.preventDefault();
+      const ruleLoc = $('#addRuleModal').attr('rule-loc');
+      const rule = $('#addRuleInput').val();
+
+      chrome.storage.local.get({ [ruleLoc]: [] }, (result) => {
+        const existingRules = result[ruleLoc] || [];
+
+        if (existingRules.includes(rule)) {
+          $('#ruleErrorModal').modal('show');
+        } else {
+          existingRules.push(rule);
+          chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+            switch (ruleLoc) {
+              case 'allowedSites':
+                retrieveSitesList();
+                break;
+              case 'allowedURLs':
+                retrieveUrlsList();
+                break;
+              case 'allowedRegex':
+                retrieveRegexList();
+                break;
+              default:
+                break;
+            }
+          });
+        }
+      });
+    });
+
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
       exportAll();

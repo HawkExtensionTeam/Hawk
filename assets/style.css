@@ -131,6 +131,27 @@ ul {
   fill: white;
 }
 
+.search-bar-sm {
+	font-family: Roboto, Arial, sans-serif;
+	background-color: #ffffff69;
+	backdrop-filter: blur(8px);
+	border: none;
+  font-size: 1rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: start;
+  margin-left: 0.4em;
+  margin-bottom: 0.4em;
+  padding-left: 0.6em;
+  padding-right: 2.4em;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+}
+
+.search-bar-sm:focus {
+	outline: none;
+}
+
 .search-bar {
 	font-family: Roboto, Arial, sans-serif;
 	background-color: #ffffff69;
@@ -376,6 +397,15 @@ ul {
 	border-radius: 3px;
 }
 
+.index-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+  background: none;
+	border-radius: 0.375rem;
+	padding-bottom: 2rem;
+}
+
 .task-list,
 .note-list {
 	list-style-type: none;
@@ -520,7 +550,7 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
   padding-bottom: 1em;
   padding-left: 1.5em;
   padding-right: 1.5em;
-  height: 75vh;
+  min-height: 75vh;
 }
 
 #edit, #delete {
@@ -532,6 +562,7 @@ input[type="checkbox"]:not(.selective-checkbox):checked {
 	margin-right: 0.25em;
 }
 
+#addRuleForm,
 #editForm,
 #todoForm {
 	background-color: #DDDDDD; 
@@ -786,6 +817,10 @@ svg {
 .browse-background-btn {
 	font-size: 0.6rem;
 	margin-bottom: 0;
+}
+
+.tab-section-btn {
+  margin-bottom: 0.4em;
 }
 
 .temp {
