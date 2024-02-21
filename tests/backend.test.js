@@ -106,3 +106,19 @@ test('successfully deletes a task', async () => {
 
   expect(taskExistsAfterDeletion).toBe(false);
 });
+const { getCorrectTextColour } = require('../todo_make.js'); 
+
+// getCorrectTextColour.test.js
+describe('Utility Function Tests', () => {
+  test('getCorrectTextColour returns #000000 for light backgrounds', () => {
+    expect(getCorrectTextColour('#FFFFFF')).toBe('#000000');
+    expect(getCorrectTextColour('#FFCCAA')).toBe('#000000');
+  });
+
+  test('getCorrectTextColour returns #ffffff for dark backgrounds', () => {
+    expect(getCorrectTextColour('#000000')).toBe('#ffffff');
+    expect(getCorrectTextColour('#123456')).toBe('#ffffff');
+  });
+
+  // Additional unit tests...
+});
