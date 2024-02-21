@@ -89,7 +89,7 @@ ul {
 	padding-right: 0.6em;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
-  min-height: 96px;
+  font-size: 2rem;
   display: flex;
   align-items: center;
 	user-select: none;
@@ -100,10 +100,14 @@ ul {
 	backdrop-filter: blur(8px);
 	box-shadow: 0px 0px 24px #888888;
 	border-radius: 12px;
-	margin-left: 1.5em;
 	padding-left: 0.6em;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
+}
+
+.controls {
+  margin-left: 0.075rem;
+  margin-right: 0.075rem;
 }
 
 .filter-btn {
@@ -111,12 +115,9 @@ ul {
 	backdrop-filter: blur(8px);
 	box-shadow: 0px 0px 12px #888888;
 	border-radius: 12px;
-	padding-left: 1.5em;
-	padding-right: 1.5em;
-	padding-top: 1.5em;
-	padding-bottom: 1.5em;
   outline: none;
   border: none;
+  padding: 0.375em;
 }
 
 .fb-pad {
@@ -152,6 +153,16 @@ ul {
 	outline: none;
 }
 
+.filter-svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.search-svg {
+  width: 3.6rem;
+  height: 3.6rem;
+}
+
 .search-bar {
 	font-family: Roboto, Arial, sans-serif;
 	background-color: #ffffff69;
@@ -176,7 +187,7 @@ ul {
 .search-bar-lg {
 	font-family: Roboto, Arial, sans-serif;
 	background: none;
-	font-size: 2vw;
+	font-size: 1.5rem;
 	border: none;
 }
 
@@ -227,10 +238,54 @@ ul {
 
 .btn-circle {
 	border-radius: 50%;
-	height: 85%;
+	height: 2em;
+  width: 2em;
 	font-weight: bold;
-	aspect-ratio: 1;
 	box-shadow: 0px 0px 12px #888888;
+  transform: scale(1);
+  transition: border-radius 0.15s ease-out, height 0.15s ease-out, width 0.15s ease-out, transform 0.15s ease-out;
+}
+
+.pilled {
+	border-radius: 2rem;
+	height: 2em;
+  width: 4em;
+	font-weight: bold;
+	box-shadow: 0px 0px 12px #888888;
+  border: 1px solid #0d6efd;
+  background: #0d6efd;
+  transition: border-radius 0.1s ease-out, height 0.15s ease-out, width 0.15s ease-out, background 0.15s ease-out;
+}
+
+.pilled:hover {
+  background: #0b5ed7;
+  border: 1px solid #0d6efd;
+}
+
+.collapsed {
+  transform: scale(0.0);
+  transition: transform 0.15s ease-out;
+}
+
+.svg-hide {
+  opacity: 0;
+  display: none;
+  transition: opacity 0.15s ease-out, display 0.15s ease-out;
+}
+
+.svg-show {
+  opacity: 1;
+  transition: opacity 0.15s ease-out;
+}
+
+.clock-svg {
+  fill: black;
+  transition: fill 0.15s ease-out;
+}
+
+.temp-svg-white {
+  fill: white;
+  transition: fill 0.15s ease-out;
 }
 
 #checklist {
@@ -241,8 +296,20 @@ ul {
 	overflow-y: auto;
 }
 
+#rd-checklist,
 #checklist-2 {
 	background: none;
+  transform: scale(0.96);
+  opacity: 0;
+  position: absolute;
+}
+
+#rd-checklist.appear,
+#checklist-2.appear {
+  opacity: 1;
+  transform: scale(1);
+  position: static;
+	transition: opacity 0.15s ease-out, transform 0.2s ease-out;
 }
 
 #checklist input {
@@ -326,6 +393,7 @@ ul {
 	height: 100%;
 }
 
+.restore-col,
 .edit-col {
 	margin-left: 1rem;
 }
@@ -761,8 +829,8 @@ svg {
 }
 
 .zero-margin {
-	margin-left: 0;
-	margin-right: 0;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
 }
 
 .zero-padding {
@@ -826,4 +894,21 @@ svg {
 .temp {
 	height: 25%;
 	text-overflow: clip;
+}
+
+.clock-svg {
+  margin-bottom: 0.25rem;
+}
+
+.back-svg {
+  margin-bottom: 0.25rem;
+}
+
+.arrow-svg {
+  margin-right: 0.25rem;
+  margin-bottom: 0.3rem;
+}
+
+#import-md-btn {
+	margin-right: 0.425em;
 }
