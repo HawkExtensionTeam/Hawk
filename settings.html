@@ -142,10 +142,102 @@
                 </div>
             </div>
             <div class="settings-pane hidden" id="indexing-pane">
-                <button class="btn btn-primary">Change allowed sites</button>
+                <div class="section-heading index-heading">
+                    Allowed sites
+                </div>
+                <div class="row flex settings-section align-contents-center">
+                    <div class="col-auto zero-margin zero-padding index-info">Indexing will occur whenever these host names are visited.
+                    </div>
+                    <ul class="nav nav-tabs mt-2" id="indexerTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="sites-tab" data-bs-toggle="tab" href="#sites" role="tab">Sites</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
+                        </li
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
+                        </li>
+                        <div class="col d-flex align-items-center">
+                            <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
+                        </div>
+                        <div class="col d-flex justify-content-end zero-margin">
+                            <button class="btn btn-primary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
+                        </div>
+                    </ul>
+                    <div class="tab-content mt-2">
+                        <div class="tab-pane fade show active" id="sites" role="tabpanel">
+                          <ul class="index-list" id="sites-list">
+                          </ul>
+                        </div>
+                        <div class="tab-pane fade" id="urls" role="tabpanel">
+                          <ul class="index-list" id="urls-list">
+                          </ul>
+                        </div>
+                        <div class="tab-pane fade" id="regex" role="tabpanel">
+                          <ul class="index-list" id="regex-list">
+                          </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="settings-pane hidden" id="about-pane">
                 Hello!
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addRuleModal" rule-loc="allowedSites">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addRuleModalLabel">Add an allow rule</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRuleForm">
+                        <div class="form-group">
+                            <label for="addRuleInput">Specify rule</label>
+                            <input type="text" class="form-control" id="addRuleInput" placeholder="Enter allow rule here" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="addRuleForm" data-bs-dismiss="modal" id="addRule" class="btn btn-primary">Add Rule</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteRuleModal" rule-loc="allowedSites" rule-to-delete="">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteRuleModalLabel">Confirm deletion</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this rule?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger regex-delete-btn" data-bs-dismiss="modal" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ruleErrorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ruleErrorModalLabel">Error</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    This allow rule already exists.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="dismissError">OK</button>
+                </div>
             </div>
         </div>
     </div>

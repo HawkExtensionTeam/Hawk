@@ -523,11 +523,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const taskId = $editBtn.attr('edit-task-id');
     openEditForm(taskId);
   });
-  
+
   $(document).on('click', '.btn.btn-warning.btn-circle.add-task-btn', () => {
     setTime();
   });
-  
+
   $(document).on('click', '.filter-trigger', () => {
     processFilter();
   });
