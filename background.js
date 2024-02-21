@@ -12,10 +12,10 @@ const _ = require('lodash');
 const { removeStopwords } = require('stopword');
 
 const defaultRegexList = [
-  'https://*.amazon.com/*',
-  'https://atoz.amazon.work/*',
-  'https://quip-amazon.com/*',
-  'https://quip.com/*',
+  '^https://[^/]+\.amazon\.com/.*$',
+  '^https://atoz\.amazon\.work/.*$',
+  '^https://quip-amazon\.com/.*$',
+  '^https://quip\.com/.*$',
 ];
 
 const prepTask = function prepTask(text) {
