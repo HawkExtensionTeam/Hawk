@@ -822,3 +822,8 @@ svg {
 .tab-section-btn {
   margin-bottom: 0.4em;
 }
+
+.temp {
+	height: 25%;
+	text-overflow: clip;
+}
