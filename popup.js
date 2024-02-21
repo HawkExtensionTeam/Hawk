@@ -49,26 +49,21 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             const dueDate = new Date(task.due);
             const formattedDueDate = dueDate.toLocaleString();
             const now = new Date();
-            const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            if (dueDate < twentyFourHoursAgo) {
-              setTaskDeleted(existingTasks, existingTasks[taskId]);
-            } else {
-              const passed = dueDate < new Date();
-              const label = `form-check-label${passed ? ' text-danger' : ''}`;
-              $('#checklist').append(
-                `<li class="list-group-item">
-                <div class="form-check">
-                  <input type="checkbox" class="form-check-input" id="item${task.id}">
-                  <div class="container">
-                    <div class="row">
-                      <label class="${label}" for="item${task.id}">${task.title}</label>
-                      <label class="${label}" for="item${task.id}">${formattedDueDate}</label>
-                    </div>
+            const passed = dueDate < now;
+            const label = `form-check-label${passed ? ' text-danger' : ''}`;
+            $('#checklist').append(
+              `<li class="list-group-item">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="item${task.id}">
+                <div class="container">
+                  <div class="row">
+                    <label class="${label}" for="item${task.id}">${task.title}</label>
+                    <label class="${label}" for="item${task.id}">${formattedDueDate}</label>
                   </div>
                 </div>
-              </li>`,
-              );
-            }
+              </div>
+            </li>`,
+            );
           }
         });
 
