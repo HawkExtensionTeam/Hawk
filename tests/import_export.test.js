@@ -33,6 +33,31 @@ afterEach(async () => {
   browser = undefined;
 });
 
+test('Test the restore of notes', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const fileInputSelector = '#jsonNoteInput';
+  const filePath = TESTDATA;
+
+  await page.waitForSelector(fileInputSelector);
+  const input = await page.$(fileInputSelector);
+  await input.uploadFile(filePath);
+
+  await page.waitForTimeout(2000);
+
+  const updatedNotes = await page.evaluate(() => new Promise((resolve) => {
+    chrome.storage.local.get('notes', (result) => {
+      resolve(result.notes);
+    });
+  }));
+  expect(updatedNotes).toMatchObject([
+    {
+      content: 'Test Note ',
+      id: '1708876013999',
+      title: 'Test Note',
+    },
+  ]);
+});
+
 test('Test the restore of Tags and Tasks', async () => {
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const fileInputSelector = '#jsonInput';
