@@ -1,0 +1,60 @@
+{
+  "allowedRegex": [
+    "^https://[^/]+.amazon.com/.*$",
+    "^https://atoz.amazon.work/.*$",
+    "^https://quip-amazon.com/.*$",
+    "^https://quip.com/.*$"
+  ],
+  "allowedSites": [],
+  "allowedURLs": [],
+  "indexed": {
+    "corpus": [
+      {
+        "body": "Skip main content Deliver Departments Arts & Crafts Automotive Baby Beauty & Personal Care Books Boys' Fashion Computers Deals Digital Music Electronics Girls' Fashion Health & Household Home & Kitchen Industrial &  Ktion  – right door Inc. its affiliates",
+        "id": 1,
+        "title": "Amazon.com. Spend less. Smile more.",
+        "url": "https://www.amazon.com/"
+      }
+    ],
+    "links": [
+      "https://www.amazon.com/"
+    ]
+  },
+  "notes": [
+    {
+      "content": "Test Note ",
+      "id": "1708876013999",
+      "title": "Test Note"
+    }
+  ],
+  "tags": {
+    "1708875962865-169": {
+      "tagColour": "#dc143c",
+      "tagName": "Test Tag"
+    }
+  },
+  "tasks": {
+    "1708875969067Test Task 1": {
+      "description": "Test Description",
+      "due": "2024-02-25T15:45:00.000Z",
+      "id": "1708875969067Test Task 1",
+      "recentlyDeleted": false,
+      "scheduledDeletion": "",
+      "tags": [
+        "1708875962865-169"
+      ],
+      "title": "Test Task 1"
+    },
+    "1708875985100Delete Test Task": {
+      "description": "Delete Task",
+      "due": "2024-02-25T15:46:00.000Z",
+      "id": "1708875985100Delete Test Task",
+      "recentlyDeleted": true,
+      "scheduledDeletion": "2024-03-26T15:46:27.781Z",
+      "tags": [
+        "1708875962865-169"
+      ],
+      "title": "Delete Test Task"
+    }
+  }
+}
