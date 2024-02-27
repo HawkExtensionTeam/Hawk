@@ -22,7 +22,7 @@ afterAll(async () => {
   await browser.close();
 });
 
-test('Adding a new note to the extension and verifying addition', async () => {
+test('Adding A New Note To The Extension And Verifying That Its Been Added', async () => {
   const url = `chrome-extension://${EXTENSION_ID}/add_note.html`;
   await page.goto(url);
 
@@ -35,7 +35,6 @@ test('Adding a new note to the extension and verifying addition', async () => {
     cm.setValue('This is a test note content');
   });
 
-  
 
   await page.click('#add-note-button');
 
@@ -53,4 +52,14 @@ test('Adding a new note to the extension and verifying addition', async () => {
   });
 
   expect(notesCountAfter).toEqual(1); 
+});
+
+test('Persisted Notes Remain After Reloading The Page', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/add_note.html`);
+
+  await page.reload();
+
+  await page.waitForSelector('.note-item');
+  const notesCount = await page.evaluate(() => document.querySelectorAll('.note-item').length);
+  expect(notesCount).toBeGreaterThan(0);
 });
