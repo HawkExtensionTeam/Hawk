@@ -33,6 +33,38 @@ afterEach(async () => {
   browser = undefined;
 });
 
+test('Test the restore of Index', async () =>{
+    await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+    const fileInputSelector = '#jsonIndexInput';
+    const filePath = TESTDATA;
+
+    await page.waitForSelector(fileInputSelector);
+    const input = await page.$(fileInputSelector);
+    await input.uploadFile(filePath);
+
+    await page.waitForTimeout(2000);
+
+    const updatedIndex = await page.evaluate(() => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }));
+
+    expect(updatedIndex).toMatchObject({
+      "corpus": [
+        {
+          "body": "Skip main content Deliver Departments Arts & Crafts Automotive Baby Beauty & Personal Care Books Boys' Fashion Computers Deals Digital Music Electronics Girls' Fashion Health & Household Home & Kitchen Industrial &  Ktion  – right door Inc. its affiliates",
+          "id": 1,
+          "title": "Amazon.com. Spend less. Smile more.",
+          "url": "https://www.amazon.com/"
+        }
+      ],
+      "links": [
+        "https://www.amazon.com/"
+      ]
+    });
+});
+
 test('Test the restore of notes', async () => {
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const fileInputSelector = '#jsonNoteInput';
