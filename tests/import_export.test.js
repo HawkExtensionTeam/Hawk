@@ -4,9 +4,9 @@ const EXTENSION_PATH = process.cwd();
 let EXTENSION_ID;
 let browser;
 let page;
-const TESTDATA = 'tests/taskData.json';
+const TESTDATA = 'tests/testData.json';
 
-beforeEach(async () => {
+beforeAll(async () => {
   browser = await puppeteer.launch({
     headless: false,
     args: [
@@ -28,41 +28,41 @@ beforeEach(async () => {
   });
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await browser.close();
   browser = undefined;
 });
 
-test('Test the restore of Index', async () =>{
-    await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
-    const fileInputSelector = '#jsonIndexInput';
-    const filePath = TESTDATA;
+test('Test the restore of Index', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const fileInputSelector = '#jsonIndexInput';
+  const filePath = TESTDATA;
 
-    await page.waitForSelector(fileInputSelector);
-    const input = await page.$(fileInputSelector);
-    await input.uploadFile(filePath);
+  await page.waitForSelector(fileInputSelector);
+  const input = await page.$(fileInputSelector);
+  await input.uploadFile(filePath);
 
-    await page.waitForTimeout(2000);
+  await page.waitForTimeout(2000);
 
-    const updatedIndex = await page.evaluate(() => new Promise((resolve) => {
-      chrome.storage.local.get('indexed', (result) => {
-        resolve(result.indexed);
-      });
-    }));
-
-    expect(updatedIndex).toMatchObject({
-      "corpus": [
-        {
-          "body": "Skip main content Deliver Departments Arts & Crafts Automotive Baby Beauty & Personal Care Books Boys' Fashion Computers Deals Digital Music Electronics Girls' Fashion Health & Household Home & Kitchen Industrial &  Ktion  – right door Inc. its affiliates",
-          "id": 1,
-          "title": "Amazon.com. Spend less. Smile more.",
-          "url": "https://www.amazon.com/"
-        }
-      ],
-      "links": [
-        "https://www.amazon.com/"
-      ]
+  const updatedIndex = await page.evaluate(() => new Promise((resolve) => {
+    chrome.storage.local.get('indexed', (result) => {
+      resolve(result.indexed);
     });
+  }));
+
+  expect(updatedIndex).toMatchObject({
+    corpus: [
+      {
+        body: "Skip main content Deliver Departments Arts & Crafts Automotive Baby Beauty & Personal Care Books Boys' Fashion Computers Deals Digital Music Electronics Girls' Fashion Health & Household Home & Kitchen Industrial &  Ktion  – right door Inc. its affiliates",
+        id: 1,
+        title: 'Amazon.com. Spend less. Smile more.',
+        url: 'https://www.amazon.com/',
+      },
+    ],
+    links: [
+      'https://www.amazon.com/',
+    ],
+  });
 });
 
 test('Test the restore of notes', async () => {
@@ -134,4 +134,40 @@ test('Test the restore of Tags and Tasks', async () => {
       title: 'Delete Test Task',
     },
   });
+});
+
+const fs = require('fs');
+const path = require('path');
+
+const downloadPath = path.resolve('./download');
+
+test('Test the export of Index', async () => {
+  const client = await page.target().createCDPSession();
+
+  await client.send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath });
+
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const buttonExists = await page.evaluate(() => !!document.querySelector('.btn.btn-primary.backup-btn'));
+
+  expect(buttonExists).toBe(true);
+
+  if (buttonExists) {
+    await page.click('#backup');
+    await page.click('.btn.btn-primary.backup-btn');
+    await page.waitForTimeout(3000); // Wait for download to complete
+  }
+
+  const expectedFileName = 'todomake_backup_data.json';
+
+  const filePath = path.join(downloadPath, expectedFileName);
+
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+
+  const expectedContentFilePath = TESTDATA;
+
+  const expectedContent = fs.readFileSync(expectedContentFilePath, 'utf8');
+
+  expect(fileContent).toEqual(expectedContent);
+
+  fs.rmdirSync(downloadPath, { recursive: true });
 });
