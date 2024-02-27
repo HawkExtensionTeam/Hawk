@@ -101,7 +101,7 @@ const indexQuip = function indexQuip() {
 
 $(document).ready(() => {
   Promise.all([checkSitesList(), checkUrlsList(), checkRegexList()])
-    .then((results) => {
+    .then(async (results) => {
       if (results.some((result) => result)) {
         $(document).on('click', 'a', (event) => {
           let link = $(event.target).prop('href');
@@ -132,6 +132,9 @@ $(document).ready(() => {
           }
         });
         if (quipRegex.test(currentURL)) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 10000);
+          });
           indexQuip();
           setInterval(indexQuip, 60000);
         } else {
