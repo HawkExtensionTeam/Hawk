@@ -16,7 +16,7 @@ function hideLists() {
 }
 
 function removeHash() { 
-    history.pushState("", document.title, window.location.pathname + window.location.search);
+    window.history.pushState("", document.title, window.location.pathname + window.location.search);
 }
 
 function exportAll() {
