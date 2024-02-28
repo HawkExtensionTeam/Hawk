@@ -88,3 +88,24 @@ test('Making Sure That The Notes Deletion Works as expected', async () => {
   expect(notesCountAfter).toEqual(0);
 });
 
+test('Testing  A note with a long content', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/add_note.html`);
+
+  
+  const longContent = 'first'.repeat(10000); // Example of long content
+  await page.type('#title', 'Long Content Note');
+  await page.evaluate(longContent => {
+    const cm = document.querySelector('.CodeMirror').CodeMirror;
+    cm.setValue(longContent);
+  }, longContent);
+  
+  await page.click('#add-note-button');
+
+  await page.waitForSelector('.note-item');
+  const notePresent = await page.evaluate(() => {
+    const noteTitle = document.querySelector('.note-item-title').textContent;
+    return noteTitle.includes('Long Content Note');
+  });
+  expect(notePresent).toBe(true);
+});
+
