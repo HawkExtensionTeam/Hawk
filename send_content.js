@@ -142,9 +142,11 @@ $(document).ready(() => {
           }
         });
         if (quipRegex.test(currentURL)) {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 10000);
-          });
+          (async () => {
+            await new Promise((resolve) => {
+              setTimeout(resolve, 10000);
+            });
+          })();
           indexQuip();
           setInterval(indexQuip, 60000);
         } else {

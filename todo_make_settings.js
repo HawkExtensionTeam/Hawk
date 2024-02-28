@@ -317,10 +317,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         return found;
       });
     });
-    
+
     $('#selection-search').on('input', function _() {
       const query = $(this).val();
-      $('#notes-selection-list, #tasks-selection-list, #index-selection-list').find('.row').each(function _(idx, obj) {
+      $('#notes-selection-list, #tasks-selection-list, #index-selection-list').find('.row').each((idx, obj) => {
         const checkbox = $(obj);
         const resultText = checkbox.text();
         const found = resultText.indexOf(query) > -1;
