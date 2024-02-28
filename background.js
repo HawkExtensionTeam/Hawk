@@ -71,7 +71,27 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         const suggestions = [];
         let searchResults = [];
 
-        if (corpus.length >= 3) {
+        let combinator;
+        let searchTerms = text.split(' ');
+        const lastTerm = searchTerms[searchTerms.length - 1];
+        switch (lastTerm) {
+          case '&':
+            combinator = 'AND';
+            break;
+          case '~':
+            combinator = 'AND_NOT';
+            break;
+          default:
+            combinator = null;
+            break;
+        }
+
+        if (combinator && searchTerms.length) {
+          searchTerms = searchTerms.slice(0, searchTerms.length - 1);
+          text = searchTerms.join(' ');
+        }
+
+        if (corpus.length >= 3 && !combinator) {
           searchResults = runningEngine.search(text);
           for (let i = 0; i < 10; i += 1) {
             if (i === searchResults.length) break;
@@ -85,11 +105,20 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         }
 
         if (!suggestions.length) {
-          searchResults = miniSearch.search(text, {
-            boost: { title: 3 },
-            prefix: (term) => term.length > 3,
-            fuzzy: (term) => (term.length > 3 ? 0.2 : null),
-          });
+          if (combinator) {
+            searchResults = miniSearch.search(text, {
+              boost: { title: 3 },
+              prefix: (term) => term.length > 3,
+              fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+              combineWith: combinator,
+            });
+          } else {
+            searchResults = miniSearch.search(text, {
+              boost: { title: 3 },
+              prefix: (term) => term.length > 3,
+              fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+            });
+          }
           for (let i = 0; i < 10; i += 1) {
             if (i === searchResults.length) break;
             const searchResult = searchResults[i];
