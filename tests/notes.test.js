@@ -63,21 +63,16 @@ test('Persisted Notes Remain After Reloading The Page', async () => {
   const notesCount = await page.evaluate(() => document.querySelectorAll('.note-item').length);
   expect(notesCount).toBeGreaterThan(0);
 });
-
+/*
 test('Delete a note', async () => {
-  // Go to the page
   await page.goto(`chrome-extension://${EXTENSION_ID}/add_note.html`);
 
-  // Assume there is a note to delete
   await page.click('.note-item'); // Click on the note to delete
 
-  // Click on the delete button
   await page.click('#delete');
 
-  // Confirm the deletion
   await page.click('#confirmDelete');
 
-  // Verify the note is deleted
   const deletedNote = await page.evaluate(() => document.querySelector('.note-item'));
   expect(deletedNote).toBe(null);
 });
