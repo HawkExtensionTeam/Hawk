@@ -1,6 +1,8 @@
 import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
 
+const xmlEscape = require('xml-escape');
+
 let engine;
 const winkNLP = require('wink-nlp');
 const model = require('wink-eng-lite-web-model');
@@ -230,7 +232,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
           const page = {
             id: indexed.corpus.length + 1,
             url,
-            title: tabs[0].title,
+            title: xmlEscape(tabs[0].title),
             body: request.visibleTextContent,
           };
 
