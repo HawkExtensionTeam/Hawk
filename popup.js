@@ -11,7 +11,7 @@ function allDeleted(allTasks) {
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
     $('#new-tab-button').on('click', () => {
-      chrome.tabs.create({ url: 'new_tab.html' });
+      chrome.tabs.create({ url: 'todo_list.html' });
     });
 
     $('#manage-settings-container').on('click', () => {
