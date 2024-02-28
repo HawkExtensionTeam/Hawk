@@ -18,7 +18,30 @@ function exportAll() {
 }
 
 function overwriteTasks(tasks) {
+  const currentDate = new Date();
+  const tasksArray = Object.values(tasks);
+  console.log(tasksArray);
+  const filteredTasks = tasksArray.filter(task => task.scheduledDeletion == '' || task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate);
+  const newTasks = {};
+  filteredTasks.forEach(task => {
+    newTasks[task.id] = task;
+  });
+  tasks = newTasks;
   chrome.storage.local.set({ tasks }, () => {
+    chrome.alarms.clearAll();
+    $.each(filteredTasks, (key, task) => {
+      if (task.recentlyDeleted) {
+        const alarmName = `${task.id}_deletion_alarm`;
+        const deletionDate = new Date(task.scheduledDeletion);
+        chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+      }
+      else {
+        const taskDue = new Date(task.due);
+        if (taskDue > currentDate) {
+          chrome.alarms.create(task.id, { when: taskDue.getTime() });
+        }
+      }
+    });
   });
 }
 
