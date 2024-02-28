@@ -317,6 +317,16 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         return found;
       });
     });
+    
+    $('#selection-search').on('input', function _() {
+      const query = $(this).val();
+      $('#notes-selection-list, #tasks-selection-list, #index-selection-list').find('.row').each(function _(idx, obj) {
+        const checkbox = $(obj);
+        const resultText = checkbox.text();
+        const found = resultText.indexOf(query) > -1;
+        checkbox.toggle(found);
+      });
+    });
 
     $(document).on('click', '.sites-del', (event) => {
       const $delBtn = $(event.currentTarget);
@@ -448,7 +458,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.btn.btn-primary.restore-selection-btn', (event) => {
       const $restoreBtn = $(event.currentTarget);
-      restoreTags(curTags);
+      if (curTags !== null) {
+        restoreTags(curTags);
+      }
       restoreSelectedNotes();
       restoreSelectedTasks();
       restoreSelectedIndexEntries();
