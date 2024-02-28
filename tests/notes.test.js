@@ -109,3 +109,36 @@ test('Testing  A note with a long content', async () => {
   expect(notePresent).toBe(true);
 });
 
+test('View A Note', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/add_note.html`);
+  await page.waitForSelector('.note-item');
+  await page.click('.note-item');
+
+  await page.waitForSelector('#titleDisplay');
+  const noteTitle = await page.evaluate(() => document.querySelector('#titleDisplay').textContent);
+  expect(noteTitle).not.toBe('');
+});
+
+test('Editing  A Note', async () => {
+  await page.goto(`chrome-extension://${EXTENSION_ID}/add_note.html`);
+  await page.waitForSelector('.note-item');
+  await page.click('.note-item');
+
+  await page.waitForSelector('#edit');
+  await page.click('#edit');
+
+  await page.waitForSelector('#title');
+  await page.type('#title', ' Edited');
+
+  await page.waitForSelector('.CodeMirror');
+  await page.evaluate(() => {
+    const cm = document.querySelector('.CodeMirror').CodeMirror;
+    cm.setValue(' Edited');
+  });
+
+  await page.click('#save');
+
+  await page.waitForSelector('.note-item');
+  const noteTitle = await page.evaluate(() => document.querySelector('.note-item-title').textContent);
+  expect(noteTitle).toBe('Long Content Note Edited');
+});
