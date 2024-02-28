@@ -31,6 +31,17 @@ function exportAll() {
   });
 }
 
+function updateWallpaperPreview() {
+  chrome.storage.local.get('bg', (result) => {
+    const imgElement = $('.settings-wallpaper-preview img');
+    if (result.bg !== '' && result.bg !== undefined) {
+      imgElement.attr('src', result.bg);
+    } else {
+      imgElement.attr('src', '../images/comic_bg.png');
+    }
+  });
+}
+
 function constrainStringLength(inputString, length) {
   return inputString.length > length ? `${inputString.substring(0, length)}...` : inputString;
 }
@@ -296,7 +307,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     retrieveUrlsList();
     retrieveStringMatchesList();
     retrieveRegexList();
-
+    updateWallpaperPreview();
     $('#rule-search').on('input', function _() {
       const query = $(this).val();
       $('#urls-list, #sites-list, #string-matches-list, #regex-list').filter(function filterLists() {
@@ -449,6 +460,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.btn.btn-primary.background-reset-btn', () => {
       chrome.storage.local.set({ bg: '' }, () => {
+        updateWallpaperPreview();
       });
     });
 
@@ -458,6 +470,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const reader = new FileReader();
         reader.onload = (e) => {
           chrome.storage.local.set({ bg: e.target.result }, () => {
+            updateWallpaperPreview();
           });
         };
         reader.readAsDataURL(selectedFile);

@@ -51,10 +51,11 @@
                 <div class="row flex settings-section align-contents-center">
                     <div class="col-auto zero-margin zero-padding">Change background on To-Do List and Notebook pages
                     </div>
-                    <div class="col-auto zero-margin zero-padding">
-                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
+                    <div class="col-auto d-flex zero-margin zero-padding w-100 mt-2 settings-wallpaper-preview">
+                        <img class="settings-wallpaper-preview-img">
                     </div>
-                    <div class="col-auto zero-margin zero-padding">
+                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
+                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
                         <label for="backgroundInput" class="btn btn-primary browse-background-btn">Browse for background</label>
                         <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
                     </div>
@@ -221,7 +222,7 @@
                     </div>
                 </div>
             </div>
-            <div class="settings-pane hidden" id="about-pane">
+            <div class="settings-pane d-flex hidden" id="about-pane">
                 <div class="row zero-padding zero-margin">
                     <div class="text-center mb-5">
                         <img class="logo-128 zero-padding">
