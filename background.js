@@ -18,6 +18,10 @@ const defaultRegexList = [
   '^https://quip\.com/.*$',
 ];
 
+const TITLE_BOOST = 3;
+const MIN_SEARCH_TERM_LENGTH = 3;
+const DEFAULT_WEIGHT = 0.2;
+
 const prepTask = function prepTask(text) {
   const tokens = [];
   nlp.readDoc(text)
@@ -91,11 +95,11 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
           text = searchTerms.join(' ');
         }
 
-        if (corpus.length >= 3 && !combinator) {
+        if (corpus.length >= MIN_SEARCH_TERM_LENGTH && !combinator) {
           searchResults = runningEngine.search(text);
-          for (let i = 0; i < 10; i += 1) {
-            if (i === searchResults.length) break;
-            const page = corpus[searchResults[i][0] - 1];
+          for (let docID = 0; docID < 10; docID += 1) {
+            if (docID === searchResults.length) break;
+            const page = corpus[searchResults[docID][0] - 1];
             suggestions.push({
               content: page.url,
               description: page.title,
@@ -107,21 +111,21 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         if (!suggestions.length) {
           if (combinator) {
             searchResults = miniSearch.search(text, {
-              boost: { title: 3 },
-              prefix: (term) => term.length > 3,
-              fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+              boost: { title: TITLE_BOOST },
+              prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
+              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
               combineWith: combinator,
             });
           } else {
             searchResults = miniSearch.search(text, {
               boost: { title: 3 },
-              prefix: (term) => term.length > 3,
-              fuzzy: (term) => (term.length > 3 ? 0.2 : null),
+              prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
+              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
             });
           }
-          for (let i = 0; i < 10; i += 1) {
-            if (i === searchResults.length) break;
-            const searchResult = searchResults[i];
+          for (let docID = 0; docID < 10; docID += 1) {
+            if (docID === searchResults.length) break;
+            const searchResult = searchResults[docID];
             const page = corpus[searchResult.id - 1];
             suggestions.push({
               content: page.url,
