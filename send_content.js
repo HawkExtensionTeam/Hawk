@@ -23,6 +23,16 @@ function checkUrlsList() {
   });
 }
 
+function checkStringMatchesList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedStringMatches'], (result) => {
+      const storedMatchesList = result.allowedStringMatches;
+      const matchesList = storedMatchesList || [];
+      resolve(matchesList.some((match) => currentURL.indexOf(match) > -1));
+    });
+  });
+}
+
 function checkRegexList() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['allowedRegex'], (result) => {
@@ -100,8 +110,8 @@ const indexQuip = function indexQuip() {
 };
 
 $(document).ready(() => {
-  Promise.all([checkSitesList(), checkUrlsList(), checkRegexList()])
-    .then(async (results) => {
+  Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
+    .then((results) => {
       if (results.some((result) => result)) {
         $(document).on('click', 'a', (event) => {
           let link = $(event.target).prop('href');
@@ -132,9 +142,11 @@ $(document).ready(() => {
           }
         });
         if (quipRegex.test(currentURL)) {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 10000);
-          });
+          (async () => {
+            await new Promise((resolve) => {
+              setTimeout(resolve, 10000);
+            });
+          })();
           indexQuip();
           setInterval(indexQuip, 60000);
         } else {

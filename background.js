@@ -281,6 +281,9 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.set({ allowedURLs: [] }, () => {
     });
 
+    chrome.storage.local.set({ allowedStringMatches: [] }, () => {
+    });
+
     chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
     });
   }

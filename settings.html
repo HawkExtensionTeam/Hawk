@@ -51,10 +51,11 @@
                 <div class="row flex settings-section align-contents-center">
                     <div class="col-auto zero-margin zero-padding">Change background on To-Do List and Notebook pages
                     </div>
-                    <div class="col-auto zero-margin zero-padding">
-                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
+                    <div class="col-auto d-flex zero-margin zero-padding w-100 mt-2 settings-wallpaper-preview">
+                        <img class="settings-wallpaper-preview-img">
                     </div>
-                    <div class="col-auto zero-margin zero-padding">
+                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
+                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
                         <label for="backgroundInput" class="btn btn-primary browse-background-btn">Browse for background</label>
                         <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
                     </div>
@@ -62,82 +63,78 @@
             </div>
 
             <div class="settings-pane hidden" id="backup-pane">
-                <div class="col">
-                    <label for="jsonAllInput" class="btn btn-primary restore-all-btn">Restore all from JSON file</label>
-                    <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
-                    <button class="btn btn-primary import-selection-btn">Import Data for Selection</button>
+                <div class="section-heading">
+                    Restore data
                 </div>
-                <div class="col">
-                    <ul class="nav nav-tabs" id="backupTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Notes</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="tasks-tab" data-bs-toggle="tab" href="#tasks" role="tab">Tasks</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="index-tab" data-bs-toggle="tab" href="#index" role="tab">Index</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content mt-2">
-                        <div class="tab-pane fade show active" id="notes" role="tabpanel">
-                            <input type="checkbox" id="notesCheckbox"> Note 1
-                            <br>
-                            <input type="checkbox" id="notesCheckbox"> Note 2
-                            <br>
-                            <input type="checkbox" id="notesCheckbox"> Note 3
-                        </div>
-                        <div class="tab-pane fade" id="tasks" role="tabpanel">
-                            <input type="checkbox" id="tasksCheckbox"> Task 1
-                            <br>
-                            <input type="checkbox" id="tasksCheckbox"> Task 2
-                            <br>
-                            <input type="checkbox" id="tasksCheckbox"> Task 3
-                        </div>
-                        <div class="tab-pane fade" id="index" role="tabpanel">
-                            <input type="checkbox" id="indexCheckbox"> Index 1
-                            <br>
-                            <input type="checkbox" id="indexCheckbox"> Index 2
-                            <br>
-                            <input type="checkbox" id="indexCheckbox"> Index 3
-                        </div>
+                <div class="row flex settings-section align-contents-center mb-4">
+                    <div class="col-auto zero-margin zero-padding">
+                    Either restore all data from a JSON file, or import it and select elements for restore from below.
                     </div>
-                    <div class="col">
-                        <button class="btn btn-primary backup-btn">Export extension data to backup (JSON)</button>
+                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
+                        <label for="jsonAllInput" class="btn btn-primary restore-all-btn">Restore all from JSON file</label>
+                        <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
+                        <label for="jsonSelectiveInput" class="btn btn-primary import-selection-btn">Import data for selection</label>
+                        <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
                     </div>
-                    <div class="col">
+                    <div class="col zero-margin zero-padding mt-3 d-none" id="backup-select-col">
+                        <ul class="nav nav-tabs" id="backupTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="notes-tab" data-bs-toggle="tab" href="#notes-selection-list" role="tab">Notes</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="tasks-tab" data-bs-toggle="tab" href="#tasks-selection-list" role="tab">Tasks</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="index-tab" data-bs-toggle="tab" href="#index-selection-list" role="tab">Index</a>
+                            </li>
+                            <div class="col d-flex align-items-center">
+                                <input type="text" class="search-bar-sm w-50" id="selection-search" placeholder="Type to search selections">
+                            </div>
+                        </ul>
+                        <div class="tab-content mt-2">
+                            <div class="tab-pane fade show active" id="notes-selection-list" role="tabpanel">
+                            </div>
+                            <div class="tab-pane fade" id="tasks-selection-list" role="tabpanel">
+                            </div>
+                            <div class="tab-pane fade" id="index-selection-list" role="tabpanel">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary restore-selection-btn mt-4">Perform overwriting restore of selected data</button>
+                    </div>
+                </div>
+                <div class="section-heading mt-4">
+                    Restore all data by category
+                </div>
+                <div class="row flex settings-section align-contents-center">
+                    <div class="col-auto zero-margin zero-padding">Restore only the data from a given data category from the provided JSON backup
+                    </div>
+                    <div class="col-auto zero-margin zero-padding mt-2 w-100">
                         <label for="jsonIndexInput" class="btn btn-primary index-restore-btn">Upload data to restore search index</label>
                         <input type="file" id="jsonIndexInput" name="jsonIndexInput" accept=".json" style="display: none;" />
-                    </div>
-                    <div class="col">
-                        <label for="jsonIndexInputSelective" class="btn btn-primary index-restore-btn">Upload and select data to restore subset of search index</label>
-                        <input type="file" id="jsonIndexInputSelective" name="jsonIndexInputSelective" accept=".json" style="display: none;" />
-                    </div>
-                    <div class="col">
                         <label for="jsonInput" class="btn btn-primary tasks-restore-btn">Upload data to restore tasks</label>
                         <input type="file" id="jsonInput" name="jsonInput" accept=".json" style="display: none;" />
-                    </div>
-                    <div class="col">
-                        <label for="jsonInputSelective" class="btn btn-primary tasks-restore-btn">Upload and select data to restore subset of tasks</label>
-                        <input type="file" id="jsonInputSelective" name="jsonInputSelective" accept=".json" style="display: none;" />
-                    </div>
-                    <div class="col selective-task-list-col" id="selective-task-list">
-                        <ul class="selective-list task-list">
-                        </ul>
-                        <button class="btn btn-primary restore-tasks-btn">Perform overwriting restore with selection</button>
-                    </div>
-                    <div class="col">
                         <label for="jsonNoteInput" class="btn btn-primary note-restore-btn">Upload data to restore notes</label>
                         <input type="file" id="jsonNoteInput" name="jsonNoteInput" accept=".json" style="display: none;" />
                     </div>
-                    <div class="col">
-                        <label for="jsonInputSelective" class="btn btn-primary note-restore-btn">Upload and select data to restore subset of notes</label>
-                        <input type="file" id="jsonNoteInputSelective" name="jsonNoteInputSelective" accept=".json" style="display: none;" />
+                </div>
+                <div class="section-heading mt-4">
+                    Export data to backup
+                </div>
+                <div class="row flex settings-section align-contents-center">
+                    <div class="col-auto zero-margin zero-padding">All data will be exported to a JSON file from which data can be restored in future
                     </div>
-                    <div class="col selective-note-list-col" id="selective-note-list">
-                        <ul class="selective-list note-list">
-                        </ul>
-                        <button class="btn btn-primary restore-notes-btn">Perform overwriting restore with selection</button>
+                    <div class="col-auto zero-margin zero-padding mt-2 w-100">
+                        <button class="btn btn-primary backup-btn">Export extension data to JSON file</button>
+                    </div>
+                </div>
+                <div class="section-heading mt-4">
+                    Reset
+                </div>
+                <div class="row flex settings-section align-contents-center mb-2">
+                    <div class="col-auto zero-margin zero-padding">Remove all data and reset extension settings
+                    </div>
+                    <div class="col-auto zero-margin zero-padding mt-2 w-100" data-bs-toggle="modal" data-bs-target="#eraseDataModal">
+                        <button class="btn btn-danger reset-btn">Erase all data and settings</button>
                     </div>
                 </div>
             </div>
@@ -154,64 +151,123 @@
                         </li>
                         <li class="nav-item" role="presentation">
                             <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
-                        </li
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="string-matches-tab" data-bs-toggle="tab" href="#string-matches" role="tab">String matches</a>
+                        </li>
                         <li class="nav-item" role="presentation">
                             <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
                         </li>
                         <div class="col d-flex align-items-center">
                             <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
                         </div>
-                        <div class="col d-flex justify-content-end zero-margin">
+                        <div class="col d-flex justify-content-xxl-end zero-margin">
                             <button class="btn btn-primary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
                         </div>
                     </ul>
                     <div class="tab-content mt-2">
                         <div class="tab-pane fade show active" id="sites" role="tabpanel">
-                          <ul class="index-list" id="sites-list">
-                          </ul>
+                            <ul class="index-list" id="sites-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No site rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                         <div class="tab-pane fade" id="urls" role="tabpanel">
-                          <ul class="index-list" id="urls-list">
-                          </ul>
+                            <ul class="index-list" id="urls-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No URL rules found.
+                                    </div>
+                                </div>
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="string-matches" role="tabpanel">
+                            <ul class="index-list" id="string-matches-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No string match rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                         <div class="tab-pane fade" id="regex" role="tabpanel">
-                          <ul class="index-list" id="regex-list">
-                          </ul>
+                            <ul class="index-list" id="regex-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No RegEx rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="settings-pane hidden" id="about-pane" width="90%">
-                <div class="row" style="overflow-y: scroll; height: 30rem; width: 50rem;">
-                    <h3>CONTACT US:</h3>
-
-                    <p>Scarlett 2711639a@student.gla.ac.uk<br />
-                    Jackson 2619114d@student.gla.ac.uk<br />
-                    Zhixiang 2616718f@student.gla.ac.uk<br />
-                    William 2620286h@student.gla.ac.uk<br />
-                    Leen 2580367j@student.gla.ac.uk<br />
-                    Mojahed 2794899a@student.gla.ac.uk<br />
-                    Katy 2563183o@student.gla.ac.uk<br />
-                    Julian 2613319w@student.gla.ac.uk<br /></p>
-
-                   <p> <h3>USAGE</h3>
-
-                    The extension indexes automatically. To search your indexed content, type "@i" in the Chrome omnibar, and type your search content. <br />
+            <div class="settings-pane d-flex hidden" id="about-pane">
+                <div class="row zero-padding zero-margin">
+                    <div class="text-center mb-5">
+                        <img class="logo-128 zero-padding">
+                        <p>
+                        <h3>To-Do Make <br>1.0</h3>
+                        </p>
+                    </div>
+                    <h3>Usage</h3>
+                    <p>
+                    The extension indexes automatically. To search your indexed content, type "@i" in the browser omnibar, then press Tab and enter your search query. <br />
                     </p>
-                    <p><h3>BACKUP AND RESTORATION</h3>
-
-                    To backup your data, navigate to Settings > Backup and Restore, and select "Export extension data". <br />
-
+                    <h3>Backup and restoration</h3>
+                    <p>
+                    To back up your data, navigate to Settings > Backup and Restore, and select "Export extension data to JSON file". <br />
                     To restore data to a new install of the extension, navigate to Settings > Backup and Restore, and select "Restore all from JSON file". If you wish to only restore some data, you can select the relevant option. <br />
                     </p>
-                    <p><h3>CHANGING INDEXING BEHAVIOUR</h3>
-
+                    <h3>Changing indexing behaviour</h3>
+                    <p>
                     By default, the application indexes pages with the domains "amazon.com", and "a2z.com". You may wish for more or other domains to be indexed when visited. To edit this, navigate to Settings > Indexing, and click "Change allowed sites". <br />
                     </p>
-                    <p><h3>APPEARANCE</h3>
-
+                    <h3>Appearance</h3>
+                    <p>
                     If you wish to change the background of the notes and tasks pages, you can do this by navigating to Settings > Appearance, and under Wallpaper, clicking "Browse for background". Select your image; choose something high quality!<br />
-                    </p>
+                    </p>                    
+                    <h3>Developer contact:</h3>
+                    <p>
+                    Scarlett Anwender<br>
+                    2711639a@student.gla.ac.uk<br><br>
+                    Jackson Dam<br>
+                    2619114d@student.gla.ac.uk<br><br>
+                    Zhixiang Feng<br>
+                    2616718f@student.gla.ac.uk<br><br>
+                    William Hunt<br>
+                    2620286h@student.gla.ac.uk<br><br>
+                    Leen Jarbouh<br>
+                    2580367j@student.gla.ac.uk<br><br>
+                    Mojahed Al Rushadi<br>
+                    2794899a@student.gla.ac.uk<br><br>
+                    Katy O'Neill<br>
+                    2563183o@student.gla.ac.uk<br><br>
+                    Julian Wang<br>
+                    2613319w@student.gla.ac.uk<br><br>
                 </div>
             </div>
         </div>
@@ -270,6 +326,23 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="modal fade" id="eraseDataModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Erase all data and settings</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>You are about to erase all data and settings of the extension.</strong><br><br> All data and settings will be erased. <br>This action cannot be undone.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirm-erase-data-btn">Erase all data and settings</button>
+          </div>
+        </div>
+      </div>
     </div>
     <script src="assets/jquery-3.7.1.min.js"></script>
     <script src="todo_make_settings.js"></script>
