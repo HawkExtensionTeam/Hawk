@@ -20,10 +20,9 @@ function exportAll() {
 function overwriteTasks(tasks) {
   const currentDate = new Date();
   const tasksArray = Object.values(tasks);
-  console.log(tasksArray);
-  const filteredTasks = tasksArray.filter(task => task.scheduledDeletion == '' || task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate);
+  const filteredTasks = tasksArray.filter((task) => (task.scheduledDeletion === '') || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
   const newTasks = {};
-  filteredTasks.forEach(task => {
+  filteredTasks.forEach((task) => {
     newTasks[task.id] = task;
   });
   tasks = newTasks;
@@ -34,8 +33,7 @@ function overwriteTasks(tasks) {
         const alarmName = `${task.id}_deletion_alarm`;
         const deletionDate = new Date(task.scheduledDeletion);
         chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-      }
-      else {
+      } else {
         const taskDue = new Date(task.due);
         if (taskDue > currentDate) {
           chrome.alarms.create(task.id, { when: taskDue.getTime() });
