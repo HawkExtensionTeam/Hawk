@@ -912,3 +912,15 @@ svg {
 #import-md-btn {
 	margin-right: 0.425em;
 }
+
+#about-pane {
+  height: 40rem;
+  width: 50rem;
+  overflow-y: scroll;
+}
+
+.logo-128 {
+  width: 128px;
+  height: 128px;
+  background-image: url('../images/logo128x128.png');
+}

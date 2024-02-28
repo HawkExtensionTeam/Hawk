@@ -1,3 +1,10 @@
+const defaultRegexList = [
+  '^https://[^/]+\.amazon\.com/.*$',
+  '^https://atoz\.amazon\.work/.*$',
+  '^https://quip-amazon\.com/.*$',
+  '^https://quip\.com/.*$',
+];
+
 let curTasks = null;
 const taskList = $('#selective-task-list');
 
@@ -243,6 +250,20 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 2);
     });
 
+    $(document).on('click', '#confirm-erase-data-btn', () => {
+      chrome.storage.local.clear();
+      chrome.alarms.clearAll();
+      chrome.storage.local.set({ allowedSites: [] }, () => {
+      });
+
+      chrome.storage.local.set({ allowedURLs: [] }, () => {
+      });
+
+      chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
+        window.location.reload();
+      });
+    });
+
     $(document).on('click', '#regex-tab', () => {
       $('.index-heading').text('Allowed RegEx');
       $('.index-info').text('Indexing will occur whenever the visited URL matches any one of these regular expressions.');
@@ -289,7 +310,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       exportAll();
       $backupBtn.text('Downloaded data backup');
       setTimeout(() => {
-        $backupBtn.text('Export extension data to backup (JSON)');
+        $backupBtn.text('Export extension data to JSON file');
       }, 1000);
     });
 

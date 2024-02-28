@@ -726,7 +726,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
       // don't sync with other machines - extension is local
       $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
-        chrome.alarms.create(taskId, { when: dueDate.getTime() });
+        if (dueDate > new Date()) {
+          chrome.alarms.create(taskId, { when: dueDate.getTime() });
+        }
         addTaskToChecklist(taskId);
         tasksObj = existingTasks;
       });
