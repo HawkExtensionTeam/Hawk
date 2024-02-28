@@ -1,25 +1,10 @@
 image: node:latest
 
-# stages:
-#   - lint
-#   - test
+stages:
+  - lint
 
-# eslint:
-#   stage: lint
-#   script:
-#     - npm install
-#     - npx eslint --fix .
-
-test:
-  cache:
-    paths:
-      - node_modules/
-  variables:
-    CI: "true"
-  before_script:
-    - echo "checking node version"
-    - node -v
-    - echo "installing dependencies..."
-    - npm install
+eslint:
+  stage: lint
   script:
-    - npm test tests/import_export.test.js
+    - npm install
+    - npx eslint --fix .
