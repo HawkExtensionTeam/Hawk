@@ -23,6 +23,16 @@ function checkUrlsList() {
   });
 }
 
+function checkStringMatchesList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedStringMatches'], (result) => {
+      const storedMatchesList = result.allowedStringMatches;
+      const matchesList = storedMatchesList || [];
+      resolve(matchesList.some((match) => currentURL.indexOf(match) > -1));
+    });
+  });
+}
+
 function checkRegexList() {
   return new Promise((resolve) => {
     chrome.storage.local.get(['allowedRegex'], (result) => {
@@ -100,7 +110,7 @@ const indexQuip = function indexQuip() {
 };
 
 $(document).ready(() => {
-  Promise.all([checkSitesList(), checkUrlsList(), checkRegexList()])
+  Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
     .then((results) => {
       if (results.some((result) => result)) {
         $(document).on('click', 'a', (event) => {

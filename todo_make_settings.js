@@ -15,8 +15,8 @@ function hideLists() {
   taskList.hide();
 }
 
-function removeHash() { 
-    window.history.pushState("", document.title, window.location.pathname + window.location.search);
+function removeHash() {
+  window.history.pushState('', document.title, window.location.pathname + window.location.search);
 }
 
 function exportAll() {
@@ -78,6 +78,28 @@ function retrieveSitesList() {
               <div class="col-8">${expr}</div>
               <div class="col-4 d-flex justify-content-end">
                   <button class="btn btn-danger sites-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                    Delete
+                  </button>
+              </div>
+          </div>
+        `);
+      });
+    }
+  });
+}
+
+function retrieveStringMatchesList() {
+  chrome.storage.local.get(['allowedStringMatches'], (result) => {
+    const storedMatchesList = result.allowedStringMatches;
+    const matchesList = storedMatchesList || [];
+    if (matchesList.length > 0) {
+      $('#string-matches-list').empty();
+      Object.values(matchesList).forEach((expr) => {
+        $('#string-matches-list').append(`
+          <div class="row urls-item align-items-center mt-2"> 
+              <div class="col-8">${expr}</div>
+              <div class="col-4 d-flex justify-content-end">
+                  <button class="btn btn-danger string-matches-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
                     Delete
                   </button>
               </div>
@@ -272,11 +294,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     hideLists();
     retrieveSitesList();
     retrieveUrlsList();
+    retrieveStringMatchesList();
     retrieveRegexList();
 
     $('#rule-search').on('input', function _() {
       const query = $(this).val();
-      $('#urls-list, #sites-list, #regex-list').filter(function filterLists() {
+      $('#urls-list, #sites-list, #string-matches-list, #regex-list').filter(function filterLists() {
         const ruleText = $(this).text();
         const found = ruleText.indexOf(query) > -1;
         $(this).toggle(found);
@@ -308,6 +331,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('#addRuleModal').attr('rule-loc', 'allowedURLs');
     });
 
+    $(document).on('click', '.string-matches-del', (event) => {
+      const $delBtn = $(event.currentTarget);
+      $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
+      $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
+    });
+
     $(document).on('click', '.regex-del', (event) => {
       const $delBtn = $(event.currentTarget);
       $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
@@ -315,15 +344,19 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
 
     $(document).on('click', '.sites-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 0);
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
     });
 
     $(document).on('click', '.urls-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 1);
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
+    });
+
+    $(document).on('click', '.string-matches-delete-btn', () => {
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
     });
 
     $(document).on('click', '.regex-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'), 2);
+      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
     });
 
     $(document).on('click', '#confirm-erase-data-btn', () => {
@@ -335,9 +368,18 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.storage.local.set({ allowedURLs: [] }, () => {
       });
 
+      chrome.storage.local.set({ allowedStringMatches: [] }, () => {
+      });
+
       chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
         window.location.reload();
       });
+    });
+
+    $(document).on('click', '#string-matches-tab', () => {
+      $('.index-heading').text('Allowed string matches');
+      $('.index-info').text('Indexing will occur whenever the URL contains any one of these strings.');
+      $('#addRuleModal').attr('rule-loc', 'allowedStringMatches');
     });
 
     $(document).on('click', '#regex-tab', () => {
@@ -372,6 +414,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 break;
               case 'allowedRegex':
                 retrieveRegexList();
+                break;
+              case 'allowedStringMatches':
+                retrieveStringMatchesList();
                 break;
               default:
                 break;

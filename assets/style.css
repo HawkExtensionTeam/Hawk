@@ -144,7 +144,7 @@ ul {
   margin-left: 0.4em;
   margin-bottom: 0.4em;
   padding-left: 0.6em;
-  padding-right: 2.4em;
+  padding-right: 3em;
   padding-top: 0.4em;
   padding-bottom: 0.4em;
 }
@@ -914,7 +914,7 @@ svg {
 }
 
 #about-pane {
-  height: 40rem;
+  height: 37rem;
   width: 50rem;
   overflow-y: scroll;
 }
