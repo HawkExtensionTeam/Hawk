@@ -924,3 +924,10 @@ svg {
   height: 128px;
   background-image: url('../images/logo128x128.png');
 }
+
+.backup-checkbox {
+  margin-left: 0.3rem;
+  margin-right: 1rem !important;
+  aspect-ratio: 1;
+  padding: 0;
+}

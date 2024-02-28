@@ -65,53 +65,40 @@
                 <div class="section-heading">
                     Restore data
                 </div>
-                <div class="row flex settings-section align-contents-center">
-                    <div class="col-auto zero-margin zero-padding">Either restore all data from a JSON file, or import it and select elements for restore from below
+                <div class="row flex settings-section align-contents-center mb-4">
+                    <div class="col-auto zero-margin zero-padding">
+                    Either restore all data from a JSON file, or import it and select elements for restore from below.
                     </div>
-                    <div class="col-auto zero-margin zero-padding my-2 w-100">
+                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
                         <label for="jsonAllInput" class="btn btn-primary restore-all-btn">Restore all from JSON file</label>
                         <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
-                        <button class="btn btn-primary import-selection-btn">Import data for selection</button>
+                        <label for="jsonSelectiveInput" class="btn btn-primary import-selection-btn">Import data for selection</label>
                         <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
                     </div>
-                    <div class="col zero-margin zero-padding">
+                    <div class="col zero-margin zero-padding mt-3 d-none" id="backup-select-col">
                         <ul class="nav nav-tabs" id="backupTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab">Notes</a>
+                                <a class="nav-link active" id="notes-tab" data-bs-toggle="tab" href="#notes-selection-list" role="tab">Notes</a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="tasks-tab" data-bs-toggle="tab" href="#tasks" role="tab">Tasks</a>
+                                <a class="nav-link" id="tasks-tab" data-bs-toggle="tab" href="#tasks-selection-list" role="tab">Tasks</a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="index-tab" data-bs-toggle="tab" href="#index" role="tab">Index</a>
+                                <a class="nav-link" id="index-tab" data-bs-toggle="tab" href="#index-selection-list" role="tab">Index</a>
                             </li>
                         </ul>
                         <div class="tab-content mt-2">
-                            <div class="tab-pane fade show active" id="notes" role="tabpanel">
-                                <input type="checkbox" id="notesCheckbox"> Note 1
-                                <br>
-                                <input type="checkbox" id="notesCheckbox"> Note 2
-                                <br>
-                                <input type="checkbox" id="notesCheckbox"> Note 3
+                            <div class="tab-pane fade show active" id="notes-selection-list" role="tabpanel">
                             </div>
-                            <div class="tab-pane fade" id="tasks" role="tabpanel">
-                                <input type="checkbox" id="tasksCheckbox"> Task 1
-                                <br>
-                                <input type="checkbox" id="tasksCheckbox"> Task 2
-                                <br>
-                                <input type="checkbox" id="tasksCheckbox"> Task 3
+                            <div class="tab-pane fade" id="tasks-selection-list" role="tabpanel">
                             </div>
-                            <div class="tab-pane fade" id="index" role="tabpanel">
-                                <input type="checkbox" id="indexCheckbox"> Index 1
-                                <br>
-                                <input type="checkbox" id="indexCheckbox"> Index 2
-                                <br>
-                                <input type="checkbox" id="indexCheckbox"> Index 3
+                            <div class="tab-pane fade" id="index-selection-list" role="tabpanel">
                             </div>
                         </div>
+                        <button class="btn btn-primary restore-selection-btn mt-4">Perform overwriting restore of selected data</button>
                     </div>
                 </div>
-                <div class="section-heading mt-3">
+                <div class="section-heading mt-4">
                     Restore all data by category
                 </div>
                 <div class="row flex settings-section align-contents-center">
@@ -126,17 +113,17 @@
                         <input type="file" id="jsonNoteInput" name="jsonNoteInput" accept=".json" style="display: none;" />
                     </div>
                 </div>
-                <div class="section-heading mt-3">
+                <div class="section-heading mt-4">
                     Export data to backup
                 </div>
                 <div class="row flex settings-section align-contents-center">
-                    <div class="col-auto zero-margin zero-padding">All data will be exported to a JSON file from which data can be restored from later
+                    <div class="col-auto zero-margin zero-padding">All data will be exported to a JSON file from which data can be restored in future
                     </div>
                     <div class="col-auto zero-margin zero-padding mt-2 w-100">
                         <button class="btn btn-primary backup-btn">Export extension data to JSON file</button>
                     </div>
                 </div>
-                <div class="section-heading mt-3">
+                <div class="section-heading mt-4">
                     Reset
                 </div>
                 <div class="row flex settings-section align-contents-center mb-2">
@@ -173,16 +160,46 @@
                     </ul>
                     <div class="tab-content mt-2">
                         <div class="tab-pane fade show active" id="sites" role="tabpanel">
-                          <ul class="index-list" id="sites-list">
-                          </ul>
+                            <ul class="index-list" id="sites-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No site rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                         <div class="tab-pane fade" id="urls" role="tabpanel">
-                          <ul class="index-list" id="urls-list">
-                          </ul>
+                            <ul class="index-list" id="urls-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No URL rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                         <div class="tab-pane fade" id="regex" role="tabpanel">
-                          <ul class="index-list" id="regex-list">
-                          </ul>
+                            <ul class="index-list" id="regex-list">
+                                <div class="row justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+                                        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+                                    </svg>
+                                </div>
+                                <div class="row justify-contents-center text-center">
+                                    <div class="warn-text-2">
+                                        No RegEx rules found.
+                                    </div>
+                                </div>
+                            </ul>
                         </div>
                     </div>
                 </div>

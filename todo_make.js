@@ -30,6 +30,10 @@ function loadCustomBackground() {
   });
 }
 
+function generateRandomId() {
+  return Math.floor(Math.random() * 1000);
+}
+
 function getTasksObj() {
   return new Promise((resolve) => {
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -570,7 +574,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     if (tagName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
         const timestamp = new Date().getTime();
-        const randomId = Math.floor(Math.random() * 1000);
+        const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
         data.tags[newTag] = {
@@ -712,7 +716,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
       const existingTasks = result.tasks || {};
-      const taskId = Date.now() + taskTitle;
+      const taskId = Date.now() + generateRandomId().toString();
       existingTasks[taskId] = {
         title: taskTitle,
         description: taskDescription,

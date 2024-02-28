@@ -4,12 +4,19 @@ const defaultRegexList = [
   '^https://quip-amazon\.com/.*$',
   '^https://quip\.com/.*$',
 ];
-
+let curTags = null;
+let curNotes = null;
 let curTasks = null;
+let curIndexEntries = null;
+const maxStringLength = 64;
 const taskList = $('#selective-task-list');
 
 function hideLists() {
   taskList.hide();
+}
+
+function removeHash() { 
+    history.pushState("", document.title, window.location.pathname + window.location.search);
 }
 
 function exportAll() {
@@ -22,6 +29,10 @@ function exportAll() {
     downloadLink.download = 'todomake_backup_data.json';
     downloadLink.click();
   });
+}
+
+function constrainStringLength(inputString, length) {
+  return inputString.length > length ? `${inputString.substring(0, length)}...` : inputString;
 }
 
 function overwriteTasks(tasks) {
@@ -59,19 +70,21 @@ function retrieveSitesList() {
   chrome.storage.local.get(['allowedSites'], (result) => {
     const storedSiteList = result.allowedSites;
     const sitesList = storedSiteList || [];
-    $('#sites-list').empty();
-    Object.values(sitesList).forEach((expr) => {
-      $('#sites-list').append(`
-        <div class="row sites-item align-items-center mt-2"> 
-            <div class="col-8">${expr}</div>
-            <div class="col-4 d-flex justify-content-end">
-                <button class="btn btn-danger sites-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
-                  Delete
-                </button>
-            </div>
-        </div>
-      `);
-    });
+    if (sitesList.length > 0) {
+      $('#sites-list').empty();
+      Object.values(sitesList).forEach((expr) => {
+        $('#sites-list').append(`
+          <div class="row sites-item align-items-center mt-2"> 
+              <div class="col-8">${expr}</div>
+              <div class="col-4 d-flex justify-content-end">
+                  <button class="btn btn-danger sites-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                    Delete
+                  </button>
+              </div>
+          </div>
+        `);
+      });
+    }
   });
 }
 
@@ -79,19 +92,21 @@ function retrieveUrlsList() {
   chrome.storage.local.get(['allowedURLs'], (result) => {
     const storedUrlsList = result.allowedURLs;
     const urlsList = storedUrlsList || [];
-    $('#urls-list').empty();
-    Object.values(urlsList).forEach((expr) => {
-      $('#urls-list').append(`
-        <div class="row urls-item align-items-center mt-2"> 
-            <div class="col-8">${expr}</div>
-            <div class="col-4 d-flex justify-content-end">
-                <button class="btn btn-danger urls-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
-                  Delete
-                </button>
-            </div>
-        </div>
-      `);
-    });
+    if (urlsList.length > 0) {
+      $('#urls-list').empty();
+      Object.values(urlsList).forEach((expr) => {
+        $('#urls-list').append(`
+          <div class="row urls-item align-items-center mt-2"> 
+              <div class="col-8">${expr}</div>
+              <div class="col-4 d-flex justify-content-end">
+                  <button class="btn btn-danger urls-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                    Delete
+                  </button>
+              </div>
+          </div>
+        `);
+      });
+    }
   });
 }
 
@@ -99,19 +114,21 @@ function retrieveRegexList() {
   chrome.storage.local.get(['allowedRegex'], (result) => {
     const storedRegexList = result.allowedRegex;
     const regexList = storedRegexList || [];
-    $('#regex-list').empty();
-    Object.values(regexList).forEach((expr) => {
-      $('#regex-list').append(`
-        <div class="row regex-item align-items-center mt-2"> 
-            <div class="col-8">${expr}</div>
-            <div class="col-4 d-flex justify-content-end">
-                <button class="btn btn-danger regex-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
-                  Delete
-                </button>
-            </div>
-        </div>
-      `);
-    });
+    if (regexList.length > 0) {
+      $('#regex-list').empty();
+      Object.values(regexList).forEach((expr) => {
+        $('#regex-list').append(`
+          <div class="row regex-item align-items-center mt-2"> 
+              <div class="col-8">${expr}</div>
+              <div class="col-4 d-flex justify-content-end">
+                  <button class="btn btn-danger regex-del" rule-to-del="${expr}" data-bs-toggle="modal" data-bs-target="#deleteRuleModal">
+                    Delete
+                  </button>
+              </div>
+          </div>
+        `);
+      });
+    }
   });
 }
 
@@ -139,41 +156,54 @@ function deleteRule(ruleLoc, rule) {
   });
 }
 
-function showTasks(tasks) {
-  const selectiveList = $('.selective-list.task-list');
+function showNotes(notes) {
+  const selectiveList = $('#notes-selection-list');
   selectiveList.empty();
+
+  $.each(notes, (key, value) => {
+    const title = `Title: ${value.title}`;
+    const constrainedContent = constrainStringLength(value.content, maxStringLength);
+    const content = `Content: ${constrainedContent}`;
+    selectiveList.append(`
+      <div class="row zero-margin zero-padding align-items-center mb-2">
+        <input class="d-block backup-checkbox" forNoteId="${key}" type="checkbox"> ${title} <br> ${content}
+      </div>
+    `);
+  });
+  curNotes = notes;
+}
+
+function showTasks(tasks) {
+  const selectiveList = $('#tasks-selection-list');
+  selectiveList.empty();
+
   $.each(tasks, (key, value) => {
-    const taskDiv = $('<div>').addClass('task-row');
     const title = `Title: ${value.title}`;
     const desc = `Description: ${value.description}`;
-    const due = `Due: ${value.due}`;
-    taskDiv.append(
-      $('<label>').html(`${title}<br />${desc}<br />${due}`)
-        .prepend(
-          $('<input>').attr('type', 'checkbox').val(key)
-            .prop('checked', false)
-            .addClass('selective-checkbox'),
-        ),
-    );
-    selectiveList.append(taskDiv);
+    const dueDate = new Date(value.due);
+    const parts = dueDate.toLocaleString().split(',');
+    const due = `Due: ${parts[0]}, at${parts[1]}`;
+    selectiveList.append(`
+      <div class="row zero-margin zero-padding align-items-center mb-2">
+        <input class="d-block backup-checkbox" forTask="${key}" type="checkbox"> ${title} <br> ${desc} <br> ${due}
+      </div>
+    `);
   });
-  $('.selective-task-list-col').css('display', 'block');
   curTasks = tasks;
 }
 
-function restoreSelectedTasks() {
-  if (curTasks) {
-    const toRestore = [];
-    const selectiveList = $('.selective-list.task-list');
-    selectiveList.find('.selective-checkbox').each(function _() {
-      const elt = $(this);
-      if (elt.is(':checked')) {
-        const taskId = elt.val();
-        toRestore.push({ ...curTasks[taskId] });
-      }
-    });
-    overwriteTasks(toRestore);
-  }
+function showIndexEntries(indexEntries) {
+  const selectiveList = $('#index-selection-list');
+  selectiveList.empty();
+
+  $.each(indexEntries[0], (key) => {
+    selectiveList.append(`
+      <div class="row zero-margin zero-padding align-items-center mb-2">
+        <input class="d-block backup-checkbox" forIndexEntryId="${key}" type="checkbox"> ${indexEntries[1][key]} <br>
+      </div>
+    `);
+  });
+  curIndexEntries = indexEntries;
 }
 
 function overwriteIndex(indexArray) {
@@ -189,6 +219,52 @@ function overwriteIndex(indexArray) {
 function overwriteNotes(notesArray) {
   chrome.storage.local.set({ notes: notesArray }, () => {
   });
+}
+
+function restoreSelectedTasks() {
+  if (curTasks) {
+    const toRestore = [];
+    const selectiveList = $('#tasks-selection-list');
+    selectiveList.find('.backup-checkbox').each(function _() {
+      const elt = $(this);
+      if (elt.is(':checked')) {
+        const key = elt.attr('forTask');
+        toRestore.push({ ...curTasks[key] });
+      }
+    });
+    overwriteTasks(toRestore);
+  }
+}
+
+function restoreSelectedNotes() {
+  if (curNotes) {
+    const toRestore = [];
+    const selectiveList = $('#notes-selection-list');
+    selectiveList.find('.backup-checkbox').each(function _() {
+      const elt = $(this);
+      if (elt.is(':checked')) {
+        const key = elt.attr('forNoteId');
+        toRestore.push({ ...curNotes[key] });
+      }
+    });
+    overwriteNotes(toRestore);
+  }
+}
+
+function restoreSelectedIndexEntries() {
+  if (curIndexEntries) {
+    const toRestore = [[], []];
+    const selectiveList = $('#index-selection-list');
+    selectiveList.find('.backup-checkbox').each(function _() {
+      const elt = $(this);
+      if (elt.is(':checked')) {
+        const key = elt.attr('forIndexEntryId');
+        toRestore[0].push({ ...curIndexEntries[0][key] });
+        toRestore[1].push(curIndexEntries[1][key]);
+      }
+    });
+    overwriteIndex(toRestore);
+  }
 }
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
@@ -314,12 +390,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }, 1000);
     });
 
-    $(document).on('click', '.btn.btn-primary.restore-tasks-btn', (event) => {
+    $(document).on('click', '.btn.btn-primary.restore-selection-btn', (event) => {
       const $restoreBtn = $(event.currentTarget);
+      restoreTags(curTags);
+      restoreSelectedNotes();
       restoreSelectedTasks();
-      $restoreBtn.text('Restored!');
+      restoreSelectedIndexEntries();
+      $restoreBtn.text('Restored selected data!');
       setTimeout(() => {
-        $restoreBtn.text('Perform overwriting restore with selection');
+        $restoreBtn.text('Perform overwriting restore of selected data');
       }, 1000);
     });
 
@@ -354,6 +433,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $entry.addClass('selected');
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
+      removeHash();
     }
 
     $(document).on('change', '#jsonAllInput', (event) => {
@@ -363,11 +443,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
-          const { tasks } = content;
           if (Object.prototype.hasOwnProperty.call(content, 'tags')) {
             restoreTags(content.tags);
           }
-          overwriteTasks(tasks);
+          if (Object.prototype.hasOwnProperty.call(content, 'tasks')) {
+            const { tasks } = content;
+            overwriteTasks(tasks);
+          }
           if (Object.prototype.hasOwnProperty.call(content, 'indexed')) {
             const indexArray = Object.values(content.indexed);
             overwriteIndex(indexArray);
@@ -398,7 +480,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
     });
 
-    $(document).on('change', '#jsonInputSelective', (event) => {
+    $(document).on('change', '#jsonSelectiveInput', (event) => {
       const selectedFile = event.target.files[0];
 
       if (selectedFile) {
@@ -406,10 +488,26 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
 
+          if (Object.prototype.hasOwnProperty.call(content, 'tags')) {
+            curTags = content.tags;
+          }
+
           if (Object.prototype.hasOwnProperty.call(content, 'tasks')) {
             const tasksArray = Object.values(content.tasks);
             showTasks(tasksArray);
           }
+
+          if (Object.prototype.hasOwnProperty.call(content, 'notes')) {
+            const notesArray = Object.values(content.notes);
+            showNotes(notesArray);
+          }
+
+          if (Object.prototype.hasOwnProperty.call(content, 'indexed')) {
+            const indexArray = Object.values(content.indexed);
+            showIndexEntries(indexArray);
+          }
+
+          $('#backup-select-col').removeClass('d-none');
         };
         reader.readAsText(selectedFile);
       }
