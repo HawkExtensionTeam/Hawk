@@ -136,7 +136,7 @@ test('Test the restore of Tags and Tasks', async () => {
   });
 });
 
-test('Check if alarm of taskis reinstate', async () => {
+test('Check if alarm of task is reinstated', async () => {
 
   // Check if the alarm exists
   const alarmExists = await page.evaluate(() =>{
