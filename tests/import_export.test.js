@@ -83,7 +83,7 @@ test('Test the restore of notes', async () => {
   }));
   expect(updatedNotes).toMatchObject([
     {
-      content: 'Test Note ',
+      content: 'Test Note \n1. test\n2. test\n![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/1200px-Test-Logo.svg.png)\n> test\n# test\n*test*',
       id: '1708876013999',
       title: 'Test Note',
     },
@@ -117,7 +117,7 @@ test('Test the restore of Tags and Tasks', async () => {
   expect(updatedTasks).toMatchObject({
     '1708875969067Test Task 1': {
       description: 'Test Description',
-      due: '2024-02-25T15:45:00.000Z',
+      due: '2999-02-25T15:45:00.000Z',
       id: '1708875969067Test Task 1',
       recentlyDeleted: false,
       scheduledDeletion: '',
@@ -136,10 +136,24 @@ test('Test the restore of Tags and Tasks', async () => {
   });
 });
 
+test('Check if alarm of task is reinstated', async () => {
+
+  // Check if the alarm exists
+  const alarmExists = await page.evaluate(() =>{
+    return chrome.alarms.get('1708875969067Test Task 1_deletion_alarm') !== undefined;
+  });
+
+  expect(alarmExists).toBe(true);
+});
+
+
 const fs = require('fs');
 const path = require('path');
-
 const downloadPath = path.resolve('./download');
+
+function normalizeLineEndings(text) {
+  return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+}
 
 test('Test the export of Index', async () => {
   const client = await page.target().createCDPSession();
@@ -161,11 +175,11 @@ test('Test the export of Index', async () => {
 
   const filePath = path.join(downloadPath, expectedFileName);
 
-  const fileContent = fs.readFileSync(filePath, 'utf8');
+  const fileContent = normalizeLineEndings(fs.readFileSync(filePath, 'utf8'));
 
   const expectedContentFilePath = TESTDATA;
 
-  const expectedContent = fs.readFileSync(expectedContentFilePath, 'utf8');
+  const expectedContent = normalizeLineEndings(fs.readFileSync(expectedContentFilePath, 'utf8'));
 
   expect(fileContent).toEqual(expectedContent);
 

@@ -6,6 +6,7 @@
     "^https://quip.com/.*$"
   ],
   "allowedSites": [],
+  "allowedStringMatches": [],
   "allowedURLs": [],
   "indexed": {
     "corpus": [
@@ -22,7 +23,7 @@
   },
   "notes": [
     {
-      "content": "Test Note ",
+      "content": "Test Note \n1. test\n2. test\n![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/1200px-Test-Logo.svg.png)\n> test\n# test\n*test*",
       "id": "1708876013999",
       "title": "Test Note"
     }
@@ -36,7 +37,7 @@
   "tasks": {
     "1708875969067Test Task 1": {
       "description": "Test Description",
-      "due": "2024-02-25T15:45:00.000Z",
+      "due": "2999-02-25T15:45:00.000Z",
       "id": "1708875969067Test Task 1",
       "recentlyDeleted": false,
       "scheduledDeletion": "",
