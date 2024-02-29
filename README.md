@@ -38,7 +38,7 @@ All types of rules can be added and deleted. If you choose to remove all data an
 
 #### How Pages Are Indexed
 
-When a page is indexed, the title and content is stored in local Chrome storage after stopwords in the page's content are removed to reduce unnecessary storage size.
+When a page is indexed, the title and content are stored in local Chrome storage after stopwords in the page's content are removed to reduce unnecessary storage size.
 
 The amazon-quip.com site is also indexed by default, but there is a 10 second delay to handle redirects. Pages on amazon-quip.com are polled every minute to update the indexed contents, overwriting the old contents.
 
