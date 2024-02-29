@@ -22,7 +22,7 @@ To access the extension:
 
 #### Indexing Rules
 
-The extension's indexer will store the title and contents of certain pages. By default the following regex rules apply:
+The extension's indexer will store the title and contents of certain pages. By default, the following regex rules apply:
 - ^https://[^/]+.amazon.com/.*$
 - ^https://atoz.amazon.work/.*$
 - ^https://quip-amazon.com/.*$
@@ -34,20 +34,20 @@ There are four types of rules that can be used to trigger indexing:
 - String matching allow listing
 - Regex allow listing
 
-All type of rules can be added and deleted. If you choose to remove all data and reset extension settings, the rules will be reset to the default four regex rules shown previously.
+All types of rules can be added and deleted. If you choose to remove all data and reset extension settings, the rules will be reset to the default four regex rules shown previously.
 
 #### How Pages Are Indexed
 
-When a page is indexed the title and content is stored in local chrome storage after stopwords in the page's content are removed to reduce unnecessary storage size.
+When a page is indexed, the title and content is stored in local Chrome storage after stopwords in the page's content are removed to reduce unnecessary storage size.
 
-The amazon-quip website is also indexed by default, but there is a 10 second delay to handle redirects. Pages on amazon-quip are polled every minute to update the indexed contents, overwriting the old contents.
+The amazon-quip.com site is also indexed by default, but there is a 10 second delay to handle redirects. Pages on amazon-quip.com are polled every minute to update the indexed contents, overwriting the old contents.
 
 #### Searching Indexed Documents
 
-To begin searching for indexed pages, type "@i" in the omnibar and then hit tab. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query. Searching uses a [BM25F](https://github.com/winkjs/wink-bm25-text-search) implemenation by default, using a popular implementation of BM25 called [MiniSearch](https://github.com/lucaong/minisearch/blob/master/DESIGN_DOCUMENT.md) if BM25F provides no results or if search filtering is applied.
+To begin searching for indexed pages, type "@i" in the omnibar and then hit Tab. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query. Searching uses a [BM25F](https://github.com/winkjs/wink-bm25-text-search) implementation by default, using a popular implementation of BM25 called [MiniSearch](https://github.com/lucaong/minisearch/blob/master/DESIGN_DOCUMENT.md) if BM25F provides no results or if search filtering is applied.
 
 Both algorithms improve on TF-IDF and work on basic principles for scoring documents:
-- The higher the frequency a term within a document, the higher the score
+- The higher the frequency a term has within a document, the higher the score
 - The less frequent a term is within all documents, a document with this term has a higher score
 - The longer the term, the higher the score for documents containing this term
 
