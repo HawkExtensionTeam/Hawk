@@ -498,12 +498,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
 
     if (window.location.hash) {
-      const $entry = $(window.location.hash);
+      const $entry = $(window.location.hash.slice(0, -1));
+      removeHash();
       $('.settings-entry').removeClass('selected');
       $entry.addClass('selected');
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
-      removeHash();
     }
 
     $(document).on('change', '#jsonAllInput', (event) => {
