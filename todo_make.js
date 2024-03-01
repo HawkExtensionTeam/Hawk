@@ -271,13 +271,13 @@ function updateChecklist(tasks, onlyRd) {
             <div class="row">
               <div class="col capped">
                 <div class="row">
-                  <label class="${label} task-title" for="item${taskId}">${taskTitle}</label>
+                  <label class="${label} task-title">${taskTitle}</label>
                 </div>
                 <div class="row">
-                  <label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+                  <label class="${label} task-desc">${task.description}</label>
                 </div>
                 <div class="row">
-                  <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
+                  <label class="${label} task-due">${formattedDueDate}</label>
                 </div>
                 <div class="row tag-cont cont-clear">
                   ${tagElements}
@@ -491,13 +491,13 @@ function addTaskToChecklist(taskId) {
                 <div class="row">
                   <div class="col capped">
                     <div class="row">
-                      <label class="${label} task-title" for="item${taskId}">${task.title}</label>
+                      <label class="${label} task-title">${task.title}</label>
                     </div>
                     <div class="row">
-                      <label class="${label} task-desc" for="item${taskId}">${task.description}</label>
+                      <label class="${label} task-desc">${task.description}</label>
                     </div>
                     <div class="row">
-                      <label class="${label} task-due" for="item${taskId}">${formattedDueDate}</label>
+                      <label class="${label} task-due">${formattedDueDate}</label>
                     </div>
                     <div class="row tag-cont cont-clear">
                       ${tagElements}

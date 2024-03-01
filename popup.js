@@ -66,8 +66,8 @@ function updateChecklist(existingTasks) {
                 <input type="checkbox" class="form-check-input" id="item${task.id}">
                 <div class="container mt-1">
                   <div class="row">
-                    <label class="emphasis-label ${label}" for="item${task.id}">${task.title}</label>
-                    <label class="${label}" for="item${task.id}">${formattedDueDate}</label>
+                    <label class="emphasis-label ${label}">${task.title}</label>
+                    <label class="${label}">${formattedDueDate}</label>
                   </div>
                 </div>
               </div>
