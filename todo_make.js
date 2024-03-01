@@ -3,6 +3,19 @@ let currentlyAllFalse = true;
 let tasksObj = {};
 let tagsObj = {};
 
+const noTasks = `
+  <div class="row justify-content-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+      </svg>
+  </div>
+  <div class="row justify-contents-center text-center">
+      <div class="warn-text-2">
+          No tasks found.
+      </div>
+  </div>
+`;
+
 function getCorrectTextColour(colour) {
   const r = parseInt(colour.substring(1, 3), 16);
   const g = parseInt(colour.substring(3, 5), 16);
@@ -135,19 +148,19 @@ function sortTasks(tasks) {
   return sortedTasks;
 }
 
-function updateChecklist(tasks) {
-  const noTasks = `
-    <div class="row justify-content-center">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
-        </svg>
-    </div>
-    <div class="row justify-contents-center text-center">
-        <div class="warn-text-2">
-            No tasks found.
-        </div>
-    </div>
-  `;
+function setTaskDeleted(allTasks, task) {
+  const now = new Date();
+  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
+  const alarmName = `${task.id}_deletion_alarm`;
+  task.recentlyDeleted = true;
+  task.scheduledDeletion = deletionDate.toISOString();
+  chrome.storage.local.set({ tasks: allTasks }, () => {
+    chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
+    tasksObj = allTasks;
+  });
+}
+
+function updateChecklist(tasks, onlyRd) {
   const noRdTasks = `
     <div class="row justify-content-center">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
@@ -162,12 +175,14 @@ function updateChecklist(tasks) {
   `;
   const checklist = $('#checklist-2');
   const rdChecklist = $('#rd-checklist');
-  checklist.empty(); // Clear existing items
+  if (!onlyRd) {
+    checklist.empty(); // Clear existing items
+  }
   rdChecklist.empty();
   const sortedTasks = sortTasks(tasks);
   const allTagsFalse = areAllTagsFalse();
   const now = new Date();
-  if (getNonDeletedCount(tasks) === 0) {
+  if (getNonDeletedCount(tasks) === 0 && !onlyRd) {
     checklist.append(noTasks);
   }
   if (getDeletedCount(tasks) === 0) {
@@ -179,6 +194,8 @@ function updateChecklist(tasks) {
     if (allTagsFalse || checkTagsAgainstFilter(task)) {
       if (task.recentlyDeleted) {
         toInsert = rdChecklist;
+      } else if (onlyRd) {
+        return;
       }
       const dueDate = new Date(task.due);
       const parts = dueDate.toLocaleString().split(',');
@@ -276,6 +293,55 @@ function updateChecklist(tasks) {
     setTimeout(() => {
       $('.checklist-item').addClass('appear');
     }, 200);
+    $('.form-check-input').on('click', function _() {
+      const associatedTaskId = $(this).attr('id').slice(4);
+      const item = $(this).closest('.form-check-2');
+      const outerItem = $(this).closest('.checklist-item');
+      let step = item.data('step') || 0;
+      clearInterval(item.data('interval'));
+      if ($(this).is(':checked')) {
+        const interval = setInterval(() => {
+          if (step <= 1000) {
+            item.css({
+              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+            });
+            step += 1;
+            item.data('step', step);
+          } else {
+            clearInterval(interval);
+            chrome.storage.local.get({ tasks: {} }, (result) => {
+              const existingTasks = result.tasks || {};
+              setTaskDeleted(existingTasks, existingTasks[associatedTaskId]);
+              outerItem.remove();
+              if ($('#checklist-2').children().length === 0) {
+                $('#checklist-2').append(noTasks);
+              }
+              updateChecklist(existingTasks, true);
+            });
+          }
+        }, 5);
+        item.data('interval', interval);
+      } else {
+        const interval = setInterval(() => {
+          if (step > 0) {
+            item.css({
+              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+            });
+            step -= 20;
+            if (step < 0) {
+              step = 0;
+            }
+            item.data('step', step);
+          } else {
+            item.css({
+              background: 'linear-gradient(to right, #ff000036 0%, #dddddda3 0%)',
+            });
+            clearInterval(interval);
+          }
+        }, 5);
+        item.data('interval', interval);
+      }
+    });
   });
 }
 
@@ -283,19 +349,6 @@ function getTasks() {
   $.when(chrome.storage.local.get({ tasks: [] })).done((result) => {
     const existingTasks = result.tasks || [];
     updateChecklist(existingTasks);
-  });
-}
-
-function setTaskDeleted(allTasks, task) {
-  const now = new Date();
-  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-  const alarmName = `${task.id}_deletion_alarm`;
-  task.recentlyDeleted = true;
-  task.scheduledDeletion = deletionDate.toISOString();
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-    tasksObj = allTasks;
-    updateChecklist(allTasks);
   });
 }
 
@@ -662,6 +715,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const existingTasks = result.tasks || {};
       const taskId = $delBtn.attr('delete-task-id');
       setTaskDeleted(existingTasks, existingTasks[taskId]);
+      updateChecklist(existingTasks);
     });
   });
 
@@ -791,6 +845,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         };
 
         $.when(chrome.storage.local.set({ tasks: existingTasks })).done(() => {
+          if (editedDueDate > new Date()) {
+            chrome.alarms.clear(taskIdToEdit);
+            chrome.alarms.create(taskIdToEdit, { when: editedDueDate.getTime() });
+          }
           updateChecklist(existingTasks);
           tasksObj = existingTasks;
         });
