@@ -606,6 +606,14 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   getTasks();
   populateTags();
 
+  chrome.runtime.onMessage.addListener(
+    (request) => {
+      if (request === 'wallpaper') {
+        loadCustomBackground();
+      }
+    },
+  );
+
   $(document).on('click', '.show-create-tag-modal-btn', () => {
     $('#tagName').val('');
     $('#tagColour').val('');
@@ -841,6 +849,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           description: editedTaskDescription,
           due: editedDueDate.toISOString(),
           tags: selectedTags,
+          recentlyDeleted: false,
+          scheduledDeletion: '',
           id: taskIdToEdit,
         };
 

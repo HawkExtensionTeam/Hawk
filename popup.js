@@ -1,3 +1,48 @@
+let currentURL = '';
+
+function checkSitesList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedSites'], (result) => {
+      const storedSiteList = result.allowedSites;
+      const sitesList = storedSiteList || [];
+      const currentHostname = new URL(currentURL).hostname;
+      resolve(sitesList.includes(currentHostname));
+    });
+  });
+}
+
+function checkUrlsList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedURLs'], (result) => {
+      const storedUrlsList = result.allowedURLs;
+      const urlsList = storedUrlsList || [];
+      resolve(urlsList.includes(currentURL));
+    });
+  });
+}
+
+function checkStringMatchesList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedStringMatches'], (result) => {
+      const storedMatchesList = result.allowedStringMatches;
+      const matchesList = storedMatchesList || [];
+      resolve(matchesList.some((match) => currentURL.indexOf(match) > -1));
+    });
+  });
+}
+
+function checkRegexList() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['allowedRegex'], (result) => {
+      const storedRegexList = result.allowedRegex;
+      const regexList = storedRegexList || [];
+
+      const isMatch = regexList.some((regex) => new RegExp(regex).test(currentURL));
+      resolve(isMatch);
+    });
+  });
+}
+
 function allDeleted(allTasks) {
   let allRecentlyDeleted = true;
   Object.keys(allTasks).forEach((key) => {
@@ -127,8 +172,21 @@ function updateChecklist(existingTasks) {
   }
 }
 
+async function getCurrentTab() {
+  const queryOptions = { active: true, currentWindow: true };
+  const [tab] = await chrome.tabs.query(queryOptions);
+  currentURL = tab.url;
+}
+
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
+    getCurrentTab();
+    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
+      .then((results) => {
+        if (results.some((result) => result)) {
+          $('#indexing-indicator').addClass('enabled');
+        }
+      });
     $('#todo-list-button').on('click', () => {
       chrome.tabs.create({ url: 'todo_list.html' });
     });

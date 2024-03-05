@@ -66,7 +66,7 @@ function constrainStringLength(inputString, length) {
 function overwriteTasks(tasks) {
   const currentDate = new Date();
   const tasksArray = Object.values(tasks);
-  const filteredTasks = tasksArray.filter((task) => (task.scheduledDeletion === '') || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
+  const filteredTasks = tasksArray.filter((task) => (task.recentlyDeleted === false) || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
   const newTasks = {};
   filteredTasks.forEach((task) => {
     newTasks[task.id] = task;
@@ -501,6 +501,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $(document).on('click', '.btn.btn-primary.background-reset-btn', () => {
       chrome.storage.local.set({ bg: '' }, () => {
         updateWallpaperPreview();
+        chrome.runtime.sendMessage(null, 'wallpaper');
       });
     });
 
@@ -511,6 +512,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           chrome.storage.local.set({ bg: e.target.result }, () => {
             updateWallpaperPreview();
+            chrome.runtime.sendMessage(null, 'wallpaper');
           });
         };
         reader.readAsDataURL(selectedFile);

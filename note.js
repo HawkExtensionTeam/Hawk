@@ -32,6 +32,14 @@ $(() => {
 
   loadCustomBackground();
 
+  chrome.runtime.onMessage.addListener(
+    (request) => {
+      if (request === 'wallpaper') {
+        loadCustomBackground();
+      }
+    },
+  );
+
   function viewNote(note) {
     const noteTitle = document.getElementById('titleDisplay');
     const noteContent = document.getElementById('contentDisplay');
