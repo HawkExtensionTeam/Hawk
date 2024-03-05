@@ -21,10 +21,13 @@ beforeAll(async () => {
   await page.goto('chrome://extensions');
 
   EXTENSION_ID = await page.evaluate(() => {
-    const extensionsItemElement = document.querySelector('body > extensions-manager')
+    const extensionsItemElement = document
+      .querySelector('body > extensions-manager')
       ?.shadowRoot.querySelector('#items-list')
       ?.shadowRoot.querySelector('extensions-item');
-    return extensionsItemElement ? extensionsItemElement.getAttribute('id') : null;
+    return extensionsItemElement
+      ? extensionsItemElement.getAttribute('id')
+      : null;
   });
 });
 
