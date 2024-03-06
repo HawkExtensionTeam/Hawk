@@ -24,10 +24,18 @@ function loadCustomBackground() {
   });
 }
 
-function loadAppearance() {
+function loadAppearance(usepreference) {
   $('.settings-container').addClass('changing');
   chrome.storage.local.get('theme', (result) => {
-    if (result.theme === 'dark') {
+    let decision = result.theme;
+    if (usepreference === true && window.matchMedia) {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        decision = 'dark';
+      } else {
+        decision = 'light';
+      }
+    }
+    if (decision === 'dark') {
       $('html').addClass('dark');
       $('html').attr('data-bs-theme', 'dark');
     } else {
@@ -365,7 +373,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     retrieveUrlsList();
     retrieveStringMatchesList();
     retrieveRegexList();
-    updateWallpaperPreview();
+    setTimeout(() => {
+      updateWallpaperPreview();
+    }, 100);
     $('#rule-search').on('input', function _() {
       const query = $(this).val();
       $('#urls-list, #sites-list, #string-matches-list, #regex-list').filter(function filterLists() {
@@ -541,6 +551,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
     });
 
+    chrome.storage.local.get('useprefer', (result) => {
+      if (result.useprefer === true) {
+        $('.sys-dark-toggle').attr('checked', true);
+        $('.dark-toggle').attr('disabled', true);
+      }
+    });
+
     $('.dark-toggle').on('click', () => {
       chrome.storage.local.get('theme', (result) => {
         if (result.theme === 'dark') {
@@ -552,9 +569,43 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         }
         chrome.runtime.sendMessage(null, 'wallpaper');
         chrome.runtime.sendMessage(null, 'theme');
-        loadAppearance();
+        loadAppearance(false);
         updateWallpaperPreview();
       });
+    });
+
+    $('.sys-dark-toggle').on('click', () => {
+      chrome.storage.local.get('useprefer', (result) => {
+        if (result.useprefer === true) {
+          chrome.storage.local.set({ useprefer: false }, () => {
+            $('.dark-toggle').removeAttr('disabled');
+            chrome.storage.local.get('theme', (result2) => {
+              if (result2.theme === 'dark') {
+                $('.dark-toggle').attr('checked', true);
+              } else {
+                $('.dark-toggle').attr('checked', false);
+              }
+              loadAppearance(false);
+            });
+          });
+        } else {
+          chrome.storage.local.set({ useprefer: true }, () => {
+            $('.dark-toggle').attr('disabled', true);
+            loadAppearance(true);
+          });
+        }
+        chrome.runtime.sendMessage(null, 'wallpaper');
+        chrome.runtime.sendMessage(null, 'theme');
+        setTimeout(() => {
+          updateWallpaperPreview();
+        }, 500);
+      });
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      setTimeout(() => {
+        updateWallpaperPreview();
+      }, 500);
     });
 
     $(document).on('change', '#backgroundInput', (event) => {

@@ -71,7 +71,13 @@ body, html {
 	max-width: 100%;
 	padding: 0!important;
 	overflow-x: hidden;
-  background-color: #2c2c2ca3;
+  background-color: #dddddda3;
+}
+
+@media (prefers-color-scheme: dark) {
+  body, html {
+    background-color: #2c2c2ca3;
+  }
 }
 
 body::-webkit-scrollbar {
