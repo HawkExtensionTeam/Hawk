@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "To-Do Make",
-  "description": "Base Level Extension",
+  "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
   "version": "1.0",
   "omnibox": { "keyword": "@i\t" },
   "permissions": [
@@ -11,7 +11,8 @@
     "unlimitedStorage",
     "webNavigation",
 		"notifications",
-		"alarms"
+		"alarms",
+    "tabs"
   ],
   "action": {
     "default_popup": "hello.html",
@@ -33,12 +34,7 @@
       ]
     },
     {
-      "matches": [
-        "https://*.amazon.com/*",
-        "https://atoz.amazon.work/*",
-        "https://quip-amazon.com/*",
-        "https://quip.com/*" 
-      ],
+      "matches": ["<all_urls>"],
       "js": [
         "assets/jquery-3.7.1.min.js",
         "send_content.js"
@@ -46,9 +42,9 @@
     }
   ],
 	"icons": {
-    "16": "logo16x16.png",
-    "32": "logo32x32.png",
-    "48": "logo48x48.png",
-    "128": "logo128x128.png"
+    "16": "images/logo16x16.png",
+    "32": "images/logo32x32.png",
+    "48": "images/logo48x48.png",
+    "128": "images/logo128x128.png"
   }
 }

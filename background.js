@@ -1,6 +1,8 @@
 import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
 
+const xmlEscape = require('xml-escape');
+
 let engine;
 const winkNLP = require('wink-nlp');
 const model = require('wink-eng-lite-web-model');
@@ -10,6 +12,17 @@ const { its } = nlp;
 const _ = require('lodash');
 
 const { removeStopwords } = require('stopword');
+
+const defaultRegexList = [
+  '^https://[^/]+\.amazon\.com/.*$',
+  '^https://atoz\.amazon\.work/.*$',
+  '^https://quip-amazon\.com/.*$',
+  '^https://quip\.com/.*$',
+];
+
+const TITLE_BOOST = 3;
+const MIN_SEARCH_TERM_LENGTH = 3;
+const DEFAULT_WEIGHT = 0.2;
 
 const prepTask = function prepTask(text) {
   const tokens = [];
@@ -64,11 +77,31 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         const suggestions = [];
         let searchResults = [];
 
-        if (corpus.length >= 3) {
+        let combinator;
+        let searchTerms = text.split(' ');
+        const lastTerm = searchTerms[searchTerms.length - 1];
+        switch (lastTerm) {
+          case '&':
+            combinator = 'AND';
+            break;
+          case '~':
+            combinator = 'AND_NOT';
+            break;
+          default:
+            combinator = null;
+            break;
+        }
+
+        if (combinator && searchTerms.length) {
+          searchTerms = searchTerms.slice(0, searchTerms.length - 1);
+          text = searchTerms.join(' ');
+        }
+
+        if (corpus.length >= MIN_SEARCH_TERM_LENGTH && !combinator) {
           searchResults = runningEngine.search(text);
-          for (let i = 0; i < 10; i += 1) {
-            if (i === searchResults.length) break;
-            const page = corpus[searchResults[i][0] - 1];
+          for (let docID = 0; docID < 10; docID += 1) {
+            if (docID === searchResults.length) break;
+            const page = corpus[searchResults[docID][0] - 1];
             suggestions.push({
               content: page.url,
               description: page.title,
@@ -78,14 +111,23 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         }
 
         if (!suggestions.length) {
-          searchResults = miniSearch.search(text, {
-            boost: { title: 3 },
-            prefix: (term) => term.length > 3,
-            fuzzy: (term) => (term.length > 3 ? 0.2 : null),
-          });
-          for (let i = 0; i < 10; i += 1) {
-            if (i === searchResults.length) break;
-            const searchResult = searchResults[i];
+          if (combinator) {
+            searchResults = miniSearch.search(text, {
+              boost: { title: TITLE_BOOST },
+              prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
+              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
+              combineWith: combinator,
+            });
+          } else {
+            searchResults = miniSearch.search(text, {
+              boost: { title: 3 },
+              prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
+              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
+            });
+          }
+          for (let docID = 0; docID < 10; docID += 1) {
+            if (docID === searchResults.length) break;
+            const searchResult = searchResults[docID];
             const page = corpus[searchResult.id - 1];
             suggestions.push({
               content: page.url,
@@ -116,7 +158,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   chrome.storage.local.get('tasks').then((result) => {
     const existingTasks = result || {};
     const foundTask = existingTasks.tasks[alarm.name];
-    if (Object.keys(existingTasks).length !== 0 && foundTask) {
+    if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
       const notification = {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
@@ -164,9 +206,14 @@ function setURL(request) {
   });
 }
 
+function removeAnchorLink(url) {
+  return url.split('#')[0];
+}
+
 chrome.runtime.onMessage.addListener(async (request) => {
   if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
-    const url = await setURL(request);
+    let url = await setURL(request);
+    url = removeAnchorLink(url);
     const tabs = await new Promise((resolve) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
         resolve(allTabs);
@@ -185,7 +232,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
           const page = {
             id: indexed.corpus.length + 1,
             url,
-            title: tabs[0].title,
+            title: xmlEscape(tabs[0].title),
             body: request.visibleTextContent,
           };
 
@@ -223,5 +270,27 @@ chrome.runtime.onMessage.addListener(async (request) => {
       miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
     });
     setupBM25F();
+  }
+});
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.storage.local.set({ allowedSites: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedURLs: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedStringMatches: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
+    });
+  }
+
+  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    chrome.tabs.create({
+      url: 'settings.html#about',
+    });
   }
 });

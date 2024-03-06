@@ -9,26 +9,16 @@ $(() => {
   const addNoteButton = $('#add-note-button');
   const deleteButton = $('#delete');
   const addNote = $('#add-note');
+  const simplemde = new SimpleMDE({
+    element: editorElement[0],
+    spellChecker: false,
+    previewRender(plainText) {
+      return marked.parse(plainText);
+    },
+  });
   showNote.hide();
   save.hide();
   deleteButton.hide();
-
-  // function loadNoteInEditor(note, editor) {
-  //     titleElement.val(note.title);
-  //     editor.value(note.content);
-  // }
-
-  function loadCustomBackground() {
-    chrome.storage.local.get('bg', (result) => {
-      if (result.bg !== '' && result.bg !== undefined) {
-        $('body').css('background-image', `url(${result.bg})`);
-      } else {
-        $('body').css('background-image', 'url(\'../images/comic_bg.png');
-      }
-    });
-  }
-
-  loadCustomBackground();
 
   function viewNote(note) {
     const noteTitle = document.getElementById('titleDisplay');
@@ -86,6 +76,44 @@ $(() => {
     });
   }
 
+  function addNewNote(title, content) {
+    const noteId = Date.now().toString();
+
+    const note = {
+      id: noteId,
+      title,
+      content,
+    };
+
+    currentNote = note;
+
+    chrome.storage.local.get({ notes: [] }, (data) => {
+      const existingNotes = data.notes;
+
+      existingNotes.push(note);
+
+      chrome.storage.local.set({ notes: existingNotes }, () => {
+        titleElement.val('');
+        simplemde.value('');
+
+        updateNotesList(existingNotes);
+        viewNote(note);
+      });
+    });
+  }
+
+  $(document).on('change', '#jsonMdInput', (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileName = selectedFile.name;
+        addNewNote(fileName.substr(0, fileName.lastIndexOf('.')), e.target.result);
+      };
+      reader.readAsText(selectedFile);
+    }
+  });
+
   $('#search').on('input', function handleInput() {
     const searchValue = $(this).val().toLowerCase();
     $('#notes-list .note-item').filter(function filterNotes() {
@@ -97,112 +125,82 @@ $(() => {
     });
   });
 
-  if (editorElement.length > 0) {
-    const simplemde = new SimpleMDE({
-      element: editorElement[0],
-      spellChecker: false,
-      previewRender(plainText) {
-        return marked.parse(plainText);
-      },
-    });
+  addNoteButton.on('click', () => {
+    const title = titleElement.val();
+    const content = simplemde.value();
 
-    loadExistingNotes();
+    if (title.trim() === '' || content.trim() === '') {
+      alert('Both title and content must be filled out.');
+    } else {
+      addNewNote(title, content);
+    }
+  });
 
-    addNoteButton.on('click', () => {
-      const title = titleElement.val();
-      const content = simplemde.value();
+  addNote.on('click', () => {
+    noteForm.show();
+    showNote.hide();
+    save.hide();
+    addNoteButton.show();
+    simplemde.value('');
+    titleElement.val('');
+    deleteButton.hide();
+  });
 
-      if (title.trim() === '' || content.trim() === '') {
-        alert('Both title and content must be filled out.');
-      } else {
-        const noteId = Date.now().toString();
+  $('#edit').on('click', () => {
+    noteForm.show();
+    showNote.hide();
+    save.show();
+    addNoteButton.hide();
+    if (currentNote) {
+      titleElement.val(currentNote.title);
+      simplemde.value(currentNote.content);
+    }
+  });
 
-        const note = {
-          id: noteId,
-          title,
-          content,
-        };
+  $('#confirmDelete').on('click', () => {
+    if (currentNote) {
+      chrome.storage.local.get({ notes: [] }, (data) => {
+        const existingNotes = data.notes;
+        const updatedNotes = existingNotes.filter((note) => note.id !== currentNote.id);
 
-        currentNote = note;
+        chrome.storage.local.set({ notes: updatedNotes, currentNote: null }, () => {
+          const currentIndex = existingNotes.findIndex((note) => note.id === currentNote.id);
 
-        chrome.storage.local.get({ notes: [] }, (data) => {
-          const existingNotes = data.notes;
+          if (currentIndex !== -1 && updatedNotes.length > 0) {
+            const nextIndex = currentIndex < updatedNotes.length ? currentIndex : 0;
+            const nextNote = updatedNotes[nextIndex];
 
-          existingNotes.push(note);
-
-          chrome.storage.local.set({ notes: existingNotes }, () => {
-            titleElement.val('');
-            simplemde.value('');
-
-            updateNotesList(existingNotes);
-            viewNote(note);
-          });
+            currentNote = nextNote;
+            viewNote(nextNote);
+          } else {
+            currentNote = null;
+            addNote.trigger('click');
+          }
+          loadExistingNotes();
         });
-      }
-    });
+      });
+    }
+  });
 
-    addNote.on('click', () => {
-      noteForm.show();
-      showNote.hide();
-      save.hide();
-      addNoteButton.show();
-      simplemde.value('');
-      titleElement.val('');
-      deleteButton.hide();
-    });
-
-    $('#edit').on('click', () => {
-      noteForm.show();
-      showNote.hide();
-      save.show();
-      addNoteButton.hide();
-      if (currentNote) {
-        titleElement.val(currentNote.title);
-        simplemde.value(currentNote.content);
-      }
-    });
-
-    $('#confirmDelete').on('click', () => {
-      if (currentNote) {
-        chrome.storage.local.get({ notes: [] }, (data) => {
-          const existingNotes = data.notes;
-          const updatedNotes = existingNotes.filter((note) => note.id !== currentNote.id);
-
-          chrome.storage.local.set({ notes: updatedNotes, currentNote: null }, () => {
-            const currentIndex = existingNotes.findIndex((note) => note.id === currentNote.id);
-
-            if (currentIndex !== -1 && updatedNotes.length > 0) {
-              const nextIndex = currentIndex < updatedNotes.length ? currentIndex : 0;
-              const nextNote = updatedNotes[nextIndex];
-
-              currentNote = nextNote;
-              viewNote(nextNote);
-            } else {
-              currentNote = null;
-              addNote.trigger('click');
-            }
+  save.on('click', () => {
+    if (currentNote) {
+      currentNote.title = titleElement.val();
+      currentNote.content = simplemde.value();
+      chrome.storage.local.get({ notes: [] }, (data) => {
+        const existingNotes = data.notes;
+        const index = existingNotes.findIndex((note) => note.id === currentNote.id);
+        if (index !== -1) {
+          existingNotes[index] = currentNote;
+          chrome.storage.local.set({ notes: existingNotes }, () => {
+            viewNote(currentNote);
             loadExistingNotes();
           });
-        });
-      }
-    });
+        }
+      });
+    }
+  });
 
-    save.on('click', () => {
-      if (currentNote) {
-        currentNote.title = titleElement.val();
-        currentNote.content = simplemde.value();
-        chrome.storage.local.get({ notes: [] }, (data) => {
-          const existingNotes = data.notes;
-          const index = existingNotes.findIndex((note) => note.id === currentNote.id);
-          if (index !== -1) {
-            existingNotes[index] = currentNote;
-            chrome.storage.local.set({ notes: existingNotes }, () => {
-              viewNote(currentNote);
-              loadExistingNotes();
-            });
-          }
-        });
-      }
-    });
+  if (editorElement.length > 0) {
+    loadExistingNotes();
   }
 });
