@@ -120,5 +120,4 @@ describe('Utility Function Tests', () => {
     expect(getCorrectTextColour('#123456')).toBe('#ffffff');
   });
 
-  // Additional unit tests...
 });
