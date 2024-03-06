@@ -535,7 +535,7 @@ function deleteTag(allTags, tagIdToRemove) {
   }
   chrome.storage.local.set({ tags: allTags }, () => {
     removeTag(tagIdToRemove);
-    tagsObj = allTags;
+    tagsObj.tags = allTags;
   });
 }
 
@@ -639,11 +639,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(document).on('contextmenu', '#tag-select-target .tag-item', function _(e) {
     e.preventDefault();
     const associatedTag = $(this).attr('associatedtag');
-    const foundTagName = tagsObj.tags[associatedTag].tagName;
-    if (window.confirm(`Are you sure you want to delete the tag "${foundTagName}"?`)) {
-      chrome.storage.local.get({ tags: {} }, (data) => {
-        deleteTag(data.tags, associatedTag);
-      });
+    if (tagsObj !== undefined && tagsObj.tags !== undefined) {
+      const foundTagName = tagsObj.tags[associatedTag].tagName;
+      if (window.confirm(`Are you sure you want to delete the tag "${foundTagName}"?`)) {
+        chrome.storage.local.get({ tags: {} }, (data) => {
+          deleteTag(data.tags, associatedTag);
+        });
+      }
     }
   });
 
