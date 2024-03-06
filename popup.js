@@ -111,8 +111,8 @@ function updateChecklist(existingTasks) {
                 <input type="checkbox" class="form-check-input" id="item${task.id}">
                 <div class="container mt-1">
                   <div class="row">
-                    <label class="emphasis-label ${label}">${task.title}</label>
-                    <label class="${label}">${formattedDueDate}</label>
+                    <label class="emphasis-label ${label}" associatedTask="${task.id}">${task.title}</label>
+                    <label class="${label}" associatedTask="${task.id}">${formattedDueDate}</label>
                   </div>
                 </div>
               </div>
@@ -206,6 +206,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
+    });
+    chrome.alarms.onAlarm.addListener((alarm) => {
+      chrome.storage.local.get('tasks').then((result) => {
+        const existingTasks = result || {};
+        const foundTask = existingTasks.tasks[alarm.name];
+        if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
+          $(`label[associatedTask=${foundTask.id}]`).addClass('text-danger');
+        }
+      });
     });
   });
 }

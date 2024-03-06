@@ -127,15 +127,13 @@ function getDeletedCount(allTasks) {
 
 function sortTasks(tasks) {
   const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
-  tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
-  const sortedIds = tasksArray.map((task) => task.id);
-  const sortedTasks = [];
-  let idx = 0;
-  sortedIds.forEach((id) => {
-    sortedTasks[idx] = id;
-    idx += 1;
-  });
-  return sortedTasks;
+  const recentlyDeletedTasks = tasksArray.filter((task) => task.recentlyDeleted);
+  const remainingTasks = tasksArray.filter((task) => !task.recentlyDeleted);
+  recentlyDeletedTasks.sort((taskA, taskB) => new Date(taskA.scheduledDeletion)
+                                              - new Date(taskB.scheduledDeletion));
+  remainingTasks.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
+  const sortedTasks = recentlyDeletedTasks.concat(remainingTasks);
+  return sortedTasks.map((task) => task.id);
 }
 
 function setTaskDeleted(allTasks, task) {
@@ -846,5 +844,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
     });
     $('#editTaskModal').modal('hide');
+  });
+
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    chrome.storage.local.get('tasks').then((result) => {
+      const existingTasks = result || {};
+      const foundTask = existingTasks.tasks[alarm.name];
+      if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
+        $(`.checklist-item[associatedTask=${foundTask.id}]`).find('.form-check-label').addClass('text-danger');
+      }
+    });
   });
 }
