@@ -354,7 +354,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.string-matches-del', (event) => {
       const $delBtn = $(event.currentTarget);
-      $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
+      $('#deleteRuleModal').attr('rule-loc', 'allowedStringMatches');
       $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
     });
 
