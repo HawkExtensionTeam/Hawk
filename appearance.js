@@ -14,9 +14,12 @@ function loadCustomBackground() {
 
 function loadAppearance() {
   if (!first) {
+    $('.card-title-lg').addClass('changing');
     $('.card-title-md').addClass('changing');
     $('.note-container').addClass('changing');
     $('.settings-container').addClass('changing');
+    $('.filter-btn').addClass('changing');
+    $('.panel-lg').addClass('changing');
   } else {
     first = false;
   }
@@ -31,9 +34,12 @@ function loadAppearance() {
     loadCustomBackground();
   });
   setTimeout(() => {
+    $('.card-title-lg').removeClass('changing');
     $('.card-title-md').removeClass('changing');
     $('.note-container').removeClass('changing');
     $('.settings-container').removeClass('changing');
+    $('.filter-btn').removeClass('changing');
+    $('.panel-lg').removeClass('changing');
   }, 500);
 }
 
@@ -48,6 +54,5 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     },
   );
   loadAppearance();
-  loadCustomBackground();
   $('body').removeClass('hidden');
 }

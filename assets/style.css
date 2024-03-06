@@ -65,7 +65,7 @@ body.hidden {
 }
 
 body, html {
-	font-family: Roboto, Arial, sans-serif;
+	font-family: Roboto, Arial, sans-serif !important;
 	background-color: white;
 	margin: 0;
 	max-width: 100%;
@@ -209,7 +209,6 @@ ul {
   display: flex;
   align-items: center;
 	user-select: none;
-  transition: background 0.5s ease-out;
 }
 
 .panel-lg {
@@ -220,7 +219,6 @@ ul {
 	padding-left: 0.6em;
 	padding-top: 0.4em;
 	padding-bottom: 0.4em;
-  transition: background 0.5s ease-out;
 }
 
 .controls {
@@ -236,7 +234,6 @@ ul {
   outline: none;
   border: none;
   padding: 0.375em;
-  transition: background 0.5s ease-out;
 }
 
 .fb-pad {
@@ -698,6 +695,7 @@ input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]) {
 	border-radius: 4px;
 	outline: none;
 	margin-right: 8px;
+  cursor: pointer;
 }
 
 label {
@@ -737,6 +735,7 @@ input.selective-checkbox[type="checkbox"]:not([role="switch"]):checked {
 	display: block;
 	clear: both;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
@@ -757,8 +756,11 @@ input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
 	text-decoration: line-through;
 }
 
+#appearance,
 #notebook,
 #indexing,
+#backup,
+#about,
 #manage-settings,
 #todo-list-button {
   cursor: pointer;
