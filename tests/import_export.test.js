@@ -137,18 +137,15 @@ test('Test the restore of Tags and Tasks', async () => {
 });
 
 test('Check if alarm of task is reinstated', async () => {
-
   // Check if the alarm exists
-  const alarmExists = await page.evaluate(() =>{
-    return chrome.alarms.get('1708875969067Test Task 1_deletion_alarm') !== undefined;
-  });
+  const alarmExists = await page.evaluate(() => chrome.alarms.get('1708875969067Test Task 1_deletion_alarm') !== undefined);
 
   expect(alarmExists).toBe(true);
 });
 
-
 const fs = require('fs');
 const path = require('path');
+
 const downloadPath = path.resolve('./download');
 
 function normalizeLineEndings(text) {

@@ -287,4 +287,10 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
     });
   }
+
+  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    chrome.tabs.create({
+      url: 'settings.html#about',
+    });
+  }
 });
