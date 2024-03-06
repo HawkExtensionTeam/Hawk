@@ -57,6 +57,7 @@ test('Test if page is indexed', async () => {
 test('Add new rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/games';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(1000);
   await page.click('#indexing');
   await page.click('#string-matches-tab');
   await page.click('button[data-bs-target="#addRuleModal"]');
