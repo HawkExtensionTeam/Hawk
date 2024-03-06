@@ -4,12 +4,42 @@ const defaultRegexList = [
   '^https://quip-amazon\.com/.*$',
   '^https://quip\.com/.*$',
 ];
+
 let curTags = null;
 let curNotes = null;
 let curTasks = null;
 let curIndexEntries = null;
 const maxStringLength = 64;
 const taskList = $('#selective-task-list');
+
+function loadCustomBackground() {
+  chrome.storage.local.get('bg', (result) => {
+    if (!$('body').hasClass('popup') && !$('body').hasClass('settings-body')) {
+      if (result.bg !== '' && result.bg !== undefined) {
+        $('body').css('background-image', `url(${result.bg})`);
+      } else {
+        $('body').css('background-image', 'var(--comic-bg)');
+      }
+    }
+  });
+}
+
+function loadAppearance() {
+  $('.settings-container').addClass('changing');
+  chrome.storage.local.get('theme', (result) => {
+    if (result.theme === 'dark') {
+      $('html').addClass('dark');
+      $('html').attr('data-bs-theme', 'dark');
+    } else {
+      $('html').removeClass('dark');
+      $('html').attr('data-bs-theme', 'light');
+    }
+    loadCustomBackground();
+  });
+  setTimeout(() => {
+    $('.settings-container').removeClass('changing');
+  }, 500);
+}
 
 const noneMsg = `
   <div class="row justify-content-center">
@@ -54,7 +84,7 @@ function updateWallpaperPreview() {
     if (result.bg !== '' && result.bg !== undefined) {
       imgElement.attr('src', result.bg);
     } else {
-      imgElement.attr('src', '../images/comic_bg.png');
+      imgElement.attr('src', getComputedStyle(document.documentElement).getPropertyValue('--wallpaper-preview'));
     }
   });
 }
@@ -502,6 +532,28 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.storage.local.set({ bg: '' }, () => {
         updateWallpaperPreview();
         chrome.runtime.sendMessage(null, 'wallpaper');
+      });
+    });
+
+    chrome.storage.local.get('theme', (result) => {
+      if (result.theme === 'dark') {
+        $('.dark-toggle').attr('checked', true);
+      }
+    });
+
+    $('.dark-toggle').on('click', () => {
+      chrome.storage.local.get('theme', (result) => {
+        if (result.theme === 'dark') {
+          chrome.storage.local.set({ theme: 'light' }, () => {
+          });
+        } else {
+          chrome.storage.local.set({ theme: 'dark' }, () => {
+          });
+        }
+        chrome.runtime.sendMessage(null, 'wallpaper');
+        chrome.runtime.sendMessage(null, 'theme');
+        loadAppearance();
+        updateWallpaperPreview();
       });
     });
 

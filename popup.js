@@ -132,7 +132,7 @@ function updateChecklist(existingTasks) {
         const interval = setInterval(() => {
           if (step <= 1000) {
             item.css({
-              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
             });
             step += 1;
             item.data('step', step);
@@ -152,7 +152,7 @@ function updateChecklist(existingTasks) {
         const interval = setInterval(() => {
           if (step > 0) {
             item.css({
-              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
             });
             step -= 20;
             if (step < 0) {
@@ -161,7 +161,7 @@ function updateChecklist(existingTasks) {
             item.data('step', step);
           } else {
             item.css({
-              background: 'linear-gradient(to right, #ff000036 0%, #dddddda3 0%)',
+              background: 'linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)',
             });
             clearInterval(interval);
           }

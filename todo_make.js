@@ -33,16 +33,6 @@ function areAllTagsFalse() {
   return Object.keys(tagFilter).every((key) => tagFilter[key] === false);
 }
 
-function loadCustomBackground() {
-  chrome.storage.local.get('bg', (result) => {
-    if (result.bg !== '' && result.bg !== undefined) {
-      $('body').css('background-image', `url(${result.bg})`);
-    } else {
-      $('body').css('background-image', 'url(\'../images/comic_bg.png');
-    }
-  });
-}
-
 function generateRandomId() {
   return Math.floor(Math.random() * 1000);
 }
@@ -303,7 +293,7 @@ function updateChecklist(tasks, onlyRd) {
         const interval = setInterval(() => {
           if (step <= 1000) {
             item.css({
-              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
             });
             step += 1;
             item.data('step', step);
@@ -325,7 +315,7 @@ function updateChecklist(tasks, onlyRd) {
         const interval = setInterval(() => {
           if (step > 0) {
             item.css({
-              background: `linear-gradient(to right, #ff000036 ${(step / 1000) * 100}%, #dddddda3 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
             });
             step -= 20;
             if (step < 0) {
@@ -334,7 +324,7 @@ function updateChecklist(tasks, onlyRd) {
             item.data('step', step);
           } else {
             item.css({
-              background: 'linear-gradient(to right, #ff000036 0%, #dddddda3 0%)',
+              background: 'linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)',
             });
             clearInterval(interval);
           }
@@ -600,19 +590,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   getTagsObj().then((obj) => {
     tagsObj = obj;
   });
-  loadCustomBackground();
   setTime();
   cleanupTagsInTasks();
   getTasks();
   populateTags();
-
-  chrome.runtime.onMessage.addListener(
-    (request) => {
-      if (request === 'wallpaper') {
-        loadCustomBackground();
-      }
-    },
-  );
 
   $(document).on('click', '.show-create-tag-modal-btn', () => {
     $('#tagName').val('');
