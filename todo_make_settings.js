@@ -229,8 +229,10 @@ function retrieveRegexList() {
 }
 
 function deleteRule(ruleLoc, rule) {
+  console.log(ruleLoc, rule);
   chrome.storage.local.get([ruleLoc], (result) => {
     const storedList = result[ruleLoc];
+    console.log(storedList);
     if (storedList) {
       const updatedList = storedList.filter((expr) => expr !== rule);
       chrome.storage.local.set({ [ruleLoc]: updatedList }, () => {
@@ -422,7 +424,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.string-matches-del', (event) => {
       const $delBtn = $(event.currentTarget);
-      $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
+      $('#deleteRuleModal').attr('rule-loc', 'allowedStringMatches');
       $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
     });
 
