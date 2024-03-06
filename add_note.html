@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="assets/jquery-3.7.1.min.js"></script>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>My Notes</title>
@@ -8,15 +9,16 @@
     <link rel="stylesheet" href="assets/bootstrap.min.css">
     <link rel="stylesheet" href="assets/style.css">
     <script src="assets/bootstrap.min.js"></script>
+    <script src="appearance.js"></script>
 </head>
 
-<body class="d-flex justify-content-center nt-body">
+<body class="d-flex justify-content-center nt-body hidden">
 	<div class="container mt-5">
 		<div class="row note-container">
 			<div class="col sidebar no-padding">
 				<h2 id="my-notes-label" class="mt-4 text-center bold-text mb-0">
           <div class="row">
-            <div class="col-8 d-flex justify-content-start align-content-start py-2">
+            <div class="col-8 d-flex justify-content-start align-content-start py-2 dynamic-title">
               My Notes
             </div>
             <div class="import-col col-4 d-flex justify-content-end align-content-end">
@@ -102,10 +104,8 @@
 			</div>
 		</div>
 	</div>
-
 	<script src="assets/marked.min.js"></script>
 	<script src="assets/simplemde.min.js"></script>
-	<script src="assets/jquery-3.7.1.min.js"></script>
 	<script src="note.js"></script>
 </body>
 </html>

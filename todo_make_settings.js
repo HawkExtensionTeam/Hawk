@@ -4,12 +4,67 @@ const defaultRegexList = [
   '^https://quip-amazon\.com/.*$',
   '^https://quip\.com/.*$',
 ];
+
 let curTags = null;
 let curNotes = null;
 let curTasks = null;
 let curIndexEntries = null;
 const maxStringLength = 64;
 const taskList = $('#selective-task-list');
+
+function loadCustomBackground() {
+  chrome.storage.local.get('bg', (result) => {
+    if (!$('body').hasClass('popup') && !$('body').hasClass('settings-body')) {
+      if (result.bg !== '' && result.bg !== undefined) {
+        $('body').css('background-image', `url(${result.bg})`);
+      } else {
+        $('body').css('background-image', 'var(--comic-bg)');
+      }
+    }
+  });
+}
+
+function loadAppearance(usepreference) {
+  $('.settings-container').addClass('changing');
+  chrome.storage.local.get('theme', (result) => {
+    let decision = result.theme;
+    if (usepreference === true && window.matchMedia) {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        decision = 'dark';
+      } else {
+        decision = 'light';
+      }
+    }
+    if (decision === 'dark') {
+      $('html').addClass('dark');
+      $('html').attr('data-bs-theme', 'dark');
+    } else {
+      $('html').removeClass('dark');
+      $('html').attr('data-bs-theme', 'light');
+    }
+    loadCustomBackground();
+  });
+  setTimeout(() => {
+    $('.settings-container').removeClass('changing');
+  }, 500);
+}
+
+const noneMsg = `
+  <div class="row justify-content-center">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+      </svg>
+  </div>
+  <div class="row justify-contents-center text-center">
+      <div class="warn-text-2">
+      </div>
+  </div>
+`;
+
+const noSites = 'No site rules found.';
+const noUrls = 'No URL rules found.';
+const noStringMatches = 'No string match rules found.';
+const noRegex = 'No RegEx rules found';
 
 function hideLists() {
   taskList.hide();
@@ -37,7 +92,7 @@ function updateWallpaperPreview() {
     if (result.bg !== '' && result.bg !== undefined) {
       imgElement.attr('src', result.bg);
     } else {
-      imgElement.attr('src', '../images/comic_bg.png');
+      imgElement.attr('src', getComputedStyle(document.documentElement).getPropertyValue('--wallpaper-preview'));
     }
   });
 }
@@ -49,7 +104,7 @@ function constrainStringLength(inputString, length) {
 function overwriteTasks(tasks) {
   const currentDate = new Date();
   const tasksArray = Object.values(tasks);
-  const filteredTasks = tasksArray.filter((task) => (task.scheduledDeletion === '') || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
+  const filteredTasks = tasksArray.filter((task) => (task.recentlyDeleted === false) || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
   const newTasks = {};
   filteredTasks.forEach((task) => {
     newTasks[task.id] = task;
@@ -81,8 +136,8 @@ function retrieveSitesList() {
   chrome.storage.local.get(['allowedSites'], (result) => {
     const storedSiteList = result.allowedSites;
     const sitesList = storedSiteList || [];
+    $('#sites-list').empty();
     if (sitesList.length > 0) {
-      $('#sites-list').empty();
       Object.values(sitesList).forEach((expr) => {
         $('#sites-list').append(`
           <div class="row sites-item align-items-center mt-2"> 
@@ -95,6 +150,8 @@ function retrieveSitesList() {
           </div>
         `);
       });
+    } else {
+      $('#sites-list').append(noneMsg).find('.warn-text-2').text(noSites);
     }
   });
 }
@@ -103,8 +160,8 @@ function retrieveStringMatchesList() {
   chrome.storage.local.get(['allowedStringMatches'], (result) => {
     const storedMatchesList = result.allowedStringMatches;
     const matchesList = storedMatchesList || [];
+    $('#string-matches-list').empty();
     if (matchesList.length > 0) {
-      $('#string-matches-list').empty();
       Object.values(matchesList).forEach((expr) => {
         $('#string-matches-list').append(`
           <div class="row urls-item align-items-center mt-2"> 
@@ -117,6 +174,8 @@ function retrieveStringMatchesList() {
           </div>
         `);
       });
+    } else {
+      $('#string-matches-list').append(noneMsg).find('.warn-text-2').text(noStringMatches);
     }
   });
 }
@@ -125,8 +184,8 @@ function retrieveUrlsList() {
   chrome.storage.local.get(['allowedURLs'], (result) => {
     const storedUrlsList = result.allowedURLs;
     const urlsList = storedUrlsList || [];
+    $('#urls-list').empty();
     if (urlsList.length > 0) {
-      $('#urls-list').empty();
       Object.values(urlsList).forEach((expr) => {
         $('#urls-list').append(`
           <div class="row urls-item align-items-center mt-2"> 
@@ -139,6 +198,8 @@ function retrieveUrlsList() {
           </div>
         `);
       });
+    } else {
+      $('#urls-list').append(noneMsg).find('.warn-text-2').text(noUrls);
     }
   });
 }
@@ -147,8 +208,8 @@ function retrieveRegexList() {
   chrome.storage.local.get(['allowedRegex'], (result) => {
     const storedRegexList = result.allowedRegex;
     const regexList = storedRegexList || [];
+    $('#regex-list').empty();
     if (regexList.length > 0) {
-      $('#regex-list').empty();
       Object.values(regexList).forEach((expr) => {
         $('#regex-list').append(`
           <div class="row regex-item align-items-center mt-2"> 
@@ -161,13 +222,17 @@ function retrieveRegexList() {
           </div>
         `);
       });
+    } else {
+      $('#regex-list').append(noneMsg).find('.warn-text-2').text(noRegex);
     }
   });
 }
 
 function deleteRule(ruleLoc, rule) {
+  console.log(ruleLoc, rule);
   chrome.storage.local.get([ruleLoc], (result) => {
     const storedList = result[ruleLoc];
+    console.log(storedList);
     if (storedList) {
       const updatedList = storedList.filter((expr) => expr !== rule);
       chrome.storage.local.set({ [ruleLoc]: updatedList }, () => {
@@ -180,6 +245,9 @@ function deleteRule(ruleLoc, rule) {
             break;
           case 'allowedRegex':
             retrieveRegexList();
+            break;
+          case 'allowedStringMatches':
+            retrieveStringMatchesList();
             break;
           default:
             break;
@@ -307,7 +375,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     retrieveUrlsList();
     retrieveStringMatchesList();
     retrieveRegexList();
-    updateWallpaperPreview();
+    setTimeout(() => {
+      updateWallpaperPreview();
+    }, 100);
     $('#rule-search').on('input', function _() {
       const query = $(this).val();
       $('#urls-list, #sites-list, #string-matches-list, #regex-list').filter(function filterLists() {
@@ -336,7 +406,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '#sites-tab', () => {
       $('.index-heading').text('Allowed sites');
-      $('.index-info').text('Indexing will occur whenever these host names are visited.');
+      $('.index-info').text('Indexing will occur whenever these host names are visited. Enter rules starting "www".');
       $('#addRuleModal').attr('rule-loc', 'allowedSites');
     });
 
@@ -354,7 +424,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $(document).on('click', '.string-matches-del', (event) => {
       const $delBtn = $(event.currentTarget);
-      $('#deleteRuleModal').attr('rule-loc', 'allowedRegex');
+      $('#deleteRuleModal').attr('rule-loc', 'allowedStringMatches');
       $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
     });
 
@@ -473,7 +543,71 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $(document).on('click', '.btn.btn-primary.background-reset-btn', () => {
       chrome.storage.local.set({ bg: '' }, () => {
         updateWallpaperPreview();
+        chrome.runtime.sendMessage(null, 'wallpaper');
       });
+    });
+
+    chrome.storage.local.get('theme', (result) => {
+      if (result.theme === 'dark') {
+        $('.dark-toggle').attr('checked', true);
+      }
+    });
+
+    chrome.storage.local.get('useprefer', (result) => {
+      if (result.useprefer === true) {
+        $('.sys-dark-toggle').attr('checked', true);
+        $('.dark-toggle').attr('disabled', true);
+      }
+    });
+
+    $('.dark-toggle').on('click', () => {
+      chrome.storage.local.get('theme', (result) => {
+        if (result.theme === 'dark') {
+          chrome.storage.local.set({ theme: 'light' }, () => {
+          });
+        } else {
+          chrome.storage.local.set({ theme: 'dark' }, () => {
+          });
+        }
+        chrome.runtime.sendMessage(null, 'wallpaper');
+        chrome.runtime.sendMessage(null, 'theme');
+        loadAppearance(false);
+        updateWallpaperPreview();
+      });
+    });
+
+    $('.sys-dark-toggle').on('click', () => {
+      chrome.storage.local.get('useprefer', (result) => {
+        if (result.useprefer === true) {
+          chrome.storage.local.set({ useprefer: false }, () => {
+            $('.dark-toggle').removeAttr('disabled');
+            chrome.storage.local.get('theme', (result2) => {
+              if (result2.theme === 'dark') {
+                $('.dark-toggle').attr('checked', true);
+              } else {
+                $('.dark-toggle').attr('checked', false);
+              }
+              loadAppearance(false);
+            });
+          });
+        } else {
+          chrome.storage.local.set({ useprefer: true }, () => {
+            $('.dark-toggle').attr('disabled', true);
+            loadAppearance(true);
+          });
+        }
+        chrome.runtime.sendMessage(null, 'wallpaper');
+        chrome.runtime.sendMessage(null, 'theme');
+        setTimeout(() => {
+          updateWallpaperPreview();
+        }, 500);
+      });
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      setTimeout(() => {
+        updateWallpaperPreview();
+      }, 500);
     });
 
     $(document).on('change', '#backgroundInput', (event) => {
@@ -483,6 +617,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.onload = (e) => {
           chrome.storage.local.set({ bg: e.target.result }, () => {
             updateWallpaperPreview();
+            chrome.runtime.sendMessage(null, 'wallpaper');
           });
         };
         reader.readAsDataURL(selectedFile);
@@ -498,12 +633,12 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
 
     if (window.location.hash) {
-      const $entry = $(window.location.hash);
+      const $entry = $(window.location.hash.slice(0, -1));
+      removeHash();
       $('.settings-entry').removeClass('selected');
       $entry.addClass('selected');
       $('.settings-pane').addClass('hidden');
       $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
-      removeHash();
     }
 
     $(document).on('change', '#jsonAllInput', (event) => {
