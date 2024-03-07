@@ -59,7 +59,7 @@ By default when searching, all terms will be used to calculate the score each do
 
 No filtering               |  AND filtering            |  AND-NOT filtering
 :-------------------------:|:-------------------------:|:-------------------------:
-![search_plain](-/blob/main/uploads/indexer/search_plain.png)  |  ![search_and_filtering](-/blob/main/uploads/indexer/search_and_filtering.png)  |  ![search_and_not__filtering](-/blob/main/uploads/indexer/search_and_not_filtering.png)
+![search_plain](uploads/indexer/search_plain.png)  |  ![search_and_filtering](uploads/indexer/search_and_filtering.png)  |  ![search_and_not__filtering](uploads/indexer/search_and_not_filtering.png)
 
 #### Importing/Exporting Indexing Data
 
