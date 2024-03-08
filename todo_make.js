@@ -913,4 +913,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       updateChecklist(filteredTasksObj);
     });
   });
+
+  $('#clear-filter-btn').on('click', () => {
+    // Clear the filters here
+    $('#startDate').val('');
+    $('#endDate').val('');
+    $('#startTime').val('');
+    $('#endTime').val('');
+    getTasks();
+  });
 }
