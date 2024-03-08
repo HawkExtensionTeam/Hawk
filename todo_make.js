@@ -861,6 +861,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
     let startDate = $('#startDate').val();
     let endDate = $('#endDate').val();
+    let startTime = $('#startTime').val();
+    let endTime = $('#endTime').val();
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
 
     // If no date is provided, set default values to year 2024 and 9999
     if (!startDate) {
@@ -870,15 +875,26 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       endDate = '9999-12-31';
     }
 
-    let startTime = $('#startTime').val();
-    let endTime = $('#endTime').val();
-
     // If no time is provided, set default values
     if (!startTime) {
       startTime = '00:00';
     }
     if (!endTime) {
       endTime = '23:59';
+    }
+
+    // Validate the logical correctness of the dates and times
+    if (startDate > endDate || (startDate === endDate && startTime > endTime)) {
+      alert('Invalid date or time range. Please ensure that the end date and time are not earlier than the start date and time.');
+      return;
+    }
+
+    // Validate the format of the dates and times
+    if (!dateRegex.test(startDate)
+        || !dateRegex.test(endDate)
+        || !timeRegex.test(startTime)
+        || !timeRegex.test(endTime)) {
+      return;
     }
 
     const startDateTime = new Date(`${startDate}T${startTime}`);
