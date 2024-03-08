@@ -11,7 +11,8 @@
     "unlimitedStorage",
     "webNavigation",
 		"notifications",
-		"alarms"
+		"alarms",
+    "tabs"
   ],
   "action": {
     "default_popup": "hello.html",
