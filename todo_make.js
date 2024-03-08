@@ -857,4 +857,40 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
     });
   });
+
+  $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+
+    if (!startDate && !endDate) {
+      return;
+    }
+
+    let startTime = $('#startTime').val();
+    let endTime = $('#endTime').val();
+
+    // If no time is provided, set default values
+    if (!startTime) {
+      startTime = '00:00';
+    }
+    if (!endTime) {
+      endTime = '23:59';
+    }
+
+    const startDateTime = new Date(`${startDate}T${startTime}`);
+    const endDateTime = new Date(`${endDate}T${endTime}`);
+    $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
+      tasksObj.tasks = result.tasks || {};
+      const filteredTasks = Object.values(tasksObj.tasks).filter((task) => {
+        const taskDate = new Date(task.due);
+
+        return taskDate >= startDateTime && taskDate <= endDateTime;
+      });
+      const filteredTasksObj = {};
+      filteredTasks.forEach((task) => {
+        filteredTasksObj[task.id] = task;
+      });
+      updateChecklist(filteredTasksObj);
+    });
+  });
 }
