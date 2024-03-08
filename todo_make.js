@@ -417,24 +417,23 @@ function clearTagFilter() {
 }
 
 function processFilter() {
+  let changed = false;
+  Object.keys(tagFilter).forEach((key) => {
+    const result = $('#tag-select-target').find(`[id="${key}"]`);
+    if (result.length > 0) {
+      if (tagFilter[key] !== result[0].checked) {
+        changed = true;
+      }
+      tagFilter[key] = result[0].checked;
+    }
+  });
+  currentlyAllFalse = areAllTagsFalse();
   if (needToUpdateDateFilter) {
     needToUpdateDateFilter = false;
     getTasks();
-  } else {
-    let changed = false;
-    Object.keys(tagFilter).forEach((key) => {
-      const result = $('#tag-select-target').find(`[id="${key}"]`);
-      if (result.length > 0) {
-        if (tagFilter[key] !== result[0].checked) {
-          changed = true;
-        }
-        tagFilter[key] = result[0].checked;
-      }
-    });
-    currentlyAllFalse = areAllTagsFalse();
-    if (changed) {
-      getTasks();
-    }
+  }
+  else if (changed) {
+    getTasks();
   }
 }
 
