@@ -859,11 +859,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   });
 
   $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
-    const startDate = $('#startDate').val();
-    const endDate = $('#endDate').val();
+    let startDate = $('#startDate').val();
+    let endDate = $('#endDate').val();
 
-    if (!startDate && !endDate) {
-      return;
+    // If no date is provided, set default values to year 2024 and 9999
+    if (!startDate) {
+      startDate = '2024-01-01';
+    }
+    if (!endDate) {
+      endDate = '9999-12-31';
     }
 
     let startTime = $('#startTime').val();
