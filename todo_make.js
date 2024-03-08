@@ -32,6 +32,15 @@ function getDaysBetweenString(date1, date2) {
   return `${dayDelta} day${dayDelta !== 1 ? 's' : ''}`;
 }
 
+function clearDates() {
+  $('#startDate').val('');
+  $('#endDate').val('');
+  $('#startTime').val('');
+  $('#endTime').val('');
+  startDateObj = null;
+  endDateObj = null;
+}
+
 function areAllTagsFalse() {
   return Object.keys(tagFilter).every((key) => tagFilter[key] === false);
 }
@@ -908,6 +917,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     // Validate the logical correctness of the dates and times
     if (startDate > endDate || (startDate === endDate && startTime > endTime)) {
       alert('Invalid date or time range. Please ensure that the end date and time are not earlier than the start date and time.');
+      clearDates();
       return;
     }
 
@@ -925,12 +935,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   });
 
   $('#clear-filter-btn').on('click', () => {
-    $('#startDate').val('');
-    $('#endDate').val('');
-    $('#startTime').val('');
-    $('#endTime').val('');
-    startDateObj = null;
-    endDateObj = null;
+    clearDates();
     needToUpdateDateFilter = true;
     clearTagFilter();
   });
