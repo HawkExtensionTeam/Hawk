@@ -1089,7 +1089,7 @@ svg {
   margin-bottom: 0.75rem;
 }
 
-.tag-cont {
+.filter-cont {
   background-color: var(--cont-color);
   padding: 0.375rem;
   border-radius: 10px;

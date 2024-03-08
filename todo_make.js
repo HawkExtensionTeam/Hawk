@@ -1,5 +1,8 @@
 let tagFilter = {};
+let startDateObj = null;
+let endDateObj = null;
 let currentlyAllFalse = true;
+let needToUpdateDateFilter = false;
 let tasksObj = {};
 let tagsObj = {};
 
@@ -186,6 +189,10 @@ function updateChecklist(tasks, onlyRd) {
         return;
       }
       const dueDate = new Date(task.due);
+      const dateFilterShouldBeApplied = startDateObj !== null && endDateObj !== null;
+      if (dateFilterShouldBeApplied && (dueDate < startDateObj || dueDate > endDateObj)) {
+        return;
+      }
       const parts = dueDate.toLocaleString().split(',');
       const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
       const passed = dueDate < now;
@@ -267,7 +274,7 @@ function updateChecklist(tasks, onlyRd) {
                 <div class="row">
                   <label class="${label} task-due">${formattedDueDate}</label>
                 </div>
-                <div class="row tag-cont cont-clear">
+                <div class="row filter-cont cont-clear">
                   ${tagElements}
                 </div>
               </div>
@@ -390,20 +397,35 @@ function populateTags() {
   });
 }
 
+function clearTagFilter() {
+  const checkboxes = $('#tag-select-target').find('.selective-checkbox');
+  if (checkboxes.length > 0) {
+    checkboxes.prop('checked', false);
+    Object.keys(tagFilter).forEach((key) => {
+      tagFilter[key] = false;
+    });
+  }
+}
+
 function processFilter() {
-  let changed = false;
-  Object.keys(tagFilter).forEach((key) => {
-    const result = $('#tag-select-target').find(`[id="${key}"]`);
-    if (result.length > 0) {
-      if (tagFilter[key] !== result[0].checked) {
-        changed = true;
-      }
-      tagFilter[key] = result[0].checked;
-    }
-  });
-  currentlyAllFalse = areAllTagsFalse();
-  if (changed) {
+  if (needToUpdateDateFilter) {
+    needToUpdateDateFilter = false;
     getTasks();
+  } else {
+    let changed = false;
+    Object.keys(tagFilter).forEach((key) => {
+      const result = $('#tag-select-target').find(`[id="${key}"]`);
+      if (result.length > 0) {
+        if (tagFilter[key] !== result[0].checked) {
+          changed = true;
+        }
+        tagFilter[key] = result[0].checked;
+      }
+    });
+    currentlyAllFalse = areAllTagsFalse();
+    if (changed) {
+      getTasks();
+    }
   }
 }
 
@@ -487,7 +509,7 @@ function addTaskToChecklist(taskId) {
                     <div class="row">
                       <label class="${label} task-due">${formattedDueDate}</label>
                     </div>
-                    <div class="row tag-cont cont-clear">
+                    <div class="row filter-cont cont-clear">
                       ${tagElements}
                     </div>
                   </div>
@@ -897,29 +919,19 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       return;
     }
 
-    const startDateTime = new Date(`${startDate}T${startTime}`);
-    const endDateTime = new Date(`${endDate}T${endTime}`);
-    $.when(chrome.storage.local.get({ tasks: {} })).done((result) => {
-      tasksObj.tasks = result.tasks || {};
-      const filteredTasks = Object.values(tasksObj.tasks).filter((task) => {
-        const taskDate = new Date(task.due);
-
-        return taskDate >= startDateTime && taskDate <= endDateTime;
-      });
-      const filteredTasksObj = {};
-      filteredTasks.forEach((task) => {
-        filteredTasksObj[task.id] = task;
-      });
-      updateChecklist(filteredTasksObj);
-    });
+    startDateObj = new Date(`${startDate}T${startTime}`);
+    endDateObj = new Date(`${endDate}T${endTime}`);
+    needToUpdateDateFilter = true;
   });
 
   $('#clear-filter-btn').on('click', () => {
-    // Clear the filters here
     $('#startDate').val('');
     $('#endDate').val('');
     $('#startTime').val('');
     $('#endTime').val('');
-    getTasks();
+    startDateObj = null;
+    endDateObj = null;
+    needToUpdateDateFilter = true;
+    clearTagFilter();
   });
 }
