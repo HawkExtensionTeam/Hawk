@@ -2,6 +2,9 @@ import { BM25F } from './assets/wink-bm25-text-search.js';
 import MiniSearch from './assets/minisearch.min.js';
 
 const xmlEscape = require('xml-escape');
+const { Mutex } = require('async-mutex');
+
+const indexMutex = new Mutex();
 
 let engine;
 const winkNLP = require('wink-nlp');
@@ -23,6 +26,7 @@ const defaultRegexList = [
 const TITLE_BOOST = 3;
 const MIN_SEARCH_TERM_LENGTH = 3;
 const DEFAULT_WEIGHT = 0.2;
+const BM25F_MIN_DOCS = 3;
 
 const prepTask = function prepTask(text) {
   const tokens = [];
@@ -51,7 +55,7 @@ async function setupBM25F() {
     docs.forEach((doc, i) => {
       engine.addDoc(doc, i + 1);
     });
-    if (docs.length >= 3) {
+    if (docs.length >= BM25F_MIN_DOCS) {
       runningEngine = _.cloneDeep(engine);
       runningEngine.consolidate();
     }
@@ -68,6 +72,9 @@ const miniSearch = new MiniSearch({
 chrome.storage.local.get(['indexed']).then((result) => {
   miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
 });
+
+const MAX_TAB_REFRESH_ATTEMPTS = 20;
+const TAB_REFRESH_DELAY_MS = 50;
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
@@ -120,7 +127,7 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
             });
           } else {
             searchResults = miniSearch.search(text, {
-              boost: { title: 3 },
+              boost: { title: TITLE_BOOST },
               prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
               fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
             });
@@ -194,75 +201,112 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   }
 });
 
-function setURL(request) {
-  return new Promise((resolve) => {
-    if (request.clickedURL) {
-      setTimeout(() => {
-        resolve(request.clickedURL);
-      }, 500);
-    } else {
-      resolve(request.currentURL);
-    }
-  });
-}
-
 function removeAnchorLink(url) {
   return url.split('#')[0];
 }
 
-chrome.runtime.onMessage.addListener(async (request) => {
-  if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
-    let url = await setURL(request);
-    url = removeAnchorLink(url);
+async function getLocalStorage(key) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([key], (result) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+async function waitForTitleUpdate(title, lastTitle) {
+  for (let i = 0; i < MAX_TAB_REFRESH_ATTEMPTS; i += 1) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, TAB_REFRESH_DELAY_MS);
+    });
+
     const tabs = await new Promise((resolve) => {
       chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
         resolve(allTabs);
       });
     });
-    if (tabs && tabs.length) {
-      chrome.storage.local.get(['indexed']).then((result) => {
-        const indexed = result.indexed || {};
-        if (Object.keys(indexed).length === 0) {
-          indexed.corpus = [];
-          indexed.links = new Set();
-        }
-        // chrome storage serialising and deserialising loses set type
-        indexed.links = new Set(indexed.links);
-        if (!indexed.links.has(url)) {
-          const page = {
-            id: indexed.corpus.length + 1,
-            url,
-            title: xmlEscape(tabs[0].title),
-            body: request.visibleTextContent,
-          };
+    if (!(tabs && tabs.length)) return '';
 
-          const decodedURL = decodeURIComponent(page.url);
-          if (`https://www.${page.title}` === decodedURL) {
-            return;
-          } if (`https://${page.title}` === decodedURL) {
-            return;
-          }
+    title = tabs[0].title;
+    if (lastTitle !== title) break;
 
-          const oldBody = page.body.split(/\n|\s/);
-          const newBody = removeStopwords(oldBody).join(' ');
-          page.body = newBody;
-          indexed.corpus.push(page);
-          indexed.links.add(url);
+    if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return '';
+  }
 
-          miniSearch.add(page);
+  return title;
+}
 
-          engine.addDoc(page, String(page.id));
-          runningEngine = _.cloneDeep(engine);
-          if (Object.keys(runningEngine.getDocs()).length >= 3) {
-            runningEngine.consolidate();
-          }
+chrome.runtime.onMessage.addListener(async (request) => {
+  if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
+    const releaseIndexing = await indexMutex.acquire();
+    try {
+      const url = removeAnchorLink(request.url);
 
-          // must convert to an array to avoid values being lost when
-          // the set is converted to an Object during serialisation
-          indexed.links = Array.from(indexed.links);
-          chrome.storage.local.set({ indexed });
-        }
+      const tabs = await new Promise((resolve) => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
+          resolve(allTabs);
+        });
       });
+      if (!(tabs && tabs.length)) return;
+
+      let { title } = tabs[0];
+      const lastTitleResult = await getLocalStorage('lastTitle');
+      const lastTitle = lastTitleResult.lastTitle || null;
+
+      const indexedResult = await getLocalStorage('indexed');
+      const indexed = indexedResult.indexed || {};
+      if (Object.keys(indexed).length === 0) {
+        indexed.corpus = [];
+        indexed.links = new Set();
+      }
+      // chrome storage serialising and deserialising loses set type
+      indexed.links = new Set(indexed.links);
+
+      if (indexed.links.has(url)) return;
+
+      if (title === lastTitle) {
+        title = await waitForTitleUpdate(title, lastTitle);
+        if (title === '') return;
+      }
+      await chrome.storage.local.set({ lastTitle: title });
+
+      const page = {
+        id: indexed.corpus.length + 1,
+        url,
+        title: xmlEscape(title),
+        body: request.visibleTextContent,
+      };
+
+      const decodedURL = decodeURIComponent(page.url);
+      if (`https://www.${page.title}` === decodedURL) {
+        return;
+      } if (`https://${page.title}` === decodedURL) {
+        return;
+      }
+
+      const oldBody = page.body.split(/\n|\s/);
+      const newBody = removeStopwords(oldBody).join(' ');
+      page.body = newBody;
+      indexed.corpus.push(page);
+      indexed.links.add(url);
+
+      miniSearch.add(page);
+
+      engine.addDoc(page, String(page.id));
+      runningEngine = _.cloneDeep(engine);
+      if (Object.keys(runningEngine.getDocs()).length >= BM25F_MIN_DOCS) {
+        runningEngine.consolidate();
+      }
+
+      // must convert to an array to avoid values being lost when
+      // the set is converted to an Object during serialisation
+      indexed.links = Array.from(indexed.links);
+      await chrome.storage.local.set({ indexed });
+    } finally {
+      releaseIndexing();
     }
   } else if (request.action === 'updateIndexing') {
     miniSearch.removeAll();
@@ -286,11 +330,8 @@ chrome.runtime.onInstalled.addListener((details) => {
 
     chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
     });
-  }
 
-  if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
-    chrome.tabs.create({
-      url: 'settings.html#about',
+    chrome.storage.local.set({ lastTitle: null }, () => {
     });
   }
 });

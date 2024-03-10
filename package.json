@@ -31,6 +31,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "async-mutex": "^0.4.1",
     "lodash": "^4.17.21",
     "minisearch": "^6.3.0",
     "puppeteer": "^21.7.0",

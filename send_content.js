@@ -66,6 +66,17 @@ const parseURLWithParams = function parseURLWithParams(parts) {
   return newURL;
 };
 
+function callIndexer(url) {
+  const visibleTextContent = document.body.innerText;
+  const { title } = document;
+  chrome.runtime.sendMessage({
+    action: 'sendVisibleTextContent',
+    visibleTextContent,
+    url,
+    title,
+  });
+}
+
 const indexQuip = function indexQuip() {
   if (quipRegex.test(currentURL)) {
     try {
@@ -95,12 +106,7 @@ const indexQuip = function indexQuip() {
 
         const documentEditor = document.getElementsByClassName('document-editor');
         if (documentEditor.length === 1) {
-          const visibleTextContent = documentEditor[0].innerText;
-          chrome.runtime.sendMessage({
-            action: 'sendVisibleTextContent',
-            visibleTextContent,
-            currentURL,
-          });
+          callIndexer(currentURL);
         }
       });
     } catch (error) {
@@ -127,15 +133,9 @@ $(document).ready(() => {
           // Check if the clicked link is not an anchor link within the same page
           if (clickedURL.origin === new URL(currentURL).origin
           && clickedURLPath === currentURLPath) {
-            const visibleTextContent = document.body.innerText;
-
             // Send a message indicating that the page has navigated
             try {
-              chrome.runtime.sendMessage({
-                action: 'sendVisibleTextContent',
-                visibleTextContent,
-                clickedURL,
-              });
+              callIndexer(clickedURL);
             } catch (error) {
             // extension will have been reloaded, ignore
             }
@@ -146,16 +146,11 @@ $(document).ready(() => {
             await new Promise((resolve) => {
               setTimeout(resolve, 10000);
             });
+            indexQuip();
+            setInterval(indexQuip, 60000);
           })();
-          indexQuip();
-          setInterval(indexQuip, 60000);
         } else {
-          const visibleTextContent = document.body.innerText;
-          chrome.runtime.sendMessage({
-            action: 'sendVisibleTextContent',
-            visibleTextContent,
-            currentURL,
-          });
+          callIndexer(currentURL);
         }
       }
     });
