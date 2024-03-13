@@ -80,8 +80,8 @@ To back up your indexed data, click the extension icon, click Settings, and clic
 
 
 ## Visuals
-![Screenshot_2024-01-31_112825](/uploads/5526daa146a580834e543d4107ea97ed/Screenshot_2024-01-31_112825.png)
-
-![Screenshot_2024-01-31_112611](/uploads/0347234f7e7507a37851b03f27e71f97/Screenshot_2024-01-31_112611.png) ![Screenshot_2024-01-31_112219](/uploads/f1c2acda686f8d0a21a25ae4fef7dd9f/Screenshot_2024-01-31_112219.png)
+![notesscreenshot](/uploads/3bd9a7ef133bca56a548a7efd9023cf3/notesscreenshot.png)
+![tasks_screenshot](/uploads/33183a9bd105bdb54159b5bc8701a793/tasks_screenshot.png)
+![popup](/uploads/f1b7ba83d31ca2bb90f7fd3bae4e147c/popup.png)
 
 
