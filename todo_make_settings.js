@@ -229,10 +229,8 @@ function retrieveRegexList() {
 }
 
 function deleteRule(ruleLoc, rule) {
-  console.log(ruleLoc, rule);
   chrome.storage.local.get([ruleLoc], (result) => {
     const storedList = result[ruleLoc];
-    console.log(storedList);
     if (storedList) {
       const updatedList = storedList.filter((expr) => expr !== rule);
       chrome.storage.local.set({ [ruleLoc]: updatedList }, () => {
