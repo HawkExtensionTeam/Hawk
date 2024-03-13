@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "To-Do Make",
+  "name": "Hawk",
   "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
   "version": "1.0",
   "omnibox": { "keyword": "@i\t" },
