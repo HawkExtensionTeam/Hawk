@@ -98,7 +98,7 @@ test('Add delete rule to indexing sites', async () => {
   await page.waitForTimeout(1000);
   await page.click('button.btn.btn-danger.string-matches-del');
   await page.waitForTimeout(1000);
-  await page.waitForSelector('button.btn.btn-danger.regex-delete-btn');
+  await page.waitForSelector('button.btn.btn-danger.rule-delete-btn');
   await page.click('button.btn.btn-danger.regex-delete-btn');
   await page.waitForTimeout(1000);
 
