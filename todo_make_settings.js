@@ -432,19 +432,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('#deleteRuleModal').attr('rule-to-delete', $delBtn.attr('rule-to-del'));
     });
 
-    $(document).on('click', '.sites-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
-    });
-
-    $(document).on('click', '.urls-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
-    });
-
-    $(document).on('click', '.string-matches-delete-btn', () => {
-      deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
-    });
-
-    $(document).on('click', '.regex-delete-btn', () => {
+    $(document).on('click', '.rule-delete-btn', () => {
       deleteRule($('#deleteRuleModal').attr('rule-loc'), $('#deleteRuleModal').attr('rule-to-delete'));
     });
 
