@@ -29,5 +29,6 @@ module.exports = {
     'no-undef': 'off', // allows using imported module functions
     'no-useless-escape': 'off', // regex escape sequences were flagged
     'no-param-reassign': 'off', // ok for params to be modified
+    'no-await-in-loop': 'off', // required for critical sections
   },
 };
