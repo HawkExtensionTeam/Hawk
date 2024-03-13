@@ -669,12 +669,10 @@ input::placeholder {
 .checklist-item {
   opacity: 0;
   transform: translateX(-5%);
-	max-height: 0;
 }
 
 .checklist-item.appear {
   opacity: 1;
-	max-height: fit-content;
   transform: translateX(0);
 	transition: opacity 0.15s ease-out, transform 0.5s ease-out, max-height 0s linear;
 }
@@ -1154,4 +1152,16 @@ svg {
 
 .settings-wallpaper-preview-img {
   border-radius: 12px;
+}
+
+@keyframes due-shake {
+  0% { transform: translateX(0px) }
+  25% { transform: translateX(5px) }
+  50% { transform: translateX(-5px) }
+  75% { transform: translateX(5px) }
+  100% { transform: translateX(0px) }
+}
+
+.shaking {
+  animation: due-shake 0.4s 1;
 }

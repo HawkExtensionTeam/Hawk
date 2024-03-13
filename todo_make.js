@@ -268,7 +268,7 @@ function updateChecklist(tasks, onlyRd) {
       `;
       const taskTitle = toInsert === checklist ? task.title : `${task.title} (${getDaysBetweenString(now, new Date(task.scheduledDeletion))})`;
       toInsert.append(`
-      <li class="checklist-item" associatedTask="${taskId}">
+      <li class="checklist-item ${toInsert === rdChecklist && !$('#recently-deleted-btn').hasClass('open') ? 'd-none' : ''}" associatedTask="${taskId}">
         <div class="form-check-2 d-flex justify-content-between align-items-center">
           ${tickbox}
           <div class="container">
@@ -689,6 +689,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const $toggleBtn = $(event.currentTarget);
     if ($toggleBtn.hasClass('open')) {
       $('#checklist-2').addClass('appear');
+      $('#checklist-2').find('.checklist-item').removeClass('d-none');
+      $('#rd-checklist').find('.checklist-item').addClass('d-none');
       $('#rd-checklist').removeClass('appear');
       $toggleBtn.removeClass('open');
       $toggleBtn.removeClass('pilled');
@@ -698,6 +700,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.add-task-btn').removeClass('collapsed');
     } else {
       $('#checklist-2').removeClass('appear');
+      $('#checklist-2').find('.checklist-item').addClass('d-none');
+      $('#rd-checklist').find('.checklist-item').removeClass('d-none');
       $('#rd-checklist').addClass('appear');
       $toggleBtn.addClass('open');
       $toggleBtn.addClass('pilled');
@@ -884,6 +888,10 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const foundTask = existingTasks.tasks[alarm.name];
       if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
         $(`.checklist-item[associatedTask=${foundTask.id}]`).find('.form-check-label').addClass('text-danger');
+        $(`.checklist-item[associatedTask=${foundTask.id}]`).addClass('shaking');
+        setTimeout(() => {
+          $(`.checklist-item[associatedTask=${foundTask.id}]`).removeClass('shaking');
+        }, 500);
       }
     });
   });
