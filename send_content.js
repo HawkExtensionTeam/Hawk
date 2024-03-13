@@ -3,7 +3,7 @@ const SIXTY_SECONDS = 60000;
 
 const currentURL = window.location.href;
 
-const quipRegex = /^https?:\/\/(?:www\.)?quip\.com(?:\/|$)/;
+const quipRegex = /^https?:\/\/(?:www\.)?quip-amazon\.com(?:\/|$)/;
 
 function checkSitesList() {
   return new Promise((resolve) => {
