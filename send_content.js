@@ -1,3 +1,6 @@
+const TEN_SECONDS = 10000;
+const SIXTY_SECONDS = 60000;
+
 const currentURL = window.location.href;
 
 const quipRegex = /^https?:\/\/(?:www\.)?quip\.com(?:\/|$)/;
@@ -144,10 +147,10 @@ $(document).ready(() => {
         if (quipRegex.test(currentURL)) {
           (async () => {
             await new Promise((resolve) => {
-              setTimeout(resolve, 10000);
+              setTimeout(resolve, TEN_SECONDS);
             });
             indexQuip();
-            setInterval(indexQuip, 60000);
+            setInterval(indexQuip, SIXTY_SECONDS);
           })();
         } else {
           callIndexer(currentURL);
