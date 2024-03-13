@@ -94,11 +94,36 @@
 				<div class="modal-dialog">
 				  <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Tags</h5>
+              <h5 class="modal-title">Filters</h5>
               <button type="button" class="btn-close filter-trigger" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div class="mb-3 tag-cont">
+              <div class="mb-3 filter-cont">
+                <label for="tagName" class="form-label tag-caption dynamic-title">Specify a date and/or time range to only show tasks within a time frame.</label>
+                    <div class="col d-flex align-items-center">
+                        <div class="form-group">
+                            <div class="row-auto mb-3">
+                                <label for="startDate" class="dynamic-title">Start date:</label>
+                                <input type="date" id="startDate" name="startDate">
+                            </div>
+                            <div class="row-auto">
+                                <label for="startTime" class="dynamic-title">Start time:</label>
+                                <input type="time" id="startTime" name="startTime">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row-auto ms-2 mb-3">
+                                <label for="endDate" class="dynamic-title">End date:</label>
+                                <input type="date" id="endDate" name="endDate">
+                            </div>
+                            <div class="row-auto ms-2">
+                                <label for="endTime" class="dynamic-title">End time:</label>
+                                <input type="time" id="endTime" name="endTime">
+                            </div>
+                        </div>
+                    </div>
+              </div>
+              <div class="mb-3 filter-cont">
                 <label for="tagName" class="form-label tag-caption dynamic-title">Tick a tag to include it in the filter.<br>Right click and confirm to delete tags.</label>
                 <div class="container tag-container zero-padding" id="tag-select-target">
                   <div class="row tag-row">
@@ -107,7 +132,8 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary filter-trigger" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="clear-filter-btn">Reset filters</button>
+              <button type="button" class="btn btn-primary filter-trigger" data-bs-dismiss="modal">Apply</button>
             </div>
 				  </div>
 				</div>
@@ -140,7 +166,7 @@
 								</div>
 								<div class="form-group">
 									<label for="tagInput" class="dynamic-title">Tags</label>
-                  <div class="mb-3 tag-cont">
+                  <div class="mb-3 filter-cont">
                     <div class="container tag-container zero-padding" id="creation-tags">
                       <div class="row tag-row">
                       </div>
@@ -191,7 +217,7 @@
 							</div>
               <div class="form-group">
                 <label for="tagInput" class="dynamic-title">Tags</label>
-                <div class="mb-3 tag-cont">
+                <div class="mb-3 filter-cont">
                   <div class="container tag-container zero-padding" id="creation-tags-2">
                     <div class="row tag-row">
                     </div>
@@ -215,7 +241,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to delete this task? <br>The task will be archived in Recently Deleted for 30 days after which time it cannot be restored.</p>
+            <p>Are you sure you want to delete this task? <br>The task will be archived in Recently Deleted for 30 days after which time it cannot be restored without a backup.</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

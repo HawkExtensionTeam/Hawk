@@ -1,5 +1,8 @@
 let tagFilter = {};
+let startDateObj = null;
+let endDateObj = null;
 let currentlyAllFalse = true;
+let needToUpdateDateFilter = false;
 let tasksObj = {};
 let tagsObj = {};
 
@@ -27,6 +30,15 @@ function getDaysBetweenString(date1, date2) {
   const timeDelta = Math.abs(date2.getTime() - date1.getTime());
   const dayDelta = Math.floor(timeDelta / 86400000);
   return `${dayDelta} day${dayDelta !== 1 ? 's' : ''}`;
+}
+
+function clearDates() {
+  $('#startDate').val('');
+  $('#endDate').val('');
+  $('#startTime').val('');
+  $('#endTime').val('');
+  startDateObj = null;
+  endDateObj = null;
 }
 
 function areAllTagsFalse() {
@@ -186,6 +198,10 @@ function updateChecklist(tasks, onlyRd) {
         return;
       }
       const dueDate = new Date(task.due);
+      const dateFilterShouldBeApplied = startDateObj !== null && endDateObj !== null;
+      if (dateFilterShouldBeApplied && (dueDate < startDateObj || dueDate > endDateObj)) {
+        return;
+      }
       const parts = dueDate.toLocaleString().split(',');
       const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
       const passed = dueDate < now;
@@ -252,7 +268,7 @@ function updateChecklist(tasks, onlyRd) {
       `;
       const taskTitle = toInsert === checklist ? task.title : `${task.title} (${getDaysBetweenString(now, new Date(task.scheduledDeletion))})`;
       toInsert.append(`
-      <li class="checklist-item" associatedTask="${taskId}">
+      <li class="checklist-item ${toInsert === rdChecklist && !$('#recently-deleted-btn').hasClass('open') ? 'd-none' : ''}" associatedTask="${taskId}">
         <div class="form-check-2 d-flex justify-content-between align-items-center">
           ${tickbox}
           <div class="container">
@@ -267,7 +283,7 @@ function updateChecklist(tasks, onlyRd) {
                 <div class="row">
                   <label class="${label} task-due">${formattedDueDate}</label>
                 </div>
-                <div class="row tag-cont cont-clear">
+                <div class="row filter-cont cont-clear">
                   ${tagElements}
                 </div>
               </div>
@@ -390,6 +406,16 @@ function populateTags() {
   });
 }
 
+function clearTagFilter() {
+  const checkboxes = $('#tag-select-target').find('.selective-checkbox');
+  if (checkboxes.length > 0) {
+    checkboxes.prop('checked', false);
+    Object.keys(tagFilter).forEach((key) => {
+      tagFilter[key] = false;
+    });
+  }
+}
+
 function processFilter() {
   let changed = false;
   Object.keys(tagFilter).forEach((key) => {
@@ -402,7 +428,11 @@ function processFilter() {
     }
   });
   currentlyAllFalse = areAllTagsFalse();
-  if (changed) {
+  if (needToUpdateDateFilter) {
+    needToUpdateDateFilter = false;
+    getTasks();
+  }
+  else if (changed) {
     getTasks();
   }
 }
@@ -487,7 +517,7 @@ function addTaskToChecklist(taskId) {
                     <div class="row">
                       <label class="${label} task-due">${formattedDueDate}</label>
                     </div>
-                    <div class="row tag-cont cont-clear">
+                    <div class="row filter-cont cont-clear">
                       ${tagElements}
                     </div>
                   </div>
@@ -659,6 +689,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const $toggleBtn = $(event.currentTarget);
     if ($toggleBtn.hasClass('open')) {
       $('#checklist-2').addClass('appear');
+      $('#checklist-2').find('.checklist-item').removeClass('d-none');
+      $('#rd-checklist').find('.checklist-item').addClass('d-none');
       $('#rd-checklist').removeClass('appear');
       $toggleBtn.removeClass('open');
       $toggleBtn.removeClass('pilled');
@@ -668,6 +700,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       $('.add-task-btn').removeClass('collapsed');
     } else {
       $('#checklist-2').removeClass('appear');
+      $('#checklist-2').find('.checklist-item').addClass('d-none');
+      $('#rd-checklist').find('.checklist-item').removeClass('d-none');
       $('#rd-checklist').addClass('appear');
       $toggleBtn.addClass('open');
       $toggleBtn.addClass('pilled');
@@ -854,7 +888,62 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const foundTask = existingTasks.tasks[alarm.name];
       if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
         $(`.checklist-item[associatedTask=${foundTask.id}]`).find('.form-check-label').addClass('text-danger');
+        $(`.checklist-item[associatedTask=${foundTask.id}]`).addClass('shaking');
+        setTimeout(() => {
+          $(`.checklist-item[associatedTask=${foundTask.id}]`).removeClass('shaking');
+        }, 500);
       }
     });
+  });
+
+  $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
+    let startDate = $('#startDate').val();
+    let endDate = $('#endDate').val();
+    let startTime = $('#startTime').val();
+    let endTime = $('#endTime').val();
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
+
+    // If no date is provided, set default values to year 2024 and 9999
+    if (!startDate) {
+      startDate = '2024-01-01';
+    }
+    if (!endDate) {
+      endDate = '9999-12-31';
+    }
+
+    // If no time is provided, set default values
+    if (!startTime) {
+      startTime = '00:00';
+    }
+    if (!endTime) {
+      endTime = '23:59';
+    }
+
+    // Validate the logical correctness of the dates and times
+    if (startDate > endDate || (startDate === endDate && startTime > endTime)) {
+      alert('Invalid date or time range. Please ensure that the end date and time are not earlier than the start date and time.');
+      clearDates();
+      return;
+    }
+
+    // Validate the format of the dates and times
+    if (!dateRegex.test(startDate)
+        || !dateRegex.test(endDate)
+        || !timeRegex.test(startTime)
+        || !timeRegex.test(endTime)) {
+      return;
+    }
+
+    startDateObj = new Date(`${startDate}T${startTime}`);
+    endDateObj = new Date(`${endDate}T${endTime}`);
+    needToUpdateDateFilter = true;
+  });
+
+  $('#clear-filter-btn').on('click', () => {
+    clearDates();
+    needToUpdateDateFilter = true;
+    clearTagFilter();
   });
 }
