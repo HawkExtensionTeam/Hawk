@@ -431,8 +431,7 @@ function processFilter() {
   if (needToUpdateDateFilter) {
     needToUpdateDateFilter = false;
     getTasks();
-  }
-  else if (changed) {
+  } else if (changed) {
     getTasks();
   }
 }
