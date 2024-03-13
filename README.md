@@ -1,8 +1,8 @@
-# To-Do Make
+# Hawk
 An indexing and productivity tool with easy backup features. Keep your to-do lists, your notes, and your documentation history in one place.
 
 ## Installation
-To-Do Make is designed to be used on the latest version of Google Chrome. Install here: <a href="https://support.google.com/chrome/answer/95346?hl=en-GB&co=GENIE.Platform%3DDesktop#zippy=">Download and install Google Chrome</a>
+Hawk is designed to be used on the latest version of Google Chrome. Install here: <a href="https://support.google.com/chrome/answer/95346?hl=en-GB&co=GENIE.Platform%3DDesktop#zippy=">Download and install Google Chrome</a>
 
 Install and unzip the project repository to your preferred location.
 
