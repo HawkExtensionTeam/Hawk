@@ -28,6 +28,14 @@ beforeAll(async () => {
       ? extensionsItemElement.getAttribute('id')
       : null;
   });
+
+  await page.waitForTimeout(500);
+
+  const allPages = await browser.pages();
+  const aboutPage = allPages[allPages.length - 1];
+  aboutPage.close();
+
+  await page.waitForTimeout(500);
 });
 
 afterAll(async () => {
@@ -87,17 +95,26 @@ test('Add delete rule to indexing sites', async () => {
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   await page.click('#indexing');
   await page.click('#string-matches-tab');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
   await page.click('button.btn.btn-danger.string-matches-del');
-  await page.waitForTimeout(2000);
-  await page.waitForSelector('button.btn.btn-danger.string-matches-del');
-  await page.click('button.btn.btn-danger.string-matches-del');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
+  await page.waitForSelector('button.btn.btn-danger.rule-delete-btn');
+  await page.click('button.btn.btn-danger.rule-delete-btn');
+  await page.waitForTimeout(1000);
 
   let linkExists = false;
-  await page.goto(testLink);
-  await page.waitForTimeout(3000);
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(500);
+  await page.click('#backup');
+  await page.waitForTimeout(500);
+  await page.click('button.btn.btn-danger.reset-btn');
+  await page.waitForTimeout(500);
+  await page.click('#confirm-erase-data-btn');
+  await page.waitForTimeout(500);
+  await page.goto(testLink);
+  await page.waitForTimeout(500);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(500);
   const indexedData = await page.evaluate(
     () => new Promise((resolve) => {
       chrome.storage.local.get('indexed', (result) => {
