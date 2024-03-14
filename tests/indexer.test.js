@@ -47,7 +47,7 @@ test('Test if page is indexed', async () => {
   const testLink = 'https://www.amazon.com/';
   let linkExists = false;
   await page.goto(testLink);
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(500);
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const indexedData = await page.evaluate(
     () => new Promise((resolve) => {
@@ -65,17 +65,17 @@ test('Test if page is indexed', async () => {
 test('Add new rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/games';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
   await page.click('#indexing');
   await page.click('#string-matches-tab');
   await page.click('button[data-bs-target="#addRuleModal"]');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(500);
   await page.type('#addRuleInput', 'nba');
   await page.click('#addRule');
 
   let linkExists = false;
   await page.goto(testLink);
-  await page.waitForTimeout(3000);
+  await page.waitForTimeout(500);
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const indexedData = await page.evaluate(
     () => new Promise((resolve) => {
@@ -90,17 +90,38 @@ test('Add new rule to indexing sites', async () => {
   expect(linkExists).toBe(true);
 });
 
+test('Test if page with XML breaking title can be indexed', async () => {
+  const testLink = 'https://www.amazon.com/SAMSUNG-Adapter-microSDXC-MB-ME512KA-AM/dp/B09B1HMJ9Z/ref=sr_1_5?s=electronics&sr=1-5&th=1';
+  await page.goto(testLink);
+  await page.waitForTimeout(500);
+
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(500);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  expect(indexedData == null).toBe(false);
+
+  const linkExists = indexedData.links.includes(testLink);
+  expect(linkExists).toBe(true);
+}, 20000);
+
 test('Add delete rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/watch/league-pass-stream';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(500);
   await page.click('#indexing');
+  await page.waitForTimeout(500);
   await page.click('#string-matches-tab');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
   await page.click('button.btn.btn-danger.string-matches-del');
-  await page.waitForTimeout(1000);
-  await page.waitForSelector('button.btn.btn-danger.rule-delete-btn');
+  await page.waitForTimeout(500);
   await page.click('button.btn.btn-danger.rule-delete-btn');
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
   let linkExists = false;
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
