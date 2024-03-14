@@ -141,6 +141,30 @@ test('Add new site rule to indexing sites', async () => {
   expect(linkExists).toBe(true);
 });
 
+test('Add delete site rule to indexing sites', async () => {
+  const ruletoDel = 'www.gla.ac.uk';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.click('#indexing');
+  await page.waitForTimeout(1000);
+  await page.click('#sites-list > div > div.col-4.d-flex.justify-content-end > button');
+
+  await page.waitForTimeout(1000);
+  await page.click('button.btn.btn-danger.rule-delete-btn');
+  await page.waitForTimeout(1000);
+  let linkExists = false;
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('allowedRegex', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.includes(ruletoDel);
+  }
+  expect(linkExists).toBe(false);
+});
+
 test('Add new String matches rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/games';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
@@ -284,36 +308,12 @@ test('Add delete Regex rule to indexing sites', async () => {
   await page.click('#regex-list > div:nth-child(4) > div.col-4.d-flex.justify-content-end > button');
 
   await page.waitForTimeout(1000);
-  await page.click('button.btn.btn-danger.regex-delete-btn');
+  await page.click('button.btn.btn-danger.rule-delete-btn');
   await page.waitForTimeout(1000);
   let linkExists = false;
   await page.goto(testLink);
   await page.waitForTimeout(1000);
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
-  const indexedData = await page.evaluate(
-    () => new Promise((resolve) => {
-      chrome.storage.local.get('allowedRegex', (result) => {
-        resolve(result.indexed);
-      });
-    }),
-  );
-  if (indexedData != null) {
-    linkExists = indexedData.includes(ruletoDel);
-  }
-  expect(linkExists).toBe(false);
-});
-
-test('Add delete site rule to indexing sites', async () => {
-  const ruletoDel = 'www.gla.ac.uk';
-  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
-  await page.click('#indexing');
-  await page.waitForTimeout(1000);
-  await page.click('#sites-list > div > div.col-4.d-flex.justify-content-end > button');
-
-  await page.waitForTimeout(1000);
-  await page.click('button.btn.btn-danger.regex-delete-btn');
-  await page.waitForTimeout(1000);
-  let linkExists = false;
   const indexedData = await page.evaluate(
     () => new Promise((resolve) => {
       chrome.storage.local.get('allowedRegex', (result) => {
