@@ -614,8 +614,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const $entry = $(event.currentTarget);
       $('.settings-entry').removeClass('selected');
       $entry.addClass('selected');
-      $('.settings-pane').addClass('hidden');
-      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
+      $('.settings-pane').addClass('d-none');
+      $(`#${$entry.attr('id')}-pane`).removeClass('d-none');
     });
 
     if (window.location.hash) {
@@ -623,8 +623,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       removeHash();
       $('.settings-entry').removeClass('selected');
       $entry.addClass('selected');
-      $('.settings-pane').addClass('hidden');
-      $(`#${$entry.attr('id')}-pane`).removeClass('hidden');
+      $('.settings-pane').addClass('d-none');
+      $(`#${$entry.attr('id')}-pane`).removeClass('d-none');
     }
 
     $(document).on('change', '#jsonAllInput', (event) => {
