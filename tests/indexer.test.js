@@ -28,14 +28,6 @@ beforeAll(async () => {
       ? extensionsItemElement.getAttribute('id')
       : null;
   });
-
-  await page.waitForTimeout(500);
-
-  const allPages = await browser.pages();
-  const aboutPage = allPages[allPages.length - 1];
-  aboutPage.close();
-
-  await page.waitForTimeout(500);
 });
 
 afterAll(async () => {
@@ -109,6 +101,51 @@ test('Test if page with XML breaking title can be indexed', async () => {
   const linkExists = indexedData.links.includes(testLink);
   expect(linkExists).toBe(true);
 }, 20000);
+
+test('Test if multiple pages can be indexed rapidly', async () => {
+  const testLinks = [
+    'https://docs.aws.amazon.com/lambda/latest/dg/lambda-foundation.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-concepts.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/foundation-progmodel.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/foundation-iac.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/foundation-networking.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/foundation-console.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html',
+    'https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-features.html',
+  ];
+  await page.goto(testLinks[0]);
+  await page.waitForTimeout(500);
+  await page.evaluate(async () => {
+    const indexOffset = 3;
+    const numDocs = 9;
+    const internalLinks = document.getElementsByClassName('awsui_link_l0dv0_1pmy4_247');
+    for (let i = 0; i < numDocs; i += 1) {
+      const link = internalLinks[i + indexOffset];
+      link.click();
+      // eslint-disable-next-line
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  });
+
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(500);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  expect(indexedData == null).toBe(false);
+  let linkExists;
+  for (let linkIdx = 0; linkIdx < testLinks.length; linkIdx += 1) {
+    const link = testLinks[linkIdx];
+    linkExists = indexedData.links.includes(link);
+    expect(linkExists).toBe(true);
+  }
+}, 30000);
 
 test('Add delete rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/watch/league-pass-stream';
