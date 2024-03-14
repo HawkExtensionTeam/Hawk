@@ -19,7 +19,7 @@ beforeAll(async () => {
 
   page = await browser.newPage();
   await page.goto('chrome://extensions');
-
+  jest.useFakeTimers('legacy');
   EXTENSION_ID = await page.evaluate(() => {
     const extensionsItemElement = document
       .querySelector('body > extensions-manager')

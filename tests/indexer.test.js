@@ -7,6 +7,7 @@ let page;
 
 beforeAll(async () => {
   browser = await puppeteer.launch({
+    devtools: true,
     headless: false,
     args: [
       `--disable-extensions-except=${EXTENSION_PATH}`,
@@ -54,7 +55,93 @@ test('Test if page is indexed', async () => {
   expect(linkExists).toBe(true);
 });
 
-test('Add new rule to indexing sites', async () => {
+test('Add new RegEx rule to indexing sites', async () => {
+  const testRule = '^https://uk.webuy.com/.*$';
+  const testLink = 'https://uk.webuy.com/';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(1000);
+  await page.click('#indexing');
+  await page.click('#regex-tab');
+  await page.click('button[data-bs-target="#addRuleModal"]');
+  await page.waitForTimeout(1000);
+  await page.type('#addRuleInput', testRule);
+  await page.click('#addRule');
+
+  let linkExists = false;
+  await page.goto(testLink);
+  await page.waitForTimeout(1000);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.links.includes(testLink);
+  }
+  expect(linkExists).toBe(true);
+});
+
+test('Add new url rule to indexing sites', async () => {
+  const testRule = 'https://brilliant.org/s/data-analysis/';
+  const testLink = 'https://brilliant.org/s/data-analysis/';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(1000);
+  await page.click('#indexing');
+  await page.click('#urls-tab');
+  await page.click('button[data-bs-target="#addRuleModal"]');
+  await page.waitForTimeout(1000);
+  await page.type('#addRuleInput', testRule);
+  await page.click('#addRule');
+
+  let linkExists = false;
+  await page.goto(testLink);
+  await page.waitForTimeout(1000);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.links.includes(testLink);
+  }
+  expect(linkExists).toBe(true);
+});
+
+test('Add new site rule to indexing sites', async () => {
+  const testRule = 'www.gla.ac.uk';
+  const testLink = 'https://www.gla.ac.uk/';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.waitForTimeout(1000);
+  await page.click('#indexing');
+  await page.click('button[data-bs-target="#addRuleModal"]');
+  await page.waitForTimeout(1000);
+  await page.type('#addRuleInput', testRule);
+  await page.click('#addRule');
+
+  let linkExists = false;
+  await page.goto(testLink);
+  await page.waitForTimeout(1000);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('indexed', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.links.includes(testLink);
+  }
+  expect(linkExists).toBe(true);
+});
+
+test('Add new String matches rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/games';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   await page.waitForTimeout(500);
@@ -149,6 +236,7 @@ test('Test if multiple pages can be indexed rapidly', async () => {
 
 test('Add delete rule to indexing sites', async () => {
   const testLink = 'https://www.nba.com/watch/league-pass-stream';
+  const ruletoDel = 'nba';
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   await page.waitForTimeout(500);
   await page.click('#indexing');
@@ -175,13 +263,66 @@ test('Add delete rule to indexing sites', async () => {
   await page.waitForTimeout(500);
   const indexedData = await page.evaluate(
     () => new Promise((resolve) => {
-      chrome.storage.local.get('indexed', (result) => {
+      chrome.storage.local.get('allowedStringMatches', (result) => {
         resolve(result.indexed);
       });
     }),
   );
   if (indexedData != null) {
-    linkExists = indexedData.links.includes(testLink);
+    linkExists = indexedData.includes(ruletoDel);
+  }
+  expect(linkExists).toBe(false);
+});
+
+test('Add delete Regex rule to indexing sites', async () => {
+  const testLink = 'https://uk.webuy.com/supercat?superCatId=1&superCatName=Gaming';
+  const ruletoDel = '^https://uk.webuy.com/.*$';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.click('#indexing');
+  await page.click('#regex-tab');
+  await page.waitForTimeout(1000);
+  await page.click('#regex-list > div:nth-child(4) > div.col-4.d-flex.justify-content-end > button');
+
+  await page.waitForTimeout(1000);
+  await page.click('button.btn.btn-danger.regex-delete-btn');
+  await page.waitForTimeout(1000);
+  let linkExists = false;
+  await page.goto(testLink);
+  await page.waitForTimeout(1000);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('allowedRegex', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.includes(ruletoDel);
+  }
+  expect(linkExists).toBe(false);
+});
+
+test('Add delete site rule to indexing sites', async () => {
+  const ruletoDel = 'www.gla.ac.uk';
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
+  await page.click('#indexing');
+  await page.waitForTimeout(1000);
+  await page.click('#sites-list > div > div.col-4.d-flex.justify-content-end > button');
+
+  await page.waitForTimeout(1000);
+  await page.click('button.btn.btn-danger.regex-delete-btn');
+  await page.waitForTimeout(1000);
+  let linkExists = false;
+  const indexedData = await page.evaluate(
+    () => new Promise((resolve) => {
+      chrome.storage.local.get('allowedRegex', (result) => {
+        resolve(result.indexed);
+      });
+    }),
+  );
+  if (indexedData != null) {
+    linkExists = indexedData.includes(ruletoDel);
   }
   expect(linkExists).toBe(false);
 });
