@@ -1,7 +1,7 @@
 {
-  "name": "sh03-main",
+  "name": "hawk",
   "version": "1.0.0",
-  "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+  "description": "Hawk is an indexing and general convenience extension. Read the settings to learn more!",
   "main": "commitlint.config.js",
   "scripts": {
     "test": "jest --config jest.config.js",
