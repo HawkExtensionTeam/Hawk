@@ -686,27 +686,34 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
   $(document).on('click', '#recently-deleted-btn', (event) => {
     const $toggleBtn = $(event.currentTarget);
+    const checklist2 = $('#checklist-2');
+    const rdChecklist = $('#rd-checklist');
+    const backSvg = $('.back-svg');
     if ($toggleBtn.hasClass('open')) {
-      $('#checklist-2').addClass('appear');
-      $('#checklist-2').find('.checklist-item').removeClass('d-none');
-      $('#rd-checklist').find('.checklist-item').addClass('d-none');
-      $('#rd-checklist').removeClass('appear');
+      checklist2.addClass('appear');
+      checklist2.find('.checklist-item').removeClass('d-none');
+      checklist2.removeClass('d-none');
+      rdChecklist.find('.checklist-item').addClass('d-none');
+      rdChecklist.addClass('d-none');
+      rdChecklist.removeClass('appear');
       $toggleBtn.removeClass('open');
       $toggleBtn.removeClass('pilled');
       $('.clock-svg').removeClass('svg-hide');
-      $('.back-svg').addClass('svg-hide');
-      $('.back-svg').removeClass('svg-show');
+      backSvg.addClass('svg-hide');
+      backSvg.removeClass('svg-show');
       $('.add-task-btn').removeClass('collapsed');
     } else {
-      $('#checklist-2').removeClass('appear');
-      $('#checklist-2').find('.checklist-item').addClass('d-none');
-      $('#rd-checklist').find('.checklist-item').removeClass('d-none');
-      $('#rd-checklist').addClass('appear');
+      checklist2.removeClass('appear');
+      checklist2.find('.checklist-item').addClass('d-none');
+      checklist2.addClass('d-none');
+      rdChecklist.find('.checklist-item').removeClass('d-none');
+      rdChecklist.removeClass('d-none');
+      rdChecklist.addClass('appear');
       $toggleBtn.addClass('open');
       $toggleBtn.addClass('pilled');
       $('.clock-svg').addClass('svg-hide');
-      $('.back-svg').removeClass('svg-hide');
-      $('.back-svg').addClass('svg-show');
+      backSvg.removeClass('svg-hide');
+      backSvg.addClass('svg-show');
       $('.add-task-btn').addClass('collapsed');
     }
   });
