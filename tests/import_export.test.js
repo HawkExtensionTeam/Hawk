@@ -41,18 +41,18 @@ test('Test the restore of Index', async () => {
   const fileInputSelector = '#jsonIndexInput';
   const filePath = TESTDATA;
 
+  await page.click('#backup');
   await page.waitForSelector(fileInputSelector);
   const input = await page.$(fileInputSelector);
   await input.uploadFile(filePath);
 
-  await page.waitForTimeout(2000);
+  await page.click('#about');
 
   const updatedIndex = await page.evaluate(() => new Promise((resolve) => {
     chrome.storage.local.get('indexed', (result) => {
       resolve(result.indexed);
     });
   }));
-
   expect(updatedIndex).toMatchObject({
     corpus: [
       {
@@ -72,18 +72,19 @@ test('Test the restore of notes', async () => {
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const fileInputSelector = '#jsonNoteInput';
   const filePath = TESTDATA;
+  await page.click('#backup');
 
   await page.waitForSelector(fileInputSelector);
   const input = await page.$(fileInputSelector);
   await input.uploadFile(filePath);
-
-  await page.waitForTimeout(2000);
+  await page.click('#about');
 
   const updatedNotes = await page.evaluate(() => new Promise((resolve) => {
     chrome.storage.local.get('notes', (result) => {
       resolve(result.notes);
     });
   }));
+
   expect(updatedNotes).toMatchObject([
     {
       content: 'Test Note \n1. test\n2. test\n![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/1200px-Test-Logo.svg.png)\n> test\n# test\n*test*',
@@ -97,12 +98,12 @@ test('Test the restore of Tags and Tasks', async () => {
   await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
   const fileInputSelector = '#jsonInput';
   const filePath = TESTDATA;
+  await page.click('#backup');
 
   await page.waitForSelector(fileInputSelector);
   const input = await page.$(fileInputSelector);
   await input.uploadFile(filePath);
-
-  await page.waitForTimeout(2000);
+  await page.click('#about');
 
   const updatedTags = await page.evaluate(() => new Promise((resolve) => {
     chrome.storage.local.get('tags', (result) => {
@@ -168,8 +169,9 @@ test('Test the export of Index', async () => {
   if (buttonExists) {
     await page.click('#backup');
     await page.click('.btn.btn-primary.backup-btn');
-    await page.waitForTimeout(3000); // Wait for download to complete
   }
+
+  await page.goto(`chrome-extension://${EXTENSION_ID}/settings.html`);
 
   const expectedFileName = 'todomake_backup_data.json';
 
