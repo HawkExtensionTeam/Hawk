@@ -162,12 +162,12 @@ function setTaskDeleted(allTasks, task) {
 
 function updateChecklist(tasks, onlyRd) {
   const noRdTasks = `
-    <div class="row justify-content-center">
+    <div class="row justify-content-center d-none">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
             <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
         </svg>
     </div>
-    <div class="row justify-contents-center text-center">
+    <div class="row justify-contents-center text-center d-none">
         <div class="warn-text-2">
             No recently deleted tasks.
         </div>
@@ -692,9 +692,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     if ($toggleBtn.hasClass('open')) {
       checklist2.addClass('appear');
       checklist2.find('.checklist-item').removeClass('d-none');
-      checklist2.removeClass('d-none');
       rdChecklist.find('.checklist-item').addClass('d-none');
-      rdChecklist.addClass('d-none');
+      rdChecklist.find('.row').addClass('d-none');
       rdChecklist.removeClass('appear');
       $toggleBtn.removeClass('open');
       $toggleBtn.removeClass('pilled');
@@ -705,9 +704,8 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     } else {
       checklist2.removeClass('appear');
       checklist2.find('.checklist-item').addClass('d-none');
-      checklist2.addClass('d-none');
       rdChecklist.find('.checklist-item').removeClass('d-none');
-      rdChecklist.removeClass('d-none');
+      rdChecklist.find('.row').removeClass('d-none');
       rdChecklist.addClass('appear');
       $toggleBtn.addClass('open');
       $toggleBtn.addClass('pilled');
