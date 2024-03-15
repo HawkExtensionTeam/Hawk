@@ -81,18 +81,23 @@ To back up your indexed data, click the extension icon, click Settings, and clic
 
 ## Visuals
 Notes feature:
+
 ![newnotes](/uploads/dd5a8974175f2976b4764f34b84cdbf5/newnotes.png)
 
 Popup UI:
+
 ![newpopup](/uploads/2ba01b6468662b2c5faf156c58f46151/newpopup.png)
 
 Indexing settings:
+
 ![settings](/uploads/bc8a56ffadcab641115b1fd03562b94a/settings.png)
 
 Dark mode:
+
 ![DARKtheme](/uploads/3bbcf4f743ebe232a3c4b5125c27fea6/DARKtheme.png)
 
 To-do list:
+
 ![newtodo](/uploads/ec72de6569814829d49363aa5840a2bd/newtodo.png)
 
 
