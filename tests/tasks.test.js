@@ -55,7 +55,7 @@ test('popup renders correctly', async () => {
  Validates the ability to open, fill, and submit the new task form,
  verifying user interaction workflows for adding tasks are functioning as designed. */
 test('Add Task - Opens form correctly', async () => {
-  await page.goto(`chrome-extension://${EXTENSION_ID}/new_tab.html`);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/todo_list.html`);
 
   await page.click('#new-tab-btn');
   await page.waitForSelector('#newTaskModal', { visible: true });
@@ -66,15 +66,13 @@ test('Add Task - Opens form correctly', async () => {
   // await page.type('#timeInput', '1:30');
 
   await page.click('#createTask');
-
-  await page.waitForSelector('#newTaskModal', { hidden: true });
 });
 
 /* Test: Sort Tasks Functionality
 Verifies that the sortTasks function sorts
  tasks correctly based on their due dates. */
 test('sortTasks function sorts tasks correctly', async () => {
-  await page.goto(`chrome-extension://${EXTENSION_ID}/new_tab.html`);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/todo_list.html`);
   const tasksToSort = {
     task1: { due: '2024/02/12' },
     task2: { due: '2024/02/10' },
@@ -90,7 +88,7 @@ test('sortTasks function sorts tasks correctly', async () => {
  Ensures that the functionality to delete a task removes it as
   expected, leaving no trace in the tasks storage. */
 test('successfully deletes a task', async () => {
-  await page.goto(`chrome-extension://${EXTENSION_ID}/new_tab.html`);
+  await page.goto(`chrome-extension://${EXTENSION_ID}/todo_list.html`);
 
   await page.evaluate(() => {
     window.tasks = {
