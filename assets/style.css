@@ -31,7 +31,7 @@
   --cont-color: #dddddd;
   --circle-ind-color: #6c757d;
   --settings-bg: url('../images/comic_cogs_bg.png');
-  --wallpaper-preview: url('../images/comic_bg.png');
+  --wallpaper-preview: ../images/comic_bg.png;
   --comic-bg: url('../images/comic_bg.png');
   --panel-box-shadow: 0px 0px 24px #0000008a;
   --note-item-hover-color: #e9ecef;
@@ -54,7 +54,7 @@ html.dark {
   --del-progress-color: #321717c9;
   --cont-color: #dddddd26;
   --circle-ind-color: #3d4144;
-  --wallpaper-preview: url('../images/comic_bg_dark.png');
+  --wallpaper-preview: ../images/comic_bg_dark.png;
   --settings-bg: url('../images/comic_cogs_bg_dark.png');
   --comic-bg: url('../images/comic_bg_dark.png');
   --panel-box-shadow: 0px 0px 24px #0000008a;
