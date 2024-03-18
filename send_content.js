@@ -69,7 +69,7 @@ const parseURLWithParams = function parseURLWithParams(parts) {
   return newURL;
 };
 
-function callIndexer(url) {
+function callIndexer(url, clicked) {
   const visibleTextContent = document.body.innerText;
   const { title } = document;
   chrome.runtime.sendMessage({
@@ -77,6 +77,7 @@ function callIndexer(url) {
     visibleTextContent,
     url,
     title,
+    clicked,
   });
 }
 
@@ -108,8 +109,8 @@ const indexQuip = function indexQuip() {
         }
 
         const documentEditor = document.getElementsByClassName('document-editor');
-        if (documentEditor.length === 1) {
-          callIndexer(currentURL);
+        if (documentEditor.length >= 1) {
+          callIndexer(currentURL, false);
         }
       });
     } catch (error) {
@@ -138,7 +139,7 @@ $(document).ready(() => {
           && clickedURLPath === currentURLPath) {
             // Send a message indicating that the page has navigated
             try {
-              callIndexer(clickedURL);
+              callIndexer(clickedURL, true);
             } catch (error) {
             // extension will have been reloaded, ignore
             }
@@ -153,7 +154,7 @@ $(document).ready(() => {
             setInterval(indexQuip, SIXTY_SECONDS);
           })();
         } else {
-          callIndexer(currentURL);
+          callIndexer(currentURL, false);
         }
       }
     });

@@ -217,7 +217,7 @@ async function getLocalStorage(key) {
   });
 }
 
-async function waitForTitleUpdate(title, lastTitle) {
+async function waitForTitleUpdate(title, lastTitles) {
   for (let i = 0; i < MAX_TAB_REFRESH_ATTEMPTS; i += 1) {
     await new Promise((resolve) => {
       setTimeout(resolve, TAB_REFRESH_DELAY_MS);
@@ -231,7 +231,7 @@ async function waitForTitleUpdate(title, lastTitle) {
     if (!(tabs && tabs.length)) return '';
 
     title = tabs[0].title;
-    if (lastTitle !== title) break;
+    if (!lastTitles.has(title)) break;
 
     if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return '';
   }
@@ -252,9 +252,23 @@ chrome.runtime.onMessage.addListener(async (request) => {
       });
       if (!(tabs && tabs.length)) return;
 
-      let { title } = tabs[0];
-      const lastTitleResult = await getLocalStorage('lastTitle');
-      const lastTitle = lastTitleResult.lastTitle || null;
+      const tabId = tabs[0].id;
+
+      let title;
+      if (request.clicked) {
+        title = tabs[0].title;
+      } else {
+        title = request.title;
+      }
+      if (!title) return;
+
+      const allLastTitles = await new Promise((resolve) => {
+        chrome.storage.local.get(['allLastTitles'], (result) => {
+          resolve(result.allLastTitles);
+        });
+      });
+      let lastTitles = allLastTitles[tabId];
+      lastTitles = new Set(lastTitles);
 
       const indexedResult = await getLocalStorage('indexed');
       const indexed = indexedResult.indexed || {};
@@ -267,11 +281,15 @@ chrome.runtime.onMessage.addListener(async (request) => {
 
       if (indexed.links.has(url)) return;
 
-      if (title === lastTitle) {
-        title = await waitForTitleUpdate(title, lastTitle);
+      if (lastTitles.has(title) || request.clicked) {
+        lastTitles.add(title);
+        title = await waitForTitleUpdate(title, lastTitles);
         if (title === '') return;
       }
-      await chrome.storage.local.set({ lastTitle: title });
+      lastTitles.add(title);
+      lastTitles = Array.from(lastTitles);
+      allLastTitles[tabId] = lastTitles;
+      await chrome.storage.local.set({ allLastTitles });
 
       const page = {
         id: indexed.corpus.length + 1,
@@ -331,7 +349,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
     });
 
-    chrome.storage.local.set({ lastTitle: null }, () => {
+    chrome.storage.local.set({ allLastTitles: {} }, () => {
     });
   }
 });
