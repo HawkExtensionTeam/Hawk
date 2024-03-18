@@ -127,6 +127,11 @@ function overwriteTasks(tasks) {
   });
 }
 
+function restoreLastTitles(lastTitles) {
+  chrome.storage.local.set({ allLastTitles: lastTitles }, () => {
+  });
+}
+
 function restoreTags(tagsObj) {
   chrome.storage.local.set({ tags: tagsObj }, () => {
   });
@@ -448,6 +453,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.storage.local.set({ allowedStringMatches: [] }, () => {
       });
 
+      chrome.storage.local.set({ allLastTitles: [] }, () => {
+      });
+
       chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
         window.location.reload();
       });
@@ -634,6 +642,9 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = JSON.parse(e.target.result);
+          if (Object.prototype.hasOwnProperty.call(content, 'allLastTitles')) {
+            restoreLastTitles(content.allLastTitles);
+          }
           if (Object.prototype.hasOwnProperty.call(content, 'tags')) {
             restoreTags(content.tags);
           }
