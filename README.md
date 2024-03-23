@@ -4,10 +4,11 @@ An indexing and productivity tool with easy backup features. Keep your to-do lis
 ## Installation
 Hawk is designed to be used on the latest version of Google Chrome. Install here: <a href="https://support.google.com/chrome/answer/95346?hl=en-GB&co=GENIE.Platform%3DDesktop#zippy=">Download and install Google Chrome</a>
 
-Here is the Chrome Web Store link: https://chromewebstore.google.com/detail/hawk-page-indexer/dmkfnkkgnjehlppknbpjhgbfeknmafde
+Here is the Chrome Web Store link: <a href="https://chromewebstore.google.com/detail/hawk-page-indexer/dmkfnkkgnjehlppknbpjhgbfeknmafde">Hawk - Page Indexer (Chrome Web Store)</a>
+
 Alternatively, install and unzip the project repository to your preferred location.
 
-To access the extension:
+To install the extension from this repo rather than the Chrome Web Store:
 1. Open Google Chrome.
 2. Click the three dots in the top right corner of the browser window.
 3. Select Settings.
