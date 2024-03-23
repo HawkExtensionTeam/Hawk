@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Hawk",
+  "name": "Hawk - Page Indexer",
   "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
-  "version": "1.0",
+  "version": "1.0.1",
   "omnibox": { "keyword": "@i\t" },
   "permissions": [
     "activeTab",

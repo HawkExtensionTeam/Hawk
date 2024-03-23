@@ -160,6 +160,57 @@ function setTaskDeleted(allTasks, task) {
   });
 }
 
+function timedDeletion(taskUIObj) {
+  const associatedTaskId = taskUIObj.attr('id').slice(4);
+  const item = taskUIObj.closest('.form-check-2');
+  const outerItem = taskUIObj.closest('.checklist-item');
+  let step = item.data('step') || 0;
+  clearInterval(item.data('interval'));
+  if (taskUIObj.is(':checked')) {
+    const interval = setInterval(() => {
+      if (step <= 1000) {
+        item.css({
+          background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
+        });
+        step += 1;
+        item.data('step', step);
+      } else {
+        clearInterval(interval);
+        chrome.storage.local.get({ tasks: {} }, (result) => {
+          const existingTasks = result.tasks || {};
+          setTaskDeleted(existingTasks, existingTasks[associatedTaskId]);
+          outerItem.remove();
+          if ($('#checklist-2').children().length === 0) {
+            $('#checklist-2').append(noTasks);
+          }
+          // eslint-disable-next-line no-use-before-define
+          updateChecklist(existingTasks, true);
+        });
+      }
+    }, 5);
+    item.data('interval', interval);
+  } else {
+    const interval = setInterval(() => {
+      if (step > 0) {
+        item.css({
+          background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
+        });
+        step -= 20;
+        if (step < 0) {
+          step = 0;
+        }
+        item.data('step', step);
+      } else {
+        item.css({
+          background: 'linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)',
+        });
+        clearInterval(interval);
+      }
+    }, 5);
+    item.data('interval', interval);
+  }
+}
+
 function updateChecklist(tasks, onlyRd) {
   const noRdTasks = `
     <div class="row justify-content-center d-none">
@@ -297,55 +348,9 @@ function updateChecklist(tasks, onlyRd) {
     setTimeout(() => {
       $('.checklist-item').addClass('appear');
     }, 200);
-    $('.form-check-input').on('click', function _() {
-      const associatedTaskId = $(this).attr('id').slice(4);
-      const item = $(this).closest('.form-check-2');
-      const outerItem = $(this).closest('.checklist-item');
-      let step = item.data('step') || 0;
-      clearInterval(item.data('interval'));
-      if ($(this).is(':checked')) {
-        const interval = setInterval(() => {
-          if (step <= 1000) {
-            item.css({
-              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
-            });
-            step += 1;
-            item.data('step', step);
-          } else {
-            clearInterval(interval);
-            chrome.storage.local.get({ tasks: {} }, (result) => {
-              const existingTasks = result.tasks || {};
-              setTaskDeleted(existingTasks, existingTasks[associatedTaskId]);
-              outerItem.remove();
-              if ($('#checklist-2').children().length === 0) {
-                $('#checklist-2').append(noTasks);
-              }
-              updateChecklist(existingTasks, true);
-            });
-          }
-        }, 5);
-        item.data('interval', interval);
-      } else {
-        const interval = setInterval(() => {
-          if (step > 0) {
-            item.css({
-              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
-            });
-            step -= 20;
-            if (step < 0) {
-              step = 0;
-            }
-            item.data('step', step);
-          } else {
-            item.css({
-              background: 'linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)',
-            });
-            clearInterval(interval);
-          }
-        }, 5);
-        item.data('interval', interval);
-      }
-    });
+  });
+  $('.form-check-input').on('click', function _() {
+    timedDeletion($(this));
   });
 }
 
@@ -500,7 +505,7 @@ function addTaskToChecklist(taskId) {
             `;
           }
         });
-        checklist.prepend(`
+        const checklistItem = `
           <li class="checklist-item" associatedTask="${taskId}">
             <div class="form-check-2 d-flex justify-content-between align-items-center">
               <input type="checkbox" class="form-check-input" id="item${taskId}">
@@ -544,10 +549,14 @@ function addTaskToChecklist(taskId) {
               </div>
             </div>
           </li>
-        `);
+        `;
+        checklist.prepend(checklistItem);
         setTimeout(() => {
           $('.checklist-item').addClass('appear');
         }, 200);
+        $(`#item${taskId}`).on('click', function _() {
+          timedDeletion($(this));
+        });
       }
     }
   });
@@ -584,10 +593,10 @@ $('#task-input').on('input', function _() {
     }
   });
   $.each(toHide, function hideNonMatches() {
-    $(this).removeClass('appear');
+    $(this).addClass('d-none');
   });
   $.each(toShow, function showMatches() {
-    $(this).addClass('appear');
+    $(this).removeClass('d-none');
   });
 });
 
